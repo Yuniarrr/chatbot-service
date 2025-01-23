@@ -1,13 +1,17 @@
 import uuid as uuid_pkg
 
+from uuid import UUID
 from enum import Enum
-from typing import Union
+from typing import Union, Optional, Annotated
 from datetime import datetime
 from zoneinfo import ZoneInfo
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import DateTime, String, Enum as SQLEnum, String, Text, ForeignKey
+from fastcrud import FastCRUD
 
 from app.core.database import Base
+from app.core.schemas import TimestampSchema
 
 
 class FileStatus(Enum):
@@ -48,3 +52,58 @@ class File(Base):
         back_populates="uploader_file",
         lazy="selectin",
     )
+
+
+####################
+# SCHEMA
+####################
+
+
+class FileBaseModel(BaseModel):
+    file_name: str
+    file_path: str
+    status: FileStatus
+    uploaded_by: str
+
+    class Config(ConfigDict):
+        orm_mode = True
+
+
+class FileModel(TimestampSchema):
+    pass
+
+
+class FileCreateModel(FileBaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+
+class FileReadModel(FileBaseModel):
+    id: UUID
+
+    created_at: Annotated[datetime, Field(examples=["datetime"])]
+    updated_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+class FileUpdateModel(BaseModel):
+    file_name: Optional[str] = None
+    file_path: Optional[str] = None
+    status: Optional[FileStatus] = None
+
+
+class FileUpdateInternalModel(FileUpdateModel):
+    updated_at: datetime
+
+
+CRUDFile = FastCRUD[
+    FileBaseModel,
+    FileModel,
+    FileCreateModel,
+    FileReadModel,
+    FileUpdateModel,
+    FileUpdateInternalModel,
+]
+
+crud_file = CRUDFile(File)

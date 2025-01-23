@@ -1,13 +1,17 @@
 import uuid as uuid_pkg
 
 from enum import Enum
-from typing import Union
+from uuid import UUID
+from typing import Union, Optional, Annotated
 from datetime import datetime
 from zoneinfo import ZoneInfo
+from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import DateTime, String, Enum as SQLEnum, String, ForeignKey, Integer
+from fastcrud import FastCRUD
 
 from app.core.database import Base
+from app.core.schemas import TimestampSchema
 
 
 class FromMessage(Enum):
@@ -50,3 +54,62 @@ class Message(Base):
         back_populates="messages",
         lazy="selectin",
     )
+
+
+####################
+# SCHEMA
+####################
+
+
+class MessageBaseModel(BaseModel):
+    from_message: Optional[FromMessage] = None
+    message: Annotated[
+        Union[str, None],
+        Field(examples=["content here"]),
+    ]
+    conversation_id: Annotated[UUID, Field(examples=["id"])]
+    file_url: Optional[str] = None
+    file_name: Optional[str] = None
+    file_size: Optional[int] = None
+
+
+class MessageModel(TimestampSchema):
+    pass
+
+
+class MessageCreateModel(MessageBaseModel):
+    pass
+
+
+class MessageRead(MessageBaseModel):
+    id: UUID
+
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+class MessageUpdateModel(BaseModel):
+    from_message: Optional[FromMessage] = None
+    message: Optional[str] = None
+    file_url: Optional[str] = None
+    file_name: Optional[str] = None
+    file_size: Optional[int] = None
+
+
+class MessageUpdateInternalModel(MessageUpdateModel):
+    updated_at: datetime
+
+
+CRUDMessage = FastCRUD[
+    Message,
+    MessageBaseModel,
+    MessageCreateModel,
+    MessageRead,
+    MessageUpdateModel,
+    MessageUpdateInternalModel,
+]
+
+crud_message = CRUDMessage(Message)

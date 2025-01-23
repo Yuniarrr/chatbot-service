@@ -3,6 +3,7 @@
 ## Table of Contents
 
 - [How to run this program](#how-to-run-this-program)
+- [Tips](#tips)
 
 ## How to run this program
 
