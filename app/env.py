@@ -27,7 +27,7 @@ API_KEY = os.environ.get("API_KEY", "Bdzb59z3SQ")
 DATABASE_NAME = os.environ.get("DATABASE_NAME")
 DATABASE_USER = os.environ.get("DATABASE_USER")
 DATABASE_PASSWORD = os.environ.get("DATABASE_PASSWORD")
-DATABASE_HOST = os.environ.get("DATABASE_HOST")
+DATABASE_HOST = os.environ.get("DATABASE_HOST", "localhost")
 DATABASE_PORT = os.environ.get("DATABASE_PORT", 5432)
 
 DATABASE_URL = f"{DATABASE_USER}:{DATABASE_PASSWORD}@{DATABASE_HOST}:{DATABASE_PORT}/{DATABASE_NAME}"
@@ -43,7 +43,7 @@ PGVECTOR_INITIALIZE_MAX_VECTOR_LENGTH = int(
 PGVECTOR_DB_NAME = os.environ.get("PGVECTOR_DB_NAME")
 PGVECTOR_DB_USER = os.environ.get("PGVECTOR_DB_USER")
 PGVECTOR_DB_PASSWORD = os.environ.get("PGVECTOR_DB_PASSWORD")
-PGVECTOR_DB_HOST = os.environ.get("PGVECTOR_DB_HOST")
+PGVECTOR_DB_HOST = os.environ.get("PGVECTOR_DB_HOST", "localhost")
 PGVECTOR_DB_PORT = os.environ.get("PGVECTOR_DB_PORT", 5432)
 
 PGVECTOR_DB_URL = f"{PGVECTOR_DB_USER}:{PGVECTOR_DB_PASSWORD}@{PGVECTOR_DB_HOST}:{PGVECTOR_DB_PORT}/{PGVECTOR_DB_NAME}"
@@ -52,12 +52,12 @@ PGVECTOR_DB_URL = f"{PGVECTOR_DB_USER}:{PGVECTOR_DB_PASSWORD}@{PGVECTOR_DB_HOST}
 # REDIS SETTINGS
 ####################################
 
-REDIS_HOST = os.environ.get("REDIS_HOST")
-REDIS_PORT = os.environ.get("REDIS_PORT")
+# REDIS_HOST = os.environ.get("REDIS_HOST")
+# REDIS_PORT = os.environ.get("REDIS_PORT")
 
 ####################################
 # EMAIL SETTINGS
 ####################################
 
-EMAIL_USER = os.environ.get("EMAIL_USER")
-EMAIL_PASSWORD = os.environ.get("EMAIL_PASSWORD")
+# EMAIL_USER = os.environ.get("EMAIL_USER")
+# EMAIL_PASSWORD = os.environ.get("EMAIL_PASSWORD")

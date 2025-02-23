@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  database:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME}
+      POSTGRES_USER: ${DATABASE_USER}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    ports:
+      - ${DATABASE_PORT}:5432
+    expose:
+      - ${DATABASE_PORT}
+    networks:
+      - chatbot-network
+
+  pg-vector:
+    image: pgvector/pgvector:pg16
+    restart: always
+    environment:
+      POSTGRES_DB: ${PGVECTOR_DB_NAME}
+      POSTGRES_USER: ${PGVECTOR_DB_USER}
+      POSTGRES_PASSWORD: ${PGVECTOR_DB_PASSWORD}
+    ports:
+      - ${PGVECTOR_DB_PORT}:5432
+    expose:
+      - ${PGVECTOR_DB_PORT}
+    networks:
+      - chatbot-network
+
+  # redis:
+  #   image: redis:alpine
+  #   restart: always
+  #   ports:
+  #     - ${REDIS_CACHE_PORT}:6379
+  #   expose:
+  #     - ${REDIS_CACHE_PORT}
+  #   volumes:
+  #     - redis-data:/data
+  #     - ./conf/redis.conf:/etc/redis/redis.conf
+
+volumes:
+  postgres-data:
+  # redis-data:
+
+networks:
+  chatbot-network:
+    driver: bridge
