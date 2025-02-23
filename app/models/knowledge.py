@@ -13,10 +13,8 @@ from sqlalchemy import (
     ForeignKey,
     JSON,
 )
-from fastcrud import FastCRUD
 
 from app.core.database import Base, JSONField
-from app.models.conversations import Conversation
 from app.core.schemas import TimestampSchema
 from app.core.logger import SRC_LOG_LEVELS
 
@@ -41,13 +39,6 @@ class Knowledge(Base):
         ForeignKey("user.id", ondelete="CASCADE"),
         index=True,
         nullable=True,
-    )
-
-    uploader = relationship(
-        "User",
-        foreign_keys=[user_id],
-        back_populates="uploader_knowledge",
-        lazy="selectin",
     )
 
     created_at: Mapped[datetime] = mapped_column(

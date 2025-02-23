@@ -37,21 +37,6 @@ class Conversation(Base):
         nullable=True,
     )
 
-    user = relationship(
-        "User",
-        foreign_keys=[user_id],
-        back_populates="conversations",
-        lazy="selectin",
-    )
-
-    messages = relationship(
-        "Message",
-        back_populates="conversation",
-        lazy="selectin",
-        cascade="all, delete",
-        passive_deletes=True,
-    )
-
 
 ####################
 # SCHEMA

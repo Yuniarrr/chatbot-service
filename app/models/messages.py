@@ -49,12 +49,6 @@ class Message(Base):
         index=True,
         default=None,
     )
-    conversation = relationship(
-        "Conversation",
-        foreign_keys=[conversation_id],
-        back_populates="message",
-        lazy="selectin",
-    )
 
 
 ####################

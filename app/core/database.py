@@ -1,5 +1,6 @@
 import contextlib
 import json
+
 from sqlalchemy.ext.asyncio import create_async_engine
 from typing import Any, AsyncIterator
 from sqlalchemy.ext.asyncio import (
@@ -33,7 +34,9 @@ class DatabaseSessionManager:
             **self.engine_kwargs,
         )
 
-        self._sessionmaker = async_sessionmaker(autocommit=False, bind=self._engine)
+        self._sessionmaker = async_sessionmaker(
+            autocommit=False, bind=self._engine, class_=AsyncSession
+        )
 
     async def close(self):
         if self._engine is None:
@@ -70,20 +73,7 @@ class DatabaseSessionManager:
             await session.close()
 
 
-sessionmanager = DatabaseSessionManager(engine_kwargs={"echo": True})
-
-
-async def async_get_db() -> AsyncSession:  # type: ignore
-    async_engine = sessionmanager._engine
-
-    local_session = sessionmaker(
-        bind=async_engine, class_=AsyncSession, expire_on_commit=False
-    )
-    async_session = local_session
-    async with async_session() as db:
-        yield db
-    # async with sessionmanager.session() as session:
-    #     yield session
+session_manager = DatabaseSessionManager(engine_kwargs={"echo": True})
 
 
 class JSONField(types.TypeDecorator):

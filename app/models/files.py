@@ -48,13 +48,6 @@ class File(Base):
         nullable=True,
     )
 
-    uploader = relationship(
-        "User",
-        foreign_keys=[user_id],
-        back_populates="uploader_file",
-        lazy="selectin",
-    )
-
 
 ####################
 # SCHEMA

@@ -2,6 +2,7 @@ import enum
 import logging
 import uuid as uuid_pkg
 
+from uuid import UUID
 from typing import Union, List, Optional, Annotated
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -55,35 +56,6 @@ class User(Base):
         DateTime(timezone=True), default=None
     )
 
-    uploader_file = relationship(
-        "File",
-        foreign_keys="File.user_id",
-        back_populates="uploader",
-        lazy="selectin",
-    )
-
-    uploader_tool = relationship(
-        "Tool",
-        foreign_keys="Tool.user_id",
-        back_populates="uploader",
-        lazy="selectin",
-    )
-
-    uploader_knowledge = relationship(
-        "Tool",
-        foreign_keys="Knowledge.user_id",
-        back_populates="uploader",
-        lazy="selectin",
-    )
-
-    conversations: Mapped[List["Conversation"]] = relationship(
-        "Conversation",
-        back_populates="user",
-        lazy="selectin",
-        cascade="all, delete",
-        passive_deletes=True,
-    )
-
 
 ####################
 # FORMS
@@ -114,15 +86,15 @@ class AddUserForm(BaseModel):
 
 
 class UserBaseModel(BaseModel):
-    full_name: str
+    full_name: Optional[str] = None
     email: Optional[str] = None
     phone_number: Optional[str] = None
     # password: Optional[str] = None
-    role: Role
+    role: Optional[Role] = None
     profile_picture: Optional[str] = None
     nrp: Optional[str] = None
     nip: Optional[str] = None
-    created_at: datetime
+    created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
     model_config = ConfigDict(from_attributes=True)
@@ -133,6 +105,15 @@ class UserModel(TimestampSchema):
 
 
 class UserReadModel(UserBaseModel):
+    id: UUID
+    # password: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
+class UserReadWithPasswordModel(UserBaseModel):
+    id: UUID
     password: Optional[str] = None
 
     class Config:

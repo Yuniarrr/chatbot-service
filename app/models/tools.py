@@ -7,15 +7,9 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import (
-    DateTime,
-    Text,
-    ForeignKey,
-)
-from fastcrud import FastCRUD
+from sqlalchemy import DateTime, Text, ForeignKey, JSON
 
 from app.core.database import Base, JSONField
-from app.models.conversations import Conversation
 from app.core.logger import SRC_LOG_LEVELS
 
 log = logging.getLogger(__name__)
@@ -31,20 +25,13 @@ class Tool(Base):
 
     name: Mapped[str] = mapped_column(Text, nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
-    specs: Mapped[str] = mapped_column(JSONField, nullable=False)
-    meta: Mapped[str] = mapped_column(JSONField, nullable=False)
+    specs: Mapped[str] = mapped_column(JSON, nullable=False)
+    meta: Mapped[str] = mapped_column(JSON, nullable=False)
 
     user_id: Mapped[Union[str, None]] = mapped_column(
         ForeignKey("user.id", ondelete="CASCADE"),
         index=True,
         nullable=True,
-    )
-
-    uploader = relationship(
-        "User",
-        foreign_keys=[user_id],
-        back_populates="uploader_tool",
-        lazy="selectin",
     )
 
     created_at: Mapped[datetime] = mapped_column(

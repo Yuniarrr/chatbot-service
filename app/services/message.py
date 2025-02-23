@@ -1,9 +1,10 @@
 import logging
 from typing import Optional
 
-from app.core.database import async_get_db
+from app.core.database import session_manager
 from app.models.messages import MessageReadModel, MessageCreateModel, messages
 from app.core.logger import SRC_LOG_LEVELS
+from app.core.exceptions import DatabaseException
 
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["SERVICE"])
@@ -15,11 +16,11 @@ class MessaeService:
         data: MessageCreateModel,
     ) -> Optional[MessageReadModel]:
         try:
-            async with async_get_db() as db:
+            async with session_manager.session() as db:
                 new_message = await messages.create(db=db, object=data.model_dump())
                 return MessageReadModel.model_validate(new_message)
-        except Exception:
-            return None
+        except Exception as e:
+            raise DatabaseException(str(e))
 
     async def get_messages_by_conversation_id(
         self,
@@ -28,7 +29,7 @@ class MessaeService:
         limit: Optional[int] = None,
     ):
         try:
-            async with async_get_db() as db:
+            async with session_manager.session() as db:
                 return await messages.get_multi(
                     db=db,
                     conversation_id=conversation_id,
@@ -37,5 +38,5 @@ class MessaeService:
                     sort_columns="created_at",
                     sort_orders="desc",
                 )
-        except Exception:
-            return None
+        except Exception as e:
+            raise DatabaseException(str(e))

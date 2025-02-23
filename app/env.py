@@ -16,8 +16,8 @@ FRONTEND_URL = os.environ.get("FRONTEND_URL", "http://localhost:5173")
 ####################################
 
 JWT_SECRET_KEY = os.environ.get("JWT_SECRET_KEY", "hrRVHOX7-GqzMrR;].youw0~;L")
-JWT_ACCESS_TOKEN_EXPIRE = os.environ.get("JWT_ACCESS_TOKEN_EXPIRE", "6")
-REFRESH_TOKEN_EXPIRE_DAYS = os.environ.get("REFRESH_TOKEN_EXPIRE_DAYS", "7")
+JWT_ACCESS_TOKEN_EXPIRE = int(os.environ.get("JWT_ACCESS_TOKEN_EXPIRE", "6"))
+REFRESH_TOKEN_EXPIRE_DAYS = int(os.environ.get("REFRESH_TOKEN_EXPIRE_DAYS", "7"))
 API_KEY = os.environ.get("API_KEY", "Bdzb59z3SQ")
 
 ####################################

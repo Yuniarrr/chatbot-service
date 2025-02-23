@@ -1,3 +1,4 @@
+from contextlib import asynccontextmanager
 from fastapi import (
     FastAPI,
     Request,
@@ -8,6 +9,8 @@ from fastapi.responses import JSONResponse
 
 from app.env import PY_ENV
 from app.routers import auth, user
+from app.core.database import session_manager
+from app.core.exceptions import DatabaseException, DuplicateValueException
 
 print(
     rf"""
@@ -22,13 +25,23 @@ https://github.com/Yuniarrr/chatbot-service
 """
 )
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await session_manager.initialize()
+    try:
+        yield
+    finally:
+        await session_manager.close()
+
+
 app = FastAPI(
     docs_url=f"/{PY_ENV}/docs" if PY_ENV == "dev" else None,
     openapi_url=f"/{PY_ENV}/openapi.json" if PY_ENV == "dev" else None,
     redoc_url=None,
-    openapi_prefix=f"/{PY_ENV}",
+    root_path=f"/api/v1/{PY_ENV}",
     title="Chatbot Service",
-    # lifespan=lifespan,
+    lifespan=lifespan,
 )
 
 app.add_middleware(
@@ -39,8 +52,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
-app.include_router(user.router, prefix="/api/v1/user", tags=["user"])
+app.include_router(auth.router, prefix="/auth", tags=["auth"])
+app.include_router(user.router, prefix="/user", tags=["user"])
 
 
 @app.exception_handler(RequestValidationError)
@@ -53,3 +66,13 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
             "error": exc.errors(),
         },
     )
+
+
+@app.exception_handler(DatabaseException)
+async def database_exception_handler(request, exc: DatabaseException):
+    return JSONResponse(status_code=500, content={"message": str(exc.detail)})
+
+
+@app.exception_handler(DuplicateValueException)
+async def duplicate_value_exception_handler(request, exc: DuplicateValueException):
+    return JSONResponse(status_code=400, content={"message": str(exc.detail)})

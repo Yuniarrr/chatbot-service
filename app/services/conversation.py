@@ -1,7 +1,7 @@
 import logging
 from typing import Optional
 
-from app.core.database import async_get_db
+from app.core.database import session_manager
 from app.models.conversations import (
     ConversationReadModel,
     ConversationCreateModel,
@@ -10,6 +10,7 @@ from app.models.conversations import (
     ConversationUpdateModel,
 )
 from app.core.logger import SRC_LOG_LEVELS
+from app.core.exceptions import DatabaseException
 
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["SERVICE"])
@@ -20,7 +21,7 @@ class ConversationService:
         self, title: str, user_id: str
     ) -> Optional[ConversationReadModel]:
         try:
-            async with async_get_db() as db:
+            async with session_manager.session() as db:
                 conversation = ConversationCreateModel(
                     title=title,
                     user_id=user_id,
@@ -30,53 +31,53 @@ class ConversationService:
                 )
 
                 return ConversationReadModel.model_validate(new_conversation)
-        except Exception:
-            return None
+        except Exception as e:
+            raise DatabaseException(str(e))
 
     async def get_conversations_by_user_id(
         self, user_id: str, skip: Optional[int] = None, limit: Optional[int] = None
     ) -> Optional[ConversationReadModel]:
         try:
-            async with async_get_db() as db:
+            async with session_manager.session() as db:
                 return await conversations.get_multi(
                     db=db,
                     id=user_id,
                     offset=skip,
                     limit=limit,
                 )
-        except Exception:
-            return None
+        except Exception as e:
+            raise DatabaseException(str(e))
 
     async def get_conversation_by_id(
         self, id: str
     ) -> Optional[ConversationReadWithMessageModel]:
         try:
-            async with async_get_db() as db:
+            async with session_manager.session() as db:
                 return await conversations.get_joined(
                     db=db, id=id, join_schema_to_select=ConversationReadWithMessageModel
                 )
-        except Exception:
-            return None
+        except Exception as e:
+            raise DatabaseException(str(e))
 
     async def update_user_by_id(
         self, id: str, data: ConversationUpdateModel
     ) -> Optional[ConversationReadModel]:
         try:
-            async with async_get_db() as db:
+            async with session_manager.session() as db:
                 return await conversations.update(
                     db=db,
                     object=data.model_dump(),
                     id=id,
                 )
-        except Exception:
-            return None
+        except Exception as e:
+            raise DatabaseException(str(e))
 
     async def delete_conversation_by_id(self, id: str):
         try:
-            async with async_get_db() as db:
+            async with session_manager.session() as db:
                 await conversations.db_delete(db=db, id=id)
-        except Exception:
-            return None
+        except Exception as e:
+            raise DatabaseException(str(e))
 
 
 conversation_service = ConversationService()

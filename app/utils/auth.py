@@ -1,5 +1,6 @@
 import logging
 import jwt
+import bcrypt
 
 from uuid import UUID
 from zoneinfo import ZoneInfo
@@ -8,7 +9,8 @@ from typing import Optional, Union, Dict, Annotated, Any
 from pydantic import BaseModel
 from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from passlib.context import CryptContext
+
+# from passlib.context import CryptContext
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.env import (
@@ -20,12 +22,12 @@ from app.env import (
 )
 from app.core.constants import ERROR_MESSAGES
 from app.models.users import users, Role
-from app.core.database import async_get_db
+from app.core.database import session_manager
 from app.core.logger import SRC_LOG_LEVELS
 
 
 bearer_security = HTTPBearer(auto_error=False)
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["UTILS"])
@@ -37,14 +39,19 @@ class TokenData(BaseModel):
     role: Role = Role.USER
 
 
-def verify_password(plain_password, hashed_password):
-    return (
-        pwd_context.verify(plain_password, hashed_password) if hashed_password else None
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    password_byte_enc = plain_password.encode("utf-8")
+    hashed_password_bytes = hashed_password.encode("utf-8")
+    return bcrypt.checkpw(
+        password=password_byte_enc, hashed_password=hashed_password_bytes
     )
 
 
 def get_password_hash(password):
-    return pwd_context.hash(password)
+    pwd_bytes = password.encode("utf-8")
+    salt = bcrypt.gensalt()
+    hashed_password = bcrypt.hashpw(password=pwd_bytes, salt=salt)
+    return hashed_password
 
 
 async def create_access_token(
@@ -107,7 +114,7 @@ def get_http_authorization_cred(auth_header: str):
 
 
 def get_current_user(
-    db: Annotated[AsyncSession, Depends(async_get_db)],
+    db: Annotated[AsyncSession, Depends(session_manager.connect)],
     request: Request,
     auth_token: HTTPAuthorizationCredentials = Depends(bearer_security),
 ):
