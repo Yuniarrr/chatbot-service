@@ -23,3 +23,4 @@ class SUCCESS_MESSAGE(str, Enum):
 
     CREATED = "Data berhasil dibuat"
     DELETED = "Data berhasil dihapus"
+    RETRIEVED = "Data berhasil didapat"

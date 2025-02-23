@@ -24,6 +24,7 @@ from app.core.constants import ERROR_MESSAGES
 from app.models.users import users, Role
 from app.core.database import session_manager
 from app.core.logger import SRC_LOG_LEVELS
+from app.services.user import user_service
 
 
 bearer_security = HTTPBearer(auto_error=False)
@@ -90,7 +91,12 @@ async def create_refresh_token(
 
 def decode_token(token: str) -> Union[TokenData, None]:
     try:
-        decoded = jwt.decode(token, JWT_SECRET_KEY)
+        print("token")
+        print(token)
+        decoded = jwt.decode(token, JWT_SECRET_KEY, algorithms=["HS256"])
+
+        print("decoded")
+        print(decoded)
 
         email: Optional[str] = decoded.get("email")
         user_id: Optional[str] = decoded.get("id")
@@ -113,7 +119,7 @@ def get_http_authorization_cred(auth_header: str):
         raise ValueError(ERROR_MESSAGES.INVALID_TOKEN_OR_API_KEY("Bearer token"))
 
 
-def get_current_user(
+async def get_current_user(
     db: Annotated[AsyncSession, Depends(session_manager.connect)],
     request: Request,
     auth_token: HTTPAuthorizationCredentials = Depends(bearer_security),
@@ -151,8 +157,8 @@ def get_current_user(
             detail=ERROR_MESSAGES.INVALID_TOKEN_OR_API_KEY("Bearer token"),
         )
 
-    if data is not None and "email" in data:
-        user = users.get(db, email=data["email"])
+    if data is not None and data.email:
+        user = await user_service.get_user_by_email(data.email)
         if user is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -160,8 +166,8 @@ def get_current_user(
             )
 
         return user
-    elif data is not None and "id" in data:
-        user = users.get(db, email=data["id"])
+    elif data is not None and data.id:
+        user = await user_service.get_user_by_id(data.id)
         if user is None:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
@@ -177,7 +183,7 @@ def get_current_user(
 
 
 def get_verified_user(user=Depends(get_current_user)):
-    if user.role not in {
+    if user.role.value not in {
         Role.USER.value,
         Role.ADMINISTRATOR.value,
         Role.DEVELOPER.value,
@@ -190,7 +196,7 @@ def get_verified_user(user=Depends(get_current_user)):
 
 
 def get_admin_user(user=Depends(get_current_user)):
-    if user.role != Role.ADMINISTRATOR.value:
+    if user.role.value != Role.ADMINISTRATOR.value:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=ERROR_MESSAGES.ACCESS_PROHIBITED,
@@ -199,7 +205,7 @@ def get_admin_user(user=Depends(get_current_user)):
 
 
 def get_developer_user(user=Depends(get_current_user)):
-    if user.role != Role.DEVELOPER.value:
+    if user.role.value != Role.DEVELOPER.value:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=ERROR_MESSAGES.ACCESS_PROHIBITED,
@@ -208,7 +214,7 @@ def get_developer_user(user=Depends(get_current_user)):
 
 
 def get_not_user(user=Depends(get_current_user)):
-    if user.role == Role.USER.value:
+    if user.role.value == Role.USER.value:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=ERROR_MESSAGES.ACCESS_PROHIBITED,

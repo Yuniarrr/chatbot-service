@@ -7,7 +7,13 @@ from app.core.response import ResponseModel
 from app.models.users import AddUserForm, Role, LoginForm
 from app.services.user import user_service
 from app.core.constants import ERROR_MESSAGES, SUCCESS_MESSAGE
-from app.utils.auth import get_password_hash, TokenData, get_admin_user, get_not_user
+from app.utils.auth import (
+    get_password_hash,
+    TokenData,
+    get_admin_user,
+    get_not_user,
+    get_verified_user,
+)
 from app.core.logger import SRC_LOG_LEVELS
 from app.core.exceptions import (
     NotFoundException,
@@ -44,6 +50,19 @@ async def register(
 
         return ResponseModel(
             status_code=201, message=SUCCESS_MESSAGE.CREATED, data=new_user
+        )
+    except Exception as e:
+        raise InternalServerException(str(e))
+
+
+@router.get("/me", response_model=ResponseModel)
+async def get_user_login_data(
+    current_user: Annotated[TokenData, Depends(get_verified_user)]
+):
+    try:
+        del current_user.password
+        return ResponseModel(
+            status_code=200, message=SUCCESS_MESSAGE.RETRIEVED, data=current_user
         )
     except Exception as e:
         raise InternalServerException(str(e))
