@@ -1,7 +1,7 @@
+import enum
 import logging
 import uuid as uuid_pkg
 
-from enum import Enum
 from typing import Union, List, Optional, Annotated
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -19,7 +19,7 @@ log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["MODEL"])
 
 
-class Role(Enum):
+class Role(enum.Enum):
     ADMINISTRATOR = "ADMINISTRATOR"
     USER = "USER"
     DEVELOPER = "DEVELOPER"
@@ -38,7 +38,11 @@ class User(Base):
         String(20), unique=True, nullable=True
     )
     password: Mapped[Union[str, None]] = mapped_column(String(255), nullable=True)
-    role: Mapped[Role] = mapped_column(SQLEnum(Role), default=Role.USER, nullable=False)
+    role: Mapped[Role] = mapped_column(
+        SQLEnum(Role),
+        default=Role.USER,
+        nullable=False,
+    )
 
     profile_picture: Mapped[Union[str, None]] = mapped_column(Text, nullable=True)
     nrp: Mapped[Union[str, None]] = mapped_column(String, nullable=True)

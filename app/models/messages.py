@@ -1,6 +1,6 @@
+import enum
 import uuid as uuid_pkg
 
-from enum import Enum
 from uuid import UUID
 from typing import Union, Optional, Annotated
 from datetime import datetime
@@ -14,7 +14,7 @@ from app.core.database import Base
 from app.core.schemas import TimestampSchema
 
 
-class FromMessage(Enum):
+class FromMessage(enum.Enum):
     USER = "USER"
     BOT = "BOT"
 

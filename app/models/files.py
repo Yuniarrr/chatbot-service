@@ -1,7 +1,7 @@
+import enum
 import uuid as uuid_pkg
 
 from uuid import UUID
-from enum import Enum
 from typing import Union, Optional, Annotated
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -14,7 +14,7 @@ from app.core.database import Base
 from app.core.schemas import TimestampSchema
 
 
-class FileStatus(Enum):
+class FileStatus(enum.Enum):
     SUCCESS = "SUCCESS"
     FAILED = "FAILED"
     AWAITING = "AWAITING"
@@ -30,7 +30,9 @@ class File(Base):
     file_name: Mapped[Union[str, None]] = mapped_column(String(40), index=True)
     file_path: Mapped[Union[str, None]] = mapped_column(Text, index=True)
     status: Mapped[FileStatus] = mapped_column(
-        SQLEnum(FileStatus), default=FileStatus.FAILED, nullable=False
+        SQLEnum(FileStatus),
+        default=FileStatus.FAILED,
+        nullable=False,
     )
 
     created_at: Mapped[datetime] = mapped_column(
@@ -66,7 +68,7 @@ class FileBaseModel(BaseModel):
     user_id: str
 
     class Config(ConfigDict):
-        orm_mode = True
+        from_attributes = True
 
 
 class FileModel(TimestampSchema):

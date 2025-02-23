@@ -1,4 +1,5 @@
-from enum import Enum
+import enum
+
 from typing import Union, Optional, Annotated
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -16,7 +17,7 @@ from app.core.database import Base
 from app.core.schemas import TimestampSchema
 
 
-class FeedbackType(Enum):
+class FeedbackType(enum.Enum):
     NEGATIVE = "NEGATIVE"
     POSITIVE = "POSITIVE"
 

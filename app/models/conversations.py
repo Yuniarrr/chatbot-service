@@ -6,7 +6,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import DateTime, String, Enum as String, ForeignKey
+from sqlalchemy import DateTime, String, ForeignKey
 from fastcrud import FastCRUD
 
 from app.core.database import Base
