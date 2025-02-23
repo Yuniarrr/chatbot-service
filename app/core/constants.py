@@ -15,6 +15,8 @@ class ERROR_MESSAGES(str, Enum):
     MISSING_TOKEN_OR_API_KEY = lambda name="": f"Forbidden: '{name}' hilang"
     NOT_FOUND = lambda name="": f"Not Found: '{name}' tidak ditemukan"
     UNAUTHORIZED = "Un-Authorized: Tidak memiliki akses"
+    EMPTY_CONTENT = "Empty content: content tidak ditemukan"
+    FAILED_UPLOAD = "Gagal mengupload file"
 
 
 class SUCCESS_MESSAGE(str, Enum):

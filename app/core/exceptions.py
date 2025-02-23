@@ -11,6 +11,11 @@ class DatabaseException(HTTPException):
         super().__init__(status_code=500, detail=f"Database Error: {detail}")
 
 
+class RetrievalException(HTTPException):
+    def __init__(self, detail: str):
+        super().__init__(status_code=500, detail=f"Retrieval Error: {detail}")
+
+
 class NotFoundException(HTTPException):
     def __init__(self, detail: str):
         super().__init__(status_code=404, detail=detail)

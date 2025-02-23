@@ -59,7 +59,6 @@ async def login(form_data: LoginForm):
         if is_email_exist is None:
             raise NotFoundException(ERROR_MESSAGES.NOT_FOUND("Email"))
 
-        print(is_email_exist.password)
         is_verify = verify_password(form_data.password, is_email_exist.password)
 
         if is_verify is False:

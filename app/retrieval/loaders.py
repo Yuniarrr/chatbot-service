@@ -26,9 +26,9 @@ class Loader:
         self.kwargs = kwargs
 
     def load(
-        self, filename: str, file_content_type: str, file_path: str
+        self, file_name: str, file_content_type: str, file_path: str
     ) -> list[Document]:
-        loader = self._get_loader(filename, file_content_type, file_path)
+        loader = self._get_loader(file_name, file_content_type, file_path)
         docs = loader.load()
 
         return [
@@ -38,8 +38,8 @@ class Loader:
             for doc in docs
         ]
 
-    def _get_loader(self, filename: str, file_content_type: str, file_path: str):
-        file_ext = filename.split(".")[-1].lower()
+    def _get_loader(self, file_name: str, file_content_type: str, file_path: str):
+        file_ext = file_name.split(".")[-1].lower()
 
         if file_ext == "pdf":
             loader = PyPDFLoader(

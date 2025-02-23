@@ -7,7 +7,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 from pydantic import BaseModel, ConfigDict, Field
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import DateTime, String, Enum as SQLEnum, String, Text, ForeignKey
+from sqlalchemy import DateTime, String, Enum as SQLEnum, String, Text, ForeignKey, JSON
 from fastcrud import FastCRUD
 
 from app.core.database import Base
@@ -34,6 +34,8 @@ class File(Base):
         default=FileStatus.FAILED,
         nullable=False,
     )
+    meta: Mapped[str] = mapped_column(JSON, nullable=False)
+    data: Mapped[str] = mapped_column(JSON, nullable=False)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(ZoneInfo("UTC"))
@@ -55,9 +57,12 @@ class File(Base):
 
 
 class FileBaseModel(BaseModel):
+    id: UUID
     file_name: str
     file_path: str
     status: FileStatus
+    meta: Optional[JSON] = None
+    data: Optional[JSON] = None
     user_id: str
 
     class Config(ConfigDict):
@@ -73,23 +78,31 @@ class FileCreateModel(FileBaseModel):
 
 
 class FileReadModel(FileBaseModel):
-    id: UUID
-
     created_at: Annotated[datetime, Field(examples=["datetime"])]
     updated_at: Optional[datetime] = None
 
     class Config:
         from_attributes = True
+        extra = "allow"
 
 
 class FileUpdateModel(BaseModel):
     file_name: Optional[str] = None
     file_path: Optional[str] = None
     status: Optional[FileStatus] = None
+    meta: Optional[JSON] = None
+    data: Optional[JSON] = None
 
 
 class FileUpdateInternalModel(FileUpdateModel):
     updated_at: datetime
+
+
+class ProcessFileForm(BaseModel):
+    file_id: str
+    content: Optional[str] = None
+    collection_name: Optional[str] = None
+    user_id: Optional[str] = None
 
 
 CRUDFile = FastCRUD[

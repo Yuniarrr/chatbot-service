@@ -1,5 +1,10 @@
 import os
+
 from dotenv import load_dotenv
+from pathlib import Path
+
+PARENT_DIR = Path(__file__).resolve().parent
+
 
 load_dotenv()
 
@@ -62,3 +67,54 @@ PGVECTOR_DB_URL = f"{PGVECTOR_DB_USER}:{PGVECTOR_DB_PASSWORD}@{PGVECTOR_DB_HOST}
 
 # EMAIL_USER = os.environ.get("EMAIL_USER")
 # EMAIL_PASSWORD = os.environ.get("EMAIL_PASSWORD")
+
+
+####################################
+# STORAGE SETTINGS
+####################################
+
+DATA_DIR = PARENT_DIR / "data"
+UPLOAD_DIR = DATA_DIR / "uploads"
+
+####################################
+# RAG SETTINGS
+####################################
+
+RAG_EMBEDDING_ENGINE = os.environ.get(
+    "RAG_EMBEDDING_ENGINE", "facebook/dpr-question_encoder-single-nq-base"
+)
+RAG_EMBEDDING_MODEL = os.environ.get("RAG_EMBEDDING_MODEL", "facebook/rag-token-nq")
+RAG_EMBEDDING_BATCH_SIZE = int(
+    os.environ.get("RAG_EMBEDDING_BATCH_SIZE")
+    or os.environ.get("RAG_EMBEDDING_OPENAI_BATCH_SIZE", "1")
+)
+RAG_OLLAMA_BASE_URL = os.environ.get("RAG_OLLAMA_BASE_URL")
+RAG_OLLAMA_API_KEY = os.environ.get("RAG_OLLAMA_API_KEY")
+RAG_EMBEDDING_MODEL_TRUST_REMOTE_CODE = (
+    os.environ.get("RAG_EMBEDDING_MODEL_TRUST_REMOTE_CODE", "True").lower() == "true"
+)
+
+USE_CUDA = os.environ.get("USE_CUDA_DOCKER", "false")
+
+if USE_CUDA.lower() == "true":
+    try:
+        import torch
+
+        assert torch.cuda.is_available(), "CUDA not available"
+        DEVICE_TYPE = "cuda"
+    except Exception as e:
+        cuda_error = (
+            "Error when testing CUDA but USE_CUDA_DOCKER is true. "
+            f"Resetting USE_CUDA_DOCKER to false: {e}"
+        )
+        os.environ["USE_CUDA_DOCKER"] = "false"
+        USE_CUDA = "false"
+        DEVICE_TYPE = "cpu"
+else:
+    DEVICE_TYPE = "cpu"
+
+try:
+    if torch.backends.mps.is_available() and torch.backends.mps.is_built():
+        DEVICE_TYPE = "mps"
+except Exception:
+    pass
