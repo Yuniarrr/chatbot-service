@@ -103,13 +103,17 @@ class ConversationUpdateInternalModel(ConversationUpdateModel):
     updated_at: datetime
 
 
+class ConversationDeleteModel(ConversationBaseModel):
+    pass
+
+
 CRUDConversation = FastCRUD[
     Conversation,
-    ConversationBaseModel,
     ConversationCreateModel,
-    ConversationReadModel,
     ConversationUpdateModel,
     ConversationUpdateInternalModel,
+    ConversationDeleteModel,
+    ConversationReadModel,
 ]
 
-conversations = FastCRUD(CRUDConversation)
+conversations = CRUDConversation(Conversation)

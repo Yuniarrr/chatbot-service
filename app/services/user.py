@@ -10,9 +10,10 @@ from app.models.users import (
     UserReadModel,
     UserUpdateModel,
 )
+from app.core.logger import SRC_LOG_LEVELS
 
 log = logging.getLogger(__name__)
-log.setLevel("SERVICE")
+log.setLevel(SRC_LOG_LEVELS["SERVICE"])
 
 
 class UserService:

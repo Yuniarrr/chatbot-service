@@ -14,9 +14,10 @@ from app.models.users import AddUserForm, Role, LoginForm
 from app.services.user import user_service
 from app.core.constants import ERROR_MESSAGES, SUCCESS_MESSAGE
 from app.utils.auth import get_password_hash, TokenData, get_admin_user, get_not_user
+from app.core.logger import SRC_LOG_LEVELS
 
 log = logging.getLogger(__name__)
-log.setLevel("ROUTERS")
+log.setLevel(SRC_LOG_LEVELS["ROUTER"])
 
 
 router = APIRouter()

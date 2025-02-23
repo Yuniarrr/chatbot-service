@@ -33,6 +33,8 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+## How to create migrations
+
 ## Tips
 
 1. Change python version: [here](https://stackoverflow.com/questions/70422866/how-to-create-a-venv-with-a-different-python-version)

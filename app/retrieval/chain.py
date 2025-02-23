@@ -7,9 +7,10 @@ from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import PromptTemplate
 
 from app.retrieval.vector import Vector
+from app.core.logger import SRC_LOG_LEVELS
 
 log = logging.getLogger(__name__)
-log.setLevel("RAG")
+log.setLevel(SRC_LOG_LEVELS["RAG"])
 
 
 class Chain:

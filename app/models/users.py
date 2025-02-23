@@ -6,16 +6,17 @@ from typing import Union, List, Optional, Annotated
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import DateTime, String, Enum as SQLEnum, String, relationship, Text
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import DateTime, String, Enum as SQLEnum, String, Text
 from fastcrud import FastCRUD
 
 from app.core.database import Base
 from app.models.conversations import Conversation
 from app.core.schemas import TimestampSchema
+from app.core.logger import SRC_LOG_LEVELS
 
 log = logging.getLogger(__name__)
-log.setLevel("MODELS")
+log.setLevel(SRC_LOG_LEVELS["MODEL"])
 
 
 class Role(Enum):
@@ -32,7 +33,7 @@ class User(Base):
     )
 
     full_name: Mapped[Union[str, None]] = mapped_column(String(40))
-    email: Mapped[str] = mapped_column(String(40), unique=True, unique=True)
+    email: Mapped[str] = mapped_column(String(40), unique=True)
     phone_number: Mapped[Union[str, None]] = mapped_column(
         String(20), unique=True, nullable=True
     )
@@ -159,8 +160,17 @@ class UserUpdateInternalModel(UserUpdateModel):
     updated_at: datetime
 
 
+class UserDeleteModel(UserBaseModel):
+    pass
+
+
 CRUDUser = FastCRUD[
-    User, UserCreateInternalModel, UserUpdateModel, UserUpdateInternalModel
+    User,
+    UserCreateInternalModel,
+    UserUpdateModel,
+    UserUpdateInternalModel,
+    UserDeleteModel,
+    UserReadModel,
 ]
 
 users = CRUDUser(User)

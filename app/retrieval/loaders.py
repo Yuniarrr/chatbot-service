@@ -14,8 +14,10 @@ from langchain_community.document_loaders import (
 )
 from langchain_core.documents import Document
 
+from app.core.logger import SRC_LOG_LEVELS
+
 log = logging.getLogger(__name__)
-log.setLevel("RAG")
+log.setLevel(SRC_LOG_LEVELS["RAG"])
 
 
 class Loader:

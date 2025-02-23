@@ -19,9 +19,10 @@ from app.utils.auth import (
     create_access_token,
     create_refresh_token,
 )
+from app.core.logger import SRC_LOG_LEVELS
 
 log = logging.getLogger(__name__)
-log.setLevel("ROUTERS")
+log.setLevel(SRC_LOG_LEVELS["ROUTER"])
 
 
 router = APIRouter()

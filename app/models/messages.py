@@ -20,7 +20,7 @@ class FromMessage(Enum):
 
 
 class Message(Base):
-    __tablename__ = "messages"
+    __tablename__ = "message"
 
     id: Mapped[uuid_pkg.UUID] = mapped_column(
         "id", default=uuid_pkg.uuid4, primary_key=True, unique=True
@@ -45,14 +45,14 @@ class Message(Base):
     )
 
     conversation_id: Mapped[str] = mapped_column(
-        ForeignKey("conversations.id", ondelete="CASCADE"),
+        ForeignKey("conversation.id", ondelete="CASCADE"),
         index=True,
         default=None,
     )
     conversation = relationship(
         "Conversation",
         foreign_keys=[conversation_id],
-        back_populates="messages",
+        back_populates="message",
         lazy="selectin",
     )
 

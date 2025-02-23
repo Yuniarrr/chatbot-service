@@ -23,12 +23,13 @@ from pydantic import BaseModel
 from typing import Optional, List, Any
 
 from app.env import PGVECTOR_DB_URL, PGVECTOR_INITIALIZE_MAX_VECTOR_LENGTH
+from app.core.logger import SRC_LOG_LEVELS
 
 VECTOR_LENGTH = PGVECTOR_INITIALIZE_MAX_VECTOR_LENGTH
 Base = declarative_base()
 
 log = logging.getLogger(__name__)
-log.setLevel("RAG")
+log.setLevel(SRC_LOG_LEVELS["RAG"])
 
 
 class VectorItem(BaseModel):

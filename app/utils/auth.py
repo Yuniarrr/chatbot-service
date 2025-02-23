@@ -6,6 +6,10 @@ from zoneinfo import ZoneInfo
 from datetime import datetime, timedelta
 from typing import Optional, Union, Dict, Annotated, Any
 from pydantic import BaseModel
+from fastapi import Depends, HTTPException, Request, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from passlib.context import CryptContext
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.env import (
     JWT_SECRET_KEY,
@@ -17,17 +21,14 @@ from app.env import (
 from app.core.constants import ERROR_MESSAGES
 from app.models.users import users, Role
 from app.core.database import async_get_db
+from app.core.logger import SRC_LOG_LEVELS
 
-from fastapi import Depends, HTTPException, Request, status
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from passlib.context import CryptContext
-from sqlalchemy.ext.asyncio import AsyncSession
 
 bearer_security = HTTPBearer(auto_error=False)
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 log = logging.getLogger(__name__)
-log.setLevel("UTILS")
+log.setLevel(SRC_LOG_LEVELS["UTILS"])
 
 
 class TokenData(BaseModel):

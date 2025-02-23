@@ -6,10 +6,9 @@ from typing import Union, List, Optional, Annotated
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy import (
     DateTime,
-    relationship,
     Text,
     ForeignKey,
 )
@@ -17,10 +16,10 @@ from fastcrud import FastCRUD
 
 from app.core.database import Base, JSONField
 from app.models.conversations import Conversation
-from app.core.schemas import TimestampSchema
+from app.core.logger import SRC_LOG_LEVELS
 
 log = logging.getLogger(__name__)
-log.setLevel("MODELS")
+log.setLevel(SRC_LOG_LEVELS["MODEL"])
 
 
 class Tool(Base):
