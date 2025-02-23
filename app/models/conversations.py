@@ -11,6 +11,7 @@ from fastcrud import FastCRUD
 
 from app.core.database import Base
 from app.core.schemas import TimestampSchema
+from app.models.messages import MessageReadModel
 
 
 class Conversation(Base):
@@ -20,7 +21,7 @@ class Conversation(Base):
         "id", default=uuid_pkg.uuid4, primary_key=True, unique=True
     )
 
-    name: Mapped[str] = mapped_column(String, nullable=False)
+    title: Mapped[str] = mapped_column(String, nullable=False)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(ZoneInfo("UTC"))
@@ -29,8 +30,8 @@ class Conversation(Base):
         DateTime(timezone=True), default=None
     )
 
-    created_by: Mapped[Union[str, None]] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE"),
+    user_id: Mapped[Union[str, None]] = mapped_column(
+        ForeignKey("user.id", ondelete="CASCADE"),
         index=True,
         default=None,
         nullable=True,
@@ -38,6 +39,7 @@ class Conversation(Base):
 
     user = relationship(
         "User",
+        foreign_keys=[user_id],
         back_populates="conversations",
         lazy="selectin",
     )
@@ -57,11 +59,11 @@ class Conversation(Base):
 
 
 class ConversationBaseModel(BaseModel):
-    name: Annotated[
+    title: Annotated[
         Union[str, None],
         Field(examples=["content here"]),
     ]
-    created_by: Optional[UUID] = None
+    user_id: Optional[UUID] = None
 
 
 class ConversationModel(TimestampSchema):
@@ -82,8 +84,19 @@ class ConversationReadModel(ConversationBaseModel):
         from_attributes = True
 
 
+class ConversationReadWithMessageModel(ConversationBaseModel):
+    id: UUID
+
+    created_at: Optional[datetime] = None
+    updated_at: Optional[datetime] = None
+    messages: Optional[MessageReadModel] = None
+
+    class Config:
+        from_attributes = True
+
+
 class ConversationUpdateModel(BaseModel):
-    name: Optional[str] = None
+    title: Optional[str] = None
 
 
 class ConversationUpdateInternalModel(ConversationUpdateModel):
@@ -99,4 +112,4 @@ CRUDConversation = FastCRUD[
     ConversationUpdateInternalModel,
 ]
 
-crud_conversation = FastCRUD(CRUDConversation)
+conversations = FastCRUD(CRUDConversation)

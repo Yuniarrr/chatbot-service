@@ -93,4 +93,4 @@ CRUDFeedback = FastCRUD[
     FeedbackUpdateInternal,
 ]
 
-crud_feedback = CRUDFeedback(Feedback)
+feedbacks = CRUDFeedback(Feedback)

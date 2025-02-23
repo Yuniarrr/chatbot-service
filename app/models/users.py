@@ -20,8 +20,8 @@ log.setLevel("MODELS")
 
 class Role(Enum):
     ADMINISTRATOR = "ADMINISTRATOR"
-    DOSEN = "DOSEN"
-    MAHASISWA = "MAHASISWA"
+    USER = "USER"
+    DEVELOPER = "DEVELOPER"
 
 
 class User(Base):
@@ -31,7 +31,7 @@ class User(Base):
         "id", default=uuid_pkg.uuid4, primary_key=True, unique=True
     )
 
-    username: Mapped[Union[str, None]] = mapped_column(String(40))
+    full_name: Mapped[Union[str, None]] = mapped_column(String(40))
     email: Mapped[str] = mapped_column(String(40), unique=True, unique=True)
     phone_number: Mapped[Union[str, None]] = mapped_column(
         String(20), unique=True, nullable=True
@@ -52,7 +52,21 @@ class User(Base):
 
     uploader_file = relationship(
         "File",
-        foreign_keys="File.uploaded_by",
+        foreign_keys="File.user_id",
+        back_populates="uploader",
+        lazy="selectin",
+    )
+
+    uploader_tool = relationship(
+        "Tool",
+        foreign_keys="Tool.user_id",
+        back_populates="uploader",
+        lazy="selectin",
+    )
+
+    uploader_knowledge = relationship(
+        "Tool",
+        foreign_keys="Knowledge.user_id",
         back_populates="uploader",
         lazy="selectin",
     )
@@ -71,15 +85,22 @@ class User(Base):
 ####################
 
 
-class SigninForm(BaseModel):
+class LoginForm(BaseModel):
     email: str
     password: str
 
 
-class SignupForm(BaseModel):
-    username: str
+class RegisterForm(BaseModel):
+    full_name: str
     email: str
     password: str
+
+
+class AddUserForm(BaseModel):
+    full_name: str
+    email: str
+    password: str
+    role: Role
 
 
 ####################
@@ -88,7 +109,7 @@ class SignupForm(BaseModel):
 
 
 class UserBaseModel(BaseModel):
-    username: str
+    full_name: str
     email: Optional[str] = None
     phone_number: Optional[str] = None
     # password: Optional[str] = None
@@ -107,6 +128,8 @@ class UserModel(TimestampSchema):
 
 
 class UserReadModel(UserBaseModel):
+    password: Optional[str] = None
+
     class Config:
         from_attributes = True
 
@@ -122,7 +145,7 @@ class UserCreateInternalModel(UserBaseModel):
 
 
 class UserUpdateModel(BaseModel):
-    username: Optional[str] = None
+    full_name: Optional[str] = None
     email: Optional[str] = None
     phone_number: Optional[str] = None
     password: Optional[str] = None
@@ -140,4 +163,4 @@ CRUDUser = FastCRUD[
     User, UserCreateInternalModel, UserUpdateModel, UserUpdateInternalModel
 ]
 
-crud_user = CRUDUser(User)
+users = CRUDUser(User)

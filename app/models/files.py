@@ -40,15 +40,15 @@ class File(Base):
         DateTime(timezone=True), default=None
     )
 
-    uploaded_by: Mapped[Union[str, None]] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE"),
+    user_id: Mapped[Union[str, None]] = mapped_column(
+        ForeignKey("user.id", ondelete="CASCADE"),
         index=True,
         nullable=True,
     )
 
     uploader = relationship(
         "User",
-        foreign_keys=[uploaded_by],
+        foreign_keys=[user_id],
         back_populates="uploader_file",
         lazy="selectin",
     )
@@ -63,7 +63,7 @@ class FileBaseModel(BaseModel):
     file_name: str
     file_path: str
     status: FileStatus
-    uploaded_by: str
+    user_id: str
 
     class Config(ConfigDict):
         orm_mode = True
@@ -106,4 +106,4 @@ CRUDFile = FastCRUD[
     FileUpdateInternalModel,
 ]
 
-crud_file = CRUDFile(File)
+files = CRUDFile(File)

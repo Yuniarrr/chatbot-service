@@ -51,6 +51,7 @@ class Message(Base):
     )
     conversation = relationship(
         "Conversation",
+        foreign_keys=[conversation_id],
         back_populates="messages",
         lazy="selectin",
     )
@@ -81,7 +82,7 @@ class MessageCreateModel(MessageBaseModel):
     pass
 
 
-class MessageRead(MessageBaseModel):
+class MessageReadModel(MessageBaseModel):
     id: UUID
 
     created_at: Optional[datetime] = None
@@ -107,9 +108,9 @@ CRUDMessage = FastCRUD[
     Message,
     MessageBaseModel,
     MessageCreateModel,
-    MessageRead,
+    MessageReadModel,
     MessageUpdateModel,
     MessageUpdateInternalModel,
 ]
 
-crud_message = CRUDMessage(Message)
+messages = CRUDMessage(Message)
