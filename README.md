@@ -35,6 +35,26 @@ pip install -r requirements.txt
 
 ## How to create migrations
 
+1. Update or add new model in `app/models`
+
+2. Run this command
+
+```sh
+alembic revision --autogenerate -m "Name migration"
+```
+
+3. Then apply it
+
+```sh
+alembic upgrade head
+```
+
+4. or, can use this file
+
+```sh
+./create-migrations.sh
+```
+
 ## Tips
 
 1. Change python version: [here](https://stackoverflow.com/questions/70422866/how-to-create-a-venv-with-a-different-python-version)
