@@ -19,7 +19,7 @@ log = logging.getLogger(__name__)
 log.setLevel("ROUTERS")
 
 
-router = APIRouter(prefix="/user", tags=["User"])
+router = APIRouter()
 
 
 @router.post("/", response_model=ResponseModel)

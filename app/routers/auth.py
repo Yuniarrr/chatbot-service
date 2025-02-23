@@ -24,7 +24,7 @@ log = logging.getLogger(__name__)
 log.setLevel("ROUTERS")
 
 
-router = APIRouter(prefix="/auth", tags=["Auth"])
+router = APIRouter()
 
 
 @router.post("/register", response_model=ResponseModel)

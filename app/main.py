@@ -7,6 +7,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from app.env import PY_ENV
+from app.routers import auth, user
 
 print(
     rf"""
@@ -38,7 +39,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# app.include_router(ollama.router, prefix="/ollama", tags=["ollama"])
+app.include_router(auth.router, prefix="/api/v1/auth", tags=["auth"])
+app.include_router(user.router, prefix="/api/v1/user", tags=["user"])
 
 
 @app.exception_handler(RequestValidationError)
