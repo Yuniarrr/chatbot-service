@@ -9,6 +9,7 @@ from fastapi.responses import JSONResponse
 
 from app.env import PY_ENV
 from app.routers import auth, user
+from app.routers.file import router
 from app.core.database import session_manager
 from app.core.exceptions import DatabaseException, DuplicateValueException
 
@@ -53,6 +54,7 @@ app.add_middleware(
 )
 
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
+app.include_router(router, prefix="/file", tags=["file"])
 app.include_router(user.router, prefix="/user", tags=["user"])
 
 

@@ -1,4 +1,7 @@
+import json
 import logging
+import uuid
+
 from typing import Optional, List, Dict, Any
 from sqlalchemy import (
     cast,
@@ -61,7 +64,13 @@ class DocumentChunk(Base):
 
 class VectorClient:
     def __init__(self) -> None:
-        engine = create_engine(PGVECTOR_DB_URL, pool_pre_ping=True, poolclass=NullPool)
+        print(PGVECTOR_DB_URL)
+        print(PGVECTOR_DB_URL)
+        engine = create_engine(
+            "postgresql://" + PGVECTOR_DB_URL,
+            pool_pre_ping=True,
+            poolclass=NullPool,
+        )
 
         SessionLocal = sessionmaker(
             autocommit=False, autoflush=False, bind=engine, expire_on_commit=False
@@ -72,6 +81,7 @@ class VectorClient:
         try:
             # Ensure the pgvector extension is available
             self.session.execute(text("CREATE EXTENSION IF NOT EXISTS vector;"))
+            self.session.commit()
 
             # Check vector length consistency
             self.check_vector_length()
@@ -83,19 +93,7 @@ class VectorClient:
             Base.metadata.create_all(bind=connection)
 
             # Create an index on the vector column if it doesn't exist
-            self.session.execute(
-                text(
-                    "CREATE INDEX IF NOT EXISTS idx_document_chunk_vector "
-                    "ON document_chunk USING ivfflat (vector vector_cosine_ops) WITH (lists = 100);"
-                )
-            )
-            self.session.execute(
-                text(
-                    "CREATE INDEX IF NOT EXISTS idx_document_chunk_collection_name "
-                    "ON document_chunk (collection_name);"
-                )
-            )
-            self.session.commit()
+            self.create_indexes()
             log.info("Initialization complete")
         except Exception as e:
             self.session.rollback()
@@ -108,7 +106,16 @@ class VectorClient:
         Raises an exception if there is a mismatch.
         """
         metadata = MetaData()
-        metadata.reflect(bind=self.session.bind, only=["document_chunk"])
+        # metadata.reflect(bind=self.session.bind, only=["document_chunk"])
+        try:
+            metadata.reflect(
+                bind=self.session.bind, only=["document_chunk"], views=True
+            )
+        except Exception:
+            log.warning(
+                "Table 'document_chunk' does not exist yet. Skipping vector length check."
+            )
+            return
 
         if "document_chunk" in metadata.tables:
             document_chunk_table = metadata.tables["document_chunk"]
@@ -131,8 +138,33 @@ class VectorClient:
                     "The 'vector' column does not exist in the 'document_chunk' table."
                 )
         else:
+            log.info(
+                "Table 'document_chunk' does not exist yet. No vector length check needed."
+            )
+
             # Table does not exist yet; no action needed
             pass
+
+    def create_indexes(self):
+        """Create indexes on the document_chunk table for efficient vector search."""
+        try:
+            self.session.execute(
+                text(
+                    "CREATE INDEX IF NOT EXISTS idx_document_chunk_vector "
+                    "ON document_chunk USING ivfflat (vector vector_cosine_ops) WITH (lists = 100);"
+                )
+            )
+            self.session.execute(
+                text(
+                    "CREATE INDEX IF NOT EXISTS idx_document_chunk_collection_name "
+                    "ON document_chunk (collection_name);"
+                )
+            )
+            self.session.commit()
+            log.info("Indexes created successfully")
+        except Exception as e:
+            log.error(f"Error creating indexes: {e}")
+            self.session.rollback()
 
     def adjust_vector_length(self, vector: List[float]) -> List[float]:
         # Adjust vector to have length VECTOR_LENGTH
@@ -148,15 +180,31 @@ class VectorClient:
 
     def insert(self, collection_name: str, items: List[VectorItem]) -> None:
         try:
+            print("collection_name")
+            print(collection_name)
+            print(collection_name)
+            print(collection_name)
             new_items = []
             for item in items:
                 vector = self.adjust_vector_length(item["vector"])
+
+                metadata = item["metadata"]
+                for key, value in list(metadata.items()):
+                    if isinstance(value, uuid.UUID):
+                        metadata[key] = str(value)
+                    elif callable(value):
+                        log.warning(f"Removing non-serializable metadata key: {key}")
+                        del metadata[key]
+
+                print("metadata")
+                print(metadata)
+
                 new_chunk = DocumentChunk(
                     id=item["id"],
                     vector=vector,
                     collection_name=collection_name,
                     text=item["text"],
-                    vmetadata=item["metadata"],
+                    vmetadata=metadata,
                 )
                 new_items.append(new_chunk)
             self.session.bulk_save_objects(new_items)

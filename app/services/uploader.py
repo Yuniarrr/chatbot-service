@@ -15,7 +15,8 @@ log.setLevel(SRC_LOG_LEVELS["SERVICE"])
 class UploaderService:
     def upload_to_local(self, contents: bytes, file_name: str) -> Tuple[bytes, str]:
         """Upload to /data/uploads"""
-        file_path = f"{UPLOAD_DIR}/{file_name}"
+        os.makedirs(UPLOAD_DIR, exist_ok=True)
+        file_path = os.path.join(UPLOAD_DIR, file_name)
         with open(file_path, "wb") as f:
             f.write(contents)
         return contents, file_path
@@ -24,9 +25,9 @@ class UploaderService:
         """Handles downloading of the file from local storage"""
         return file_path
 
-    def _delete_from_local(self, file_name: str) -> None:
+    def delete_from_local(self, file_name: str) -> None:
         """Handles deletion of the file from local storage."""
-        file_path = f"{UPLOAD_DIR}/{file_name}"
+        file_path = os.path.join(UPLOAD_DIR, file_name)
         if os.path.isfile(file_path):
             os.remove(file_path)
         else:

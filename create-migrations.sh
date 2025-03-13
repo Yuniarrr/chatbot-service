@@ -14,4 +14,5 @@ echo
 
 echo "################################"
 echo "Run 'alembic upgrade head' to apply migrations"
+echo "Run 'alembic downgrade -1' to downgrade migrations"
 echo "################################"

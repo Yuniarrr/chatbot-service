@@ -67,13 +67,16 @@ class MessageBaseModel(BaseModel):
     file_name: Optional[str] = None
     file_size: Optional[int] = None
 
+    class Config(ConfigDict):
+        from_attributes = True
+
 
 class MessageModel(TimestampSchema):
     pass
 
 
 class MessageCreateModel(MessageBaseModel):
-    pass
+    model_config = ConfigDict(extra="forbid")
 
 
 class MessageReadModel(MessageBaseModel):
@@ -99,8 +102,8 @@ class MessageUpdateInternalModel(MessageUpdateModel):
 
 
 CRUDMessage = FastCRUD[
-    Message,
     MessageBaseModel,
+    MessageModel,
     MessageCreateModel,
     MessageReadModel,
     MessageUpdateModel,

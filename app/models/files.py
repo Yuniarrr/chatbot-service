@@ -18,6 +18,7 @@ class FileStatus(enum.Enum):
     SUCCESS = "SUCCESS"
     FAILED = "FAILED"
     AWAITING = "AWAITING"
+    DETACHED = "DETACHED"
 
 
 class File(Base):
@@ -27,7 +28,7 @@ class File(Base):
         "id", default=uuid_pkg.uuid4, primary_key=True, unique=True
     )
 
-    file_name: Mapped[Union[str, None]] = mapped_column(String(40), index=True)
+    file_name: Mapped[Union[str, None]] = mapped_column(Text, index=True)
     file_path: Mapped[Union[str, None]] = mapped_column(Text, index=True)
     status: Mapped[FileStatus] = mapped_column(
         SQLEnum(FileStatus),
@@ -61,9 +62,9 @@ class FileBaseModel(BaseModel):
     file_name: str
     file_path: str
     status: FileStatus
-    meta: Optional[JSON] = None
-    data: Optional[JSON] = None
-    user_id: str
+    meta: Optional[dict] = None
+    data: Optional[dict] = None
+    user_id: UUID
 
     class Config(ConfigDict):
         from_attributes = True
@@ -90,8 +91,8 @@ class FileUpdateModel(BaseModel):
     file_name: Optional[str] = None
     file_path: Optional[str] = None
     status: Optional[FileStatus] = None
-    meta: Optional[JSON] = None
-    data: Optional[JSON] = None
+    meta: Optional[dict] = None
+    data: Optional[dict] = None
 
 
 class FileUpdateInternalModel(FileUpdateModel):

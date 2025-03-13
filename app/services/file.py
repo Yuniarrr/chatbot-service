@@ -5,7 +5,13 @@ from app.models.users import RegisterForm
 from app.core.database import session_manager
 from app.core.logger import SRC_LOG_LEVELS
 from app.core.exceptions import DatabaseException
-from app.models.files import FileCreateModel, files, FileReadModel, FileUpdateModel
+from app.models.files import (
+    File,
+    FileCreateModel,
+    files,
+    FileReadModel,
+    FileUpdateModel,
+)
 
 
 log = logging.getLogger(__name__)
@@ -53,9 +59,11 @@ class FileService:
                     object=form_data,
                     commit=True,
                     return_as_model=True,
-                    schema_to_select=FileReadModel,
+                    schema_to_select=File,
                     id=file_id,
                 )
+                print(updated_file)
+                updated_file = await db.merge(updated_file)
                 await db.refresh(updated_file)
                 return FileReadModel.model_validate(updated_file)
         except Exception as e:

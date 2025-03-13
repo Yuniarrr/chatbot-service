@@ -3,7 +3,9 @@ import os
 from dotenv import load_dotenv
 from pathlib import Path
 
-PARENT_DIR = Path(__file__).resolve().parent
+CURRENT_FILE = Path(__file__).resolve()
+APP_DIR = CURRENT_FILE.parent
+PARENT_DIR = APP_DIR.parent
 
 
 load_dotenv()
@@ -88,11 +90,14 @@ RAG_EMBEDDING_BATCH_SIZE = int(
     os.environ.get("RAG_EMBEDDING_BATCH_SIZE")
     or os.environ.get("RAG_EMBEDDING_OPENAI_BATCH_SIZE", "1")
 )
-RAG_OLLAMA_BASE_URL = os.environ.get("RAG_OLLAMA_BASE_URL")
+RAG_OLLAMA_BASE_URL = os.environ.get(
+    "RAG_OLLAMA_BASE_URL", default="http://localhost:11434"
+)
 RAG_OLLAMA_API_KEY = os.environ.get("RAG_OLLAMA_API_KEY")
 RAG_EMBEDDING_MODEL_TRUST_REMOTE_CODE = (
     os.environ.get("RAG_EMBEDDING_MODEL_TRUST_REMOTE_CODE", "True").lower() == "true"
 )
+SENTENCE_TRANSFORMERS_HOME = os.environ.get("SENTENCE_TRANSFORMERS_HOME")
 
 USE_CUDA = os.environ.get("USE_CUDA_DOCKER", "false")
 

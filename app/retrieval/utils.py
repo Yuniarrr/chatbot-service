@@ -47,7 +47,7 @@ def generate_ollama_batch_embeddings(
 ) -> Optional[list[list[float]]]:
     try:
         r = requests.post(
-            f"{url}/api/embed",
+            f"{url}/api/generate",
             headers={
                 "Content-Type": "application/json",
                 "Authorization": f"Bearer {key}",
