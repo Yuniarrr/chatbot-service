@@ -1,4 +1,5 @@
 import os
+import getpass
 
 from dotenv import load_dotenv
 from pathlib import Path
@@ -54,7 +55,8 @@ PGVECTOR_DB_HOST = os.environ.get("PGVECTOR_DB_HOST", "localhost")
 PGVECTOR_DB_PORT = os.environ.get("PGVECTOR_DB_PORT", 5432)
 
 PGVECTOR_DB_URL = f"{PGVECTOR_DB_USER}:{PGVECTOR_DB_PASSWORD}@{PGVECTOR_DB_HOST}:{PGVECTOR_DB_PORT}/{PGVECTOR_DB_NAME}"
-# DATABASE_URL = f"{PGVECTOR_DB_USER}:{PGVECTOR_DB_PASSWORD}@{PGVECTOR_DB_HOST}:{PGVECTOR_DB_PORT}/{PGVECTOR_DB_NAME}"
+
+VECTOR_TABLE_NAME = os.environ.get("VECTOR_TABLE_NAME", "chatbot_vector")
 
 ####################################
 # REDIS SETTINGS
@@ -123,3 +125,12 @@ try:
         DEVICE_TYPE = "mps"
 except Exception:
     pass
+
+####################################
+# RAG SETTINGS
+####################################
+
+RAG_MODEL = os.environ.get("RAG_MODEL", "llama3.2")
+
+if not os.environ.get("OPENAI_API_KEY"):
+    os.environ["OPENAI_API_KEY"] = getpass.getpass("Enter API key for OpenAI: ")

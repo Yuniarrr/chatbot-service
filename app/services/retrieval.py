@@ -12,7 +12,11 @@ from app.core.logger import SRC_LOG_LEVELS
 from app.services.file import file_service
 from app.services.uploader import uploader_service
 from app.retrieval.loaders import Loader
-from app.core.exceptions import RetrievalException
+from app.core.exceptions import (
+    RetrievalException,
+    BadRequestException,
+    InternalServerException,
+)
 from app.core.constants import ERROR_MESSAGES
 from app.env import (
     RAG_EMBEDDING_ENGINE,
@@ -23,7 +27,8 @@ from app.env import (
     DEVICE_TYPE,
     RAG_EMBEDDING_MODEL_TRUST_REMOTE_CODE,
 )
-from app.retrieval.vector import VECTOR_DB_CLIENT
+
+# from app.retrieval.vector import VECTOR_DB_CLIENT
 from app.retrieval.utils import get_embedding_function, get_model_path
 
 log = logging.getLogger(__name__)
@@ -37,141 +42,123 @@ class RetrievalService:
         )
 
     async def process_file(self, form_data: ProcessFileForm):
-        print("In process file service")
-        file = await file_service.get_file_by_id(form_data.file_id)
-
-        collection_name = form_data.collection_name
-
-        if collection_name is None:
-            collection_name = f"file-{file.id}"
-
-        print("collection_name di bawah form")
-        print(collection_name)
-
-        # if form_data.collection_name:
-        #     log.info("TODO: collection")
-        #     result = VECTOR_DB_CLIENT.query(
-        #         collection_name=collection_name, filter={"file_id": file.id}
-        #     )
-
-        #     if result is not None and len(result.ids[0]) > 0:
-        #         docs = [
-        #             Document(
-        #                 page_content=result.documents[0][idx],
-        #                 metadata=result.metadatas[0][idx],
-        #             )
-        #             for idx, id in enumerate(result.ids[0])
-        #         ]
-        #     else:
-        #         docs = [
-        #             Document(
-        #                 page_content=file.data.get("content", ""),
-        #                 metadata={
-        #                     **file.meta,
-        #                     "name": file.file_name,
-        #                     "created_by": file.user_id,
-        #                     "file_id": file.id,
-        #                     "source": file.file_name,
-        #                 },
-        #             )
-        #         ]
-
-        #     text_content = file.data.get("content", "")
-        # else:
-        file_path = file.file_path
-
-        print("file")
-        print(file)
-
-        if file_path:
-            print("di filepath")
-            print("file:", file)
-            print("file_path:", file_path)
-            file_path = uploader_service.get_file_from_local(file_path)
-            # engine=request.app.state.config.CONTENT_EXTRACTION_ENGINE,
-            print("loader")
-            loader = Loader(PDF_EXTRACT_IMAGES=True)
-            print("docs")
-            docs = loader.load(file.file_name, file.meta.get("content_type"), file_path)
-            print("docs arr")
-            docs = [
-                Document(
-                    page_content=doc.page_content,
-                    metadata={
-                        **doc.metadata,
-                        "name": file.file_name,
-                        "created_by": file.user_id,
-                        "file_id": file.id,
-                        "source": file.file_name,
-                    },
-                )
-                for doc in docs
-            ]
-        else:
-            print("di else")
-            docs = [
-                Document(
-                    page_content=file.data.get("content", ""),
-                    metadata={
-                        **file.meta,
-                        "name": file.filename,
-                        "created_by": file.user_id,
-                        "file_id": file.id,
-                        "source": file.filename,
-                    },
-                )
-            ]
-
-        print("atas text_content")
-        text_content = " ".join([doc.page_content for doc in docs])
-
-        log.debug(f"text_content: {text_content}")
-
-        await file_service.update_file_by_id(
-            file.id,
-            FileUpdateModel(
-                **{
-                    "data": {"content": text_content},
-                }
-            ),
-        )
-
-        print("collection_name do atas save docs")
-        print(collection_name)
-
         try:
-            result = await self.save_docs_to_vector_db(
-                docs=docs,
-                collection_name=collection_name,
-                metadata={
-                    "file_id": file.id,
-                    "name": file.file_name,
-                    "hash": hash,
-                },
-                add=(True if form_data.collection_name else False),
+            print("In process file service")
+            file = await file_service.get_file_by_id(form_data.file_id)
+
+            print("file")
+            print(file)
+
+            collection_name = form_data.collection_name
+
+            if collection_name is None:
+                collection_name = f"file-{file.id}"
+
+            print("collection_name di bawah form")
+            print(collection_name)
+
+            file_path = file.file_path
+
+            print("file")
+            print(file)
+
+            if file_path:
+                print("di filepath")
+                print("file:", file)
+                print("file_path:", file_path)
+                file_path = uploader_service.get_file_from_local(file_path)
+                # engine=request.app.state.config.CONTENT_EXTRACTION_ENGINE,
+                print("loader")
+                loader = Loader(PDF_EXTRACT_IMAGES=True)
+                print("docs")
+                docs = loader.load(
+                    file.file_name, file.meta.get("content_type"), file_path
+                )
+                print("docs arr")
+                docs = [
+                    Document(
+                        page_content=doc.page_content,
+                        metadata={
+                            **doc.metadata,
+                            "name": file.file_name,
+                            "created_by": file.user_id,
+                            "file_id": file.id,
+                            "source": file.file_name,
+                        },
+                    )
+                    for doc in docs
+                ]
+            else:
+                print("di else")
+                docs = [
+                    Document(
+                        page_content=file.data.get("content", ""),
+                        metadata={
+                            **file.meta,
+                            "name": file.filename,
+                            "created_by": file.user_id,
+                            "file_id": file.id,
+                            "source": file.filename,
+                        },
+                    )
+                ]
+
+            print("atas text_content")
+            text_content = " ".join([doc.page_content for doc in docs])
+
+            log.debug(f"text_content: {text_content}")
+
+            await file_service.update_file_by_id(
+                file.id,
+                FileUpdateModel(
+                    **{
+                        "data": {"content": text_content},
+                    }
+                ),
             )
 
-            if result:
-                await file_service.update_file_by_id(
-                    file.id,
-                    FileUpdateModel(
-                        **{
-                            "meta": {"collection_name": collection_name},
-                            "status": FileStatus.SUCCESS,
-                        }
-                    ),
+            print("collection_name do atas save docs")
+            print(collection_name)
+
+            try:
+                result = await self.save_docs_to_vector_db(
+                    docs=docs,
+                    collection_name=collection_name,
+                    metadata={
+                        "file_id": file.id,
+                        "name": file.file_name,
+                        "hash": hash,
+                    },
+                    add=(True if form_data.collection_name else False),
                 )
 
-                return {
-                    "status": True,
-                    "collection_name": collection_name,
-                    "filename": file.file_name,
-                    "content": text_content,
-                }
+                if result:
+                    await file_service.update_file_by_id(
+                        file.id,
+                        FileUpdateModel(
+                            **{
+                                "meta": {"collection_name": collection_name},
+                                "status": FileStatus.SUCCESS,
+                            }
+                        ),
+                    )
+
+                    return {
+                        "status": True,
+                        "collection_name": collection_name,
+                        "filename": file.file_name,
+                        "content": text_content,
+                    }
+            except Exception as e:
+                print(f"Error save_docs_to_vector_db: {e}")
+                log.error(f"Error save_docs_to_vector_db: {e}")
+                raise RetrievalException(str(e))
         except Exception as e:
-            print(f"Error process file: {e}")
-            log.error(f"Error process file: {e}")
-            raise RetrievalException(str(e))
+            log.exception(e)
+            if "No pandoc was found" in str(e):
+                raise BadRequestException(detail=ERROR_MESSAGES.PANDOC_NOT_INSTALLED)
+            else:
+                raise BadRequestException(str(e))
 
     async def save_docs_to_vector_db(
         self,
@@ -232,17 +219,17 @@ class RetrievalService:
                     metadata[key] = str(value)
 
         try:
-            if VECTOR_DB_CLIENT.has_collection(collection_name=collection_name):
-                log.info(f"collection {collection_name} already exists")
+            # if VECTOR_DB_CLIENT.has_collection(collection_name=collection_name):
+            #     log.info(f"collection {collection_name} already exists")
 
-                if overwrite:
-                    VECTOR_DB_CLIENT.delete_collection(collection_name=collection_name)
-                    log.info(f"deleting existing collection {collection_name}")
-                elif add is False:
-                    log.info(
-                        f"collection {collection_name} already exists, overwrite is False and add is False"
-                    )
-                    return True
+            #     if overwrite:
+            #         VECTOR_DB_CLIENT.delete_collection(collection_name=collection_name)
+            #         log.info(f"deleting existing collection {collection_name}")
+            #     elif add is False:
+            #         log.info(
+            #             f"collection {collection_name} already exists, overwrite is False and add is False"
+            #         )
+            #         return True
 
             log.info(f"adding to collection {collection_name}")
 
@@ -272,10 +259,10 @@ class RetrievalService:
                 for idx, text in enumerate(texts)
             ]
 
-            VECTOR_DB_CLIENT.insert(
-                collection_name=collection_name,
-                items=items,
-            )
+            # VECTOR_DB_CLIENT.insert(
+            #     collection_name=collection_name,
+            #     items=items,
+            # )
 
             return True
         except Exception as e:

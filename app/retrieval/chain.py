@@ -1,54 +1,120 @@
 import logging
+import os
+import json
+from typing import Optional
 
-from langchain_core.prompts.chat import ChatPromptTemplate, MessagesPlaceholder
+from langchain_google_vertexai import ChatVertexAI
+from langchain_ollama import OllamaLLM
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.messages import HumanMessage
+from langchain.schema import HumanMessage
 from langchain.chains.combine_documents import create_stuff_documents_chain
 from langchain_core.prompts import PromptTemplate
+from google.oauth2 import service_account
+from langchain.chat_models import init_chat_model
+from langgraph.prebuilt import create_react_agent
+from langchain.agents import initialize_agent, Tool, AgentExecutor
+from langchain.chains import RetrievalQA
 
-from app.retrieval.vector import Vector
+
+from app.retrieval.vector_store import vector_store_service
 from app.core.logger import SRC_LOG_LEVELS
+from app.env import RAG_MODEL, RAG_OLLAMA_BASE_URL
+from app.services.list_tool import get_current_weather
 
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["RAG"])
 
 
 class Chain:
-    def __init__(self, vector) -> None:
-        self._vector: Vector = vector
-
     def init_prompt(self):
         # Prompt engineering
         system_msg = (
-            "Anda adalah KADIN AI, chatbot resmi dari Kamar Dagang Indonesia (KADIN). Tugas Anda adalah memberikan informasi tentang KADIN Indonesia kepada pengguna dalam bahasa Indonesia.\n\n"
-            "**Instruksi Utama:**\n\n"
-            "1. **Menjawab Pertanyaan Umum:**\n"
-            "   - Berikan informasi yang relevan tentang KADIN Indonesia berdasarkan data yang tersedia.\n"
-            "   - Jika Anda tidak memiliki informasi yang cukup untuk menjawab pertanyaan pengguna, berikan respons berikut: "
-            "Maaf, saya tidak memiliki informasi tersebut. Adakah hal lain yang ingin Anda tanyakan?\n\n"
+            "Anda adalah CATI, asisten virtual yang membantu pengguna dengan menjawab pertanyaan seputar administarasi dan informasi mengenai Departemen Teknologi Informasi di Institut Teknologi Sepuluh Nopember. "
+            "Anda adalah asisten yang dikembangkan oleh mahasiswi di Departemen Teknologi Informasi, Midyanisa Yuniar, sebagai bagian dari Tugas Akhir. "
+            "{context}"
+            "Question: {question}"
+            "Helpful Answer:"
         )
 
         return PromptTemplate.from_template(system_msg)
 
-    def init_llm(self):
+    def init_llm(self, model: Optional[str] = "ollama"):
         # Large language model
-        return
+        if model == "ollama":
+            return OllamaLLM(model=RAG_MODEL, base_url=RAG_OLLAMA_BASE_URL)
+        elif model == "deepseek":
+            return OllamaLLM(
+                model="deepseek-r1:1.5b", base_url="http://34.101.167.227:11434"
+            )
+        elif model == "gemini":
+            return init_chat_model(
+                "gemini-2.0-flash-001", model_provider="google_genai"
+            )
+            # with open(
+            #     os.path.join(os.path.dirname(__file__), "./google.json")
+            # ) as source:
+            #     info = json.load(source)
+
+            # credentials = service_account.Credentials.from_service_account_info(
+            #     info, scopes=["https://www.googleapis.com/auth/cloud-platform"]
+            # )
+            # return ChatVertexAI(
+            #     model_name="gemini-2.0-flash-001",
+            #     credentials=credentials,
+            # )
+        elif model == "openai":
+            return init_chat_model("gpt-4o", model_provider="openai")
 
     def get_chain(self):
-        # The chain will automatically update since vectorstore update even with no reinitialization
         return create_stuff_documents_chain(
             llm=self.init_llm(),
             prompt=self.init_prompt(),
             output_parser=StrOutputParser(),
         )
 
+    def create_agent(self, collection_name: Optional[str] = None) -> AgentExecutor:
+        model = init_chat_model("gpt-4o", model_provider="openai")
+
+        retriever = vector_store_service.get_retriever(collection_name=collection_name)
+
+        retrieval_qa_chain = RetrievalQA.from_chain_type(
+            llm=model, retriever=retriever, return_source_documents=True
+        )
+
+        tools = [
+            Tool(
+                name="current_weather",
+                func=get_current_weather,
+                description="Get the current weather for a location.",
+            ),
+            Tool(
+                name="Document Retrieval",
+                func=self.document_retrieval_tool(retrieval_qa_chain),
+                description="Retrieve knowledge from the document database.",
+            ),
+        ]
+
+        return initialize_agent(
+            tools,
+            model,
+            agent_type="reactive",  # You can change the agent type based on your needs
+            verbose=True,
+        )
+
+    def document_retrieval_tool(self, retrieval_qa_chain):
+        def tool(query):
+            response = retrieval_qa_chain({"query": query})
+            return response["result"]
+
+        return tool
+
     @staticmethod
     def _format_docs(docs):
         return "\n\n".join(doc.page_content for doc in docs)
 
-    async def get_context(self, question, memorystore):
+    def get_context(self, question, memorystore):
         log.info("Getting context")
-        context = await self._vector.similarity_search(question)
+        context = vector_store_service.similarity_search(question)
         log.info(f"Got context: {context}")
         if not context:
             log.warning("Context not found")
@@ -62,3 +128,6 @@ class Chain:
             "context": [HumanMessage(content=self._format_docs(context))],
             "messages": memorystore.messages,
         }
+
+
+chain_service = Chain()

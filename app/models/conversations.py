@@ -102,3 +102,15 @@ CRUDConversation = FastCRUD[
 ]
 
 conversations = CRUDConversation(Conversation)
+
+
+####################
+# FORM
+####################
+
+
+class ConversationForm(BaseModel):
+    title: str
+
+
+# class Chat

@@ -10,14 +10,17 @@ log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["SERVICE"])
 
 
-class MessaeService:
+class MessageService:
     async def create_new_message(
         self,
-        data: MessageCreateModel,
+        form_data: MessageCreateModel,
     ) -> Optional[MessageReadModel]:
         try:
             async with session_manager.session() as db:
-                new_message = await messages.create(db=db, object=data.model_dump())
+                new_message = await messages.create(
+                    db=db, object=form_data, commit=True
+                )
+                await db.refresh(new_message)
                 return MessageReadModel.model_validate(new_message)
         except Exception as e:
             raise DatabaseException(str(e))
@@ -40,3 +43,6 @@ class MessaeService:
                 )
         except Exception as e:
             raise DatabaseException(str(e))
+
+
+message_service = MessageService()

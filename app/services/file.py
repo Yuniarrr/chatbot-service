@@ -62,7 +62,6 @@ class FileService:
                     schema_to_select=File,
                     id=file_id,
                 )
-                print(updated_file)
                 updated_file = await db.merge(updated_file)
                 await db.refresh(updated_file)
                 return FileReadModel.model_validate(updated_file)

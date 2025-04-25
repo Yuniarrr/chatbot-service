@@ -8,10 +8,11 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from app.env import PY_ENV
-from app.routers import auth, user
+from app.routers import auth, user, conversation, chat
 from app.routers.file import router
-from app.core.database import session_manager
+from app.core.database import session_manager, pgvector_session_manager
 from app.core.exceptions import DatabaseException, DuplicateValueException
+from app.retrieval.vector_store import vector_store_service
 
 print(
     rf"""
@@ -30,10 +31,14 @@ https://github.com/Yuniarrr/chatbot-service
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await session_manager.initialize()
+    vector_store_service.initialize_embedding_model()
+    vector_store_service.initialize_pg_vector()
+    await pgvector_session_manager.initialize()
     try:
         yield
     finally:
         await session_manager.close()
+        await pgvector_session_manager.close()
 
 
 app = FastAPI(
@@ -56,6 +61,8 @@ app.add_middleware(
 app.include_router(auth.router, prefix="/auth", tags=["auth"])
 app.include_router(router, prefix="/file", tags=["file"])
 app.include_router(user.router, prefix="/user", tags=["user"])
+app.include_router(conversation.router, prefix="/conversation", tags=["conversation"])
+app.include_router(chat.router, prefix="/chat", tags=["chat"])
 
 
 @app.exception_handler(RequestValidationError)

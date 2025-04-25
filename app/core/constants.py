@@ -17,6 +17,9 @@ class ERROR_MESSAGES(str, Enum):
     UNAUTHORIZED = "Un-Authorized: Tidak memiliki akses"
     EMPTY_CONTENT = "Empty content: content tidak ditemukan"
     FAILED_UPLOAD = "Gagal mengupload file"
+    PANDOC_NOT_INSTALLED = (
+        "Pandoc tidak terinstal. Silakan instal pandoc untuk menggunakan fitur ini."
+    )
 
 
 class SUCCESS_MESSAGE(str, Enum):

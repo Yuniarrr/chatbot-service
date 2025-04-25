@@ -11,16 +11,22 @@ from app.retrieval.loaders import Loader
 
 
 class Embedding:
-    def __init__(self, embedding_model) -> None:
+    def __init__(self) -> None:
         self._splitter = RecursiveCharacterTextSplitter(
-            chunk_size=1000,
-            chunk_overlap=200,
+            chunk_size=1000, chunk_overlap=200, add_start_index=True
         )
-        self._embedding_model: SentenceTransformer = embedding_model
 
     def split_document(self, document: str) -> List[Document]:
         splitted_document = self._splitter.split_documents(document)
         return splitted_document
+
+    def add_addtional_data_to_docs(
+        self, docs: List[Document], file_id: str, file_name: str
+    ) -> List[Document]:
+        for doc in docs:
+            doc.metadata["file_id"] = file_id
+            doc.metadata["file_name"] = file_name
+        return docs
 
     def loader(self, filename: str, file_content_type: str, file_path: str):
         loader = Loader(PDF_EXTRACT_IMAGES=True)
@@ -28,3 +34,6 @@ class Embedding:
 
     def split_text(self, text: str) -> List[str]:
         return self._splitter.split_text(text)
+
+
+embedding_service = Embedding()

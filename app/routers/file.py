@@ -14,6 +14,7 @@ from app.core.exceptions import (
     InternalServerException,
     NotFoundException,
 )
+from app.retrieval.loaders import Loader
 from app.utils.auth import (
     TokenData,
     get_not_user,
@@ -28,7 +29,8 @@ from app.models.files import (
     FileReadModel,
 )
 from app.services.retrieval import retrieval_service
-from app.retrieval.vector import VECTOR_DB_CLIENT
+from app.retrieval.embed import embedding_service
+from app.retrieval.vector_store import vector_store_service
 
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["ROUTER"])
@@ -66,6 +68,7 @@ async def add_new_file(
                     "name": name,
                     "content_type": file.content_type,
                     "size": len(contents),
+                    "collection_name": collection_name,
                 },
             }
         )
@@ -73,31 +76,34 @@ async def add_new_file(
         await file_service.insert_new_file(_new_file)
 
         try:
-            file_item = None
-            await retrieval_service.process_file(
-                ProcessFileForm(file_id=id, collection_name=collection_name)
-            )
-            file_item = await file_service.get_file_by_id(id=id)
-        except Exception as e:
-            log.error(f"Error processing file: {file_item.id}")
-            file_item = FileReadModel(
-                **{
-                    **file_item.model_dump(),
-                    "error": str(e.detail) if hasattr(e, "detail") else str(e),
-                }
-            )
-            print("ERROR")
-            await file_service.update_file_by_id(
-                file.id,
-                FileUpdateModel(**{"status": FileStatus.FAILED}),
+            loader_document = embedding_service.loader(
+                _new_file.file_name,
+                _new_file.meta.get("content_type"),
+                _new_file.file_path,
             )
 
-        if file_item:
-            return ResponseModel(
-                status_code=201, message=SUCCESS_MESSAGE.CREATED, data=file_item
+            splitted_document = embedding_service.split_document(loader_document)
+
+            splitted_document = embedding_service.add_addtional_data_to_docs(
+                docs=splitted_document,
+                file_id=str(_new_file.id),
+                file_name=_new_file.file_name,
             )
-        else:
-            raise BadRequestException(ERROR_MESSAGES.FAILED_UPLOAD)
+
+            vector_store_service.add_vectostore(splitted_document, collection_name)
+        except Exception as e:
+            update_file = FileUpdateModel(**{"status": FileStatus.FAILED})
+            await file_service.update_file_by_id(_new_file.id, update_file)
+
+            log.error(f"Error processing file: {_new_file.id}")
+            raise InternalServerException(f"Error in processing file {e}")
+
+        update_file = FileUpdateModel(**{"status": FileStatus.SUCCESS})
+        updated = await file_service.update_file_by_id(_new_file.id, update_file)
+
+        return ResponseModel(
+            status_code=201, message=SUCCESS_MESSAGE.CREATED, data=updated
+        )
 
     except Exception as e:
         raise InternalServerException(str(e))
@@ -131,12 +137,6 @@ async def delete_file_by_id(
         if not file:
             raise NotFoundException(ERROR_MESSAGES.NOT_FOUND("file"))
 
-        collection_name = file.meta.get("collection_name")
-        # Remove content from the vector database
-        VECTOR_DB_CLIENT.delete(
-            collection_name=collection_name, filter={"file_id": file_id}
-        )
-
         await file_service.update_file_by_id(
             file.id,
             FileUpdateModel(
@@ -149,6 +149,15 @@ async def delete_file_by_id(
         if delete_file:
             uploader_service.delete_from_local(file.file_name)
             await file_service.delete_file_by_id(file.id)
+
+        collection_name = file.meta.get("collection_name")
+        vector_ids = await vector_store_service.get_vector_ids(
+            file_id,
+        )
+
+        vector_ids_list = [item["id"] for item in vector_ids]
+
+        vector_store_service.delete_by_ids(vector_ids_list, collection_name)
 
         return ResponseModel(status_code=200, message=SUCCESS_MESSAGE.DELETED)
     except Exception as e:

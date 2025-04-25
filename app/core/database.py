@@ -16,21 +16,22 @@ from typing import Any, Optional
 from sqlalchemy.sql.type_api import _T
 from typing_extensions import Self
 
-from app.env import DATABASE_URL
+from app.env import DATABASE_URL, PGVECTOR_DB_URL
 
 Base = declarative_base()
 
 
 class DatabaseSessionManager:
-    def __init__(self, engine_kwargs: dict[str, Any] = {}):
+    def __init__(self, db_url: str, engine_kwargs: dict[str, Any] = {}):
         self.engine_kwargs = engine_kwargs
         self._engine = AsyncEngine
         self._sessionmaker = None
+        self._database_url = db_url
 
     async def initialize(self):
         # Local environment: use standard connection
         self._engine = create_async_engine(
-            "postgresql+asyncpg://" + DATABASE_URL,
+            "postgresql+asyncpg://" + self._database_url,
             **self.engine_kwargs,
         )
 
@@ -73,7 +74,12 @@ class DatabaseSessionManager:
             await session.close()
 
 
-session_manager = DatabaseSessionManager(engine_kwargs={"echo": True})
+session_manager = DatabaseSessionManager(
+    db_url=DATABASE_URL, engine_kwargs={"echo": True}
+)
+pgvector_session_manager = DatabaseSessionManager(
+    db_url=PGVECTOR_DB_URL, engine_kwargs={"echo": True}
+)
 
 
 class JSONField(types.TypeDecorator):

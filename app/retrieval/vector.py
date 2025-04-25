@@ -25,7 +25,10 @@ from sqlalchemy.ext.mutable import MutableDict
 from pydantic import BaseModel
 from typing import Optional, List, Any
 
-from app.env import PGVECTOR_DB_URL, PGVECTOR_INITIALIZE_MAX_VECTOR_LENGTH
+from app.env import (
+    PGVECTOR_DB_URL,
+    PGVECTOR_INITIALIZE_MAX_VECTOR_LENGTH,
+)
 from app.core.logger import SRC_LOG_LEVELS
 
 VECTOR_LENGTH = PGVECTOR_INITIALIZE_MAX_VECTOR_LENGTH
@@ -456,4 +459,4 @@ class VectorClient:
         log.info(f"Collection '{collection_name}' deleted.")
 
 
-VECTOR_DB_CLIENT = VectorClient()
+# VECTOR_DB_CLIENT = VectorClient()

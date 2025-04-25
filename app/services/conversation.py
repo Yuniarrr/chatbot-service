@@ -27,9 +27,9 @@ class ConversationService:
                     user_id=user_id,
                 )
                 new_conversation = await conversations.create(
-                    db=db, object=conversation
+                    db=db, object=conversation, commit=True
                 )
-
+                await db.refresh(new_conversation)
                 return ConversationReadModel.model_validate(new_conversation)
         except Exception as e:
             raise DatabaseException(str(e))

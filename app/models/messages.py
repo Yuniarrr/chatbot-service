@@ -101,6 +101,18 @@ class MessageUpdateInternalModel(MessageUpdateModel):
     updated_at: datetime
 
 
+####################
+# FORM
+####################
+
+
+class MessageForm(BaseModel):
+    message: str
+    conversation_id: UUID
+    collection_name: Optional[str] = None
+    model: Optional[str] = "ollama"
+
+
 CRUDMessage = FastCRUD[
     MessageBaseModel,
     MessageModel,
