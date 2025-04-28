@@ -98,9 +98,10 @@ class VectorStore:
         else:
             self.initialize_pg_vector(collection_name)
 
-        return self._vector_store.as_retriever(
-            search_type="similarity", search_kwargs={"k": self._k}
-        ).invoke(query)
+        # return self._vector_store.as_retriever(
+        #     search_type="similarity", search_kwargs={"k": self._k}
+        # ).invoke(query)
+        return self._vector_store.similarity_search(query, k=self._k)
 
     def sim_search(
         self, query: str, collection_name: Optional[str] = None

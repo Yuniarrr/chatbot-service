@@ -14,10 +14,11 @@ from google.oauth2 import service_account
 from langchain.chat_models import init_chat_model
 from langgraph.prebuilt import create_react_agent
 from langchain.agents import initialize_agent, Tool, AgentExecutor
-from langchain.chains import RetrievalQA
+from langchain.chains import retrieval
 from langchain_core.messages import BaseMessage, FunctionMessage
 from sqlalchemy import Sequence
 from langchain_core.runnables import RunnableLambda, Runnable
+from langchain_core.tools import tool
 
 # from langgraph.prebuilt import ToolInvocation, ToolExecutor
 from langchain_core.runnables import RunnablePassthrough, RunnableSerializable
@@ -38,7 +39,6 @@ class AgentState(TypedDict):
 
 class Chain:
     def init_prompt(self):
-        # Prompt engineering
         system_msg = (
             "Anda adalah CATI, asisten virtual yang membantu pengguna dengan menjawab pertanyaan seputar administarasi dan informasi mengenai Departemen Teknologi Informasi di Institut Teknologi Sepuluh Nopember. "
             "Anda adalah asisten yang dikembangkan oleh mahasiswi di Departemen Teknologi Informasi, Midyanisa Yuniar, sebagai bagian dari Tugas Akhir. "
@@ -50,19 +50,9 @@ class Chain:
         return PromptTemplate.from_template(system_msg)
 
     def agent_system_prompt(self) -> str:
-        return """Kamu adalah asisten cerdas berbahasa Indonesia.
-
-        Kamu memiliki akses ke beberapa alat berikut:
-        - `current_weather`: Untuk mendapatkan informasi cuaca saat ini.
-        - `document_retrieval`: Untuk mengambil informasi dari kumpulan dokumen.
-
-        **Peraturan penting yang harus kamu ikuti:**
-        - **Jika** pertanyaan pengguna bisa dijawab menggunakan data dokumen, kamu **WAJIB** menggunakan `document_retrieval` terlebih dahulu.
-        - **Jangan pernah** langsung menjawab hanya berdasarkan pengetahuan umum kalau data bisa diambil dari dokumen.
-        - Jika dokumen ditemukan, gunakan isi dokumen tersebut dalam jawabanmu.
-        - Jika tidak ada dokumen yang relevan, baru kamu boleh menggunakan pengetahuan umummu.
-
-        **Ingat**: Prioritaskan selalu mencari informasi dari dokumen menggunakan `document_retrieval`.
+        return """Anda adalah CATI, asisten virtual yang membantu pengguna dengan menjawab pertanyaan seputar administarasi dan informasi mengenai Departemen Teknologi Informasi di Institut Teknologi Sepuluh Nopember.
+    
+        Anda adalah asisten yang dikembangkan oleh mahasiswi di Departemen Teknologi Informasi, Midyanisa Yuniar, sebagai bagian dari Tugas Akhir.
         """
 
     def init_llm(self, model: Optional[str] = "ollama"):
@@ -100,8 +90,10 @@ class Chain:
         )
 
     def create_agent(self) -> CompiledGraph:
-        model = init_chat_model("gpt-4o", model_provider="openai")
-        model = model.bind(system_message=self.agent_system_prompt())
+        model = init_chat_model(
+            "gpt-4o",
+            model_provider="openai",
+        )
 
         tools = [
             Tool(
@@ -109,11 +101,7 @@ class Chain:
                 func=get_current_weather,
                 description="Get the current weather for a location.",
             ),
-            Tool(
-                name="document_retrieval",
-                func=self.document_retrieval_tool(),
-                description="Retrieve knowledge from the document database.",
-            ),
+            Chain.retrieve,
         ]
 
         return create_react_agent(model, tools)
@@ -137,6 +125,21 @@ class Chain:
             return retrieval_chain.invoke(inputs)
 
         return retrieval_callable
+
+    @tool(response_format="content_and_artifact")
+    @staticmethod
+    def retrieve(query: str):
+        """Retrieve information related to a query."""
+        # collection_name = lambda inputs: inputs["collection_name"]
+        collection_name = "administration"
+        print("collection_name")
+        print(collection_name)
+        retrieved_docs = vector_store_service.similarity_search(query, collection_name)
+        serialized = "\n\n".join(
+            (f"Source: {doc.metadata}\n" f"Content: {doc.page_content}")
+            for doc in retrieved_docs
+        )
+        return serialized, retrieved_docs
 
     @staticmethod
     def _format_docs(docs):
