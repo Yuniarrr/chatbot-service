@@ -1,7 +1,8 @@
 import logging
 import os
 import json
-from typing import Optional
+from typing import Annotated, Optional, TypedDict
+import operator
 
 from langchain_google_vertexai import ChatVertexAI
 from langchain_ollama import OllamaLLM
@@ -14,7 +15,13 @@ from langchain.chat_models import init_chat_model
 from langgraph.prebuilt import create_react_agent
 from langchain.agents import initialize_agent, Tool, AgentExecutor
 from langchain.chains import RetrievalQA
+from langchain_core.messages import BaseMessage, FunctionMessage
+from sqlalchemy import Sequence
+from langchain_core.runnables import RunnableLambda, Runnable
 
+# from langgraph.prebuilt import ToolInvocation, ToolExecutor
+from langchain_core.runnables import RunnablePassthrough, RunnableSerializable
+from langgraph.graph.graph import CompiledGraph
 
 from app.retrieval.vector_store import vector_store_service
 from app.core.logger import SRC_LOG_LEVELS
@@ -23,6 +30,10 @@ from app.services.list_tool import get_current_weather
 
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["RAG"])
+
+
+class AgentState(TypedDict):
+    messages: Annotated[Sequence[BaseMessage], operator.add]
 
 
 class Chain:
@@ -37,6 +48,22 @@ class Chain:
         )
 
         return PromptTemplate.from_template(system_msg)
+
+    def agent_system_prompt(self) -> str:
+        return """Kamu adalah asisten cerdas berbahasa Indonesia.
+
+        Kamu memiliki akses ke beberapa alat berikut:
+        - `current_weather`: Untuk mendapatkan informasi cuaca saat ini.
+        - `document_retrieval`: Untuk mengambil informasi dari kumpulan dokumen.
+
+        **Peraturan penting yang harus kamu ikuti:**
+        - **Jika** pertanyaan pengguna bisa dijawab menggunakan data dokumen, kamu **WAJIB** menggunakan `document_retrieval` terlebih dahulu.
+        - **Jangan pernah** langsung menjawab hanya berdasarkan pengetahuan umum kalau data bisa diambil dari dokumen.
+        - Jika dokumen ditemukan, gunakan isi dokumen tersebut dalam jawabanmu.
+        - Jika tidak ada dokumen yang relevan, baru kamu boleh menggunakan pengetahuan umummu.
+
+        **Ingat**: Prioritaskan selalu mencari informasi dari dokumen menggunakan `document_retrieval`.
+        """
 
     def init_llm(self, model: Optional[str] = "ollama"):
         # Large language model
@@ -72,14 +99,9 @@ class Chain:
             output_parser=StrOutputParser(),
         )
 
-    def create_agent(self, collection_name: Optional[str] = None) -> AgentExecutor:
+    def create_agent(self) -> CompiledGraph:
         model = init_chat_model("gpt-4o", model_provider="openai")
-
-        retriever = vector_store_service.get_retriever(collection_name=collection_name)
-
-        retrieval_qa_chain = RetrievalQA.from_chain_type(
-            llm=model, retriever=retriever, return_source_documents=True
-        )
+        model = model.bind(system_message=self.agent_system_prompt())
 
         tools = [
             Tool(
@@ -88,25 +110,33 @@ class Chain:
                 description="Get the current weather for a location.",
             ),
             Tool(
-                name="Document Retrieval",
-                func=self.document_retrieval_tool(retrieval_qa_chain),
+                name="document_retrieval",
+                func=self.document_retrieval_tool(),
                 description="Retrieve knowledge from the document database.",
             ),
         ]
 
-        return initialize_agent(
-            tools,
-            model,
-            agent_type="reactive",  # You can change the agent type based on your needs
-            verbose=True,
+        return create_react_agent(model, tools)
+
+    def document_retrieval_tool(self):
+        init_llm = lambda inputs: self.init_llm(model=inputs["model"])
+
+        retrieval_chain = (
+            {
+                "context": lambda inputs: vector_store_service.get_retriever(
+                    collection_name=inputs["collection_name"]
+                ),
+                "question": RunnablePassthrough(),
+            }
+            | chain_service.init_prompt()
+            | init_llm
+            | StrOutputParser()
         )
 
-    def document_retrieval_tool(self, retrieval_qa_chain):
-        def tool(query):
-            response = retrieval_qa_chain({"query": query})
-            return response["result"]
+        def retrieval_callable(inputs: dict):
+            return retrieval_chain.invoke(inputs)
 
-        return tool
+        return retrieval_callable
 
     @staticmethod
     def _format_docs(docs):

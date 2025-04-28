@@ -1,3 +1,4 @@
+import json
 import logging
 import uuid
 
@@ -6,6 +7,9 @@ from fastapi import APIRouter, Form, Query, Request, UploadFile, File, Depends
 from sse_starlette import EventSourceResponse
 from langchain_core.runnables import RunnablePassthrough, RunnableSerializable
 from langchain_core.output_parsers import StrOutputParser
+from langgraph.graph import StateGraph, END
+from langchain_core.messages import HumanMessage
+
 
 from app.core.constants import SUCCESS_MESSAGE
 from app.core.exceptions import InternalServerException
@@ -18,7 +22,7 @@ from app.utils.auth import (
 )
 from app.services.message import message_service
 from app.retrieval.vector_store import vector_store_service
-from app.retrieval.chain import chain_service
+from app.retrieval.chain import AgentState, chain_service
 
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["ROUTER"])
@@ -48,26 +52,19 @@ async def chat_to_assistant(
 
             accumulated_text = ""
 
-            rag_chain: RunnableSerializable = (
-                {
-                    "context": vector_store_service.get_retriever(
-                        collection_name=data.collection_name
-                    ),
-                    "question": RunnablePassthrough(),
-                }
-                | chain_service.init_prompt()
-                | chain_service.init_llm(data.model)
-                | StrOutputParser()
-            )
-
             agent_executor = chain_service.create_agent()
 
-            print(">>>>>> BEFORE STREAM <<<<<<")
-            for chunk in rag_chain.stream(data.message):
-                print(chunk)
-                accumulated_text += chunk
-                yield chunk
-            print(">>>>>> AFTER STREAM <<<<<<")
+            for step in agent_executor.stream(
+                {
+                    "messages": [HumanMessage(content=data.message)],
+                    "collection_name": data.collection_name,
+                    "model": data.model,
+                },
+                stream_mode="values",
+            ):
+                print("step")
+                print(step)
+                yield "test"
 
             _new_chat_from_assistant = MessageCreateModel(
                 **{

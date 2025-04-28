@@ -2,7 +2,7 @@ import os
 import requests
 
 
-def get_current_weather(self, city: str) -> str:
+def get_current_weather(city: str) -> str:
     """
     Get the current weather for a given city.
     :param city: The name of the city to get the weather for.
