@@ -134,3 +134,10 @@ RAG_MODEL = os.environ.get("RAG_MODEL", "llama3.2")
 
 if not os.environ.get("OPENAI_API_KEY"):
     os.environ["OPENAI_API_KEY"] = getpass.getpass("Enter API key for OpenAI: ")
+
+####################################
+# EMAIL SETTINGS
+####################################
+
+GOOGLE_EMAIL = os.environ.get("GOOGLE_EMAIL")
+GOOGLE_PASSWORD = os.environ.get("GOOGLE_PASSWORD")

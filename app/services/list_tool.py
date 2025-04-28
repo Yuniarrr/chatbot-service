@@ -1,5 +1,18 @@
 import os
 import requests
+import smtplib
+import logging
+import traceback
+
+from pydantic import BaseModel, EmailStr
+from email.message import EmailMessage
+from email.utils import make_msgid
+
+from app.core.logger import SRC_LOG_LEVELS
+from app.env import GOOGLE_EMAIL, GOOGLE_PASSWORD
+
+log = logging.getLogger(__name__)
+log.setLevel(SRC_LOG_LEVELS["SERVICE"])
 
 
 def get_current_weather(city: str) -> str:
@@ -30,3 +43,52 @@ def get_current_weather(city: str) -> str:
         return f"Weather in {city}: {temperature}°C"
     except requests.RequestException as e:
         return f"Error fetching weather data: {str(e)}"
+
+
+class EmailInputSchema(BaseModel):
+    email: EmailStr
+    subject: str
+    body: str
+
+
+def send_email(email: str, subject: str, body: str) -> str:
+    """
+    Service pengiriman email.
+
+    :param input: Dictionary yang berisi recipient_email, subject, dan body
+    :return: Status pengiriman email
+    """
+    try:
+        recipient_email = email
+
+        # Set up email message
+        message_data = EmailMessage()
+        username = GOOGLE_EMAIL
+        password = GOOGLE_PASSWORD
+        message_data["Subject"] = subject
+        message_data["From"] = username
+        message_data["To"] = recipient_email
+
+        # Add HTML content
+        message_data.add_alternative(body, subtype="html")
+
+        # Send the email
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp_server:
+            smtp_server.login(username, password)
+            smtp_server.send_message(message_data)
+
+        return f"Berhasil mengirimkan email ke {recipient_email}"
+
+    except smtplib.SMTPRecipientsRefused:
+        # print("Recipient address rejected: not found")
+        return "Alamat penerima tidak ditemukan"
+    except smtplib.SMTPSenderRefused:
+        # print("Sender address invalid")
+        return "Alamat pengirim tidak valid"
+    except smtplib.SMTPDataError:
+        # print("The SMTP server refused to accept the message data.")
+        return "Server SMTP menolak menerima data pesan"
+    except Exception as error:
+        log.error(f"Error: {error}")
+        log.info(traceback.print_exc())
+        return "Gagal mengirimkan email"

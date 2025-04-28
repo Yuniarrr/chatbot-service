@@ -19,6 +19,8 @@ from langchain_core.messages import BaseMessage, FunctionMessage
 from sqlalchemy import Sequence
 from langchain_core.runnables import RunnableLambda, Runnable
 from langchain_core.tools import tool
+from langchain_core.tools import StructuredTool
+
 
 # from langgraph.prebuilt import ToolInvocation, ToolExecutor
 from langchain_core.runnables import RunnablePassthrough, RunnableSerializable
@@ -27,7 +29,7 @@ from langgraph.graph.graph import CompiledGraph
 from app.retrieval.vector_store import vector_store_service
 from app.core.logger import SRC_LOG_LEVELS
 from app.env import RAG_MODEL, RAG_OLLAMA_BASE_URL
-from app.services.list_tool import get_current_weather
+from app.services.list_tool import get_current_weather, send_email, EmailInputSchema
 
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["RAG"])
@@ -56,9 +58,13 @@ class Chain:
         """
 
     def init_llm(self, model: Optional[str] = "ollama"):
-        # Large language model
         if model == "ollama":
-            return OllamaLLM(model=RAG_MODEL, base_url=RAG_OLLAMA_BASE_URL)
+            # return OllamaLLM(model=RAG_MODEL, base_url=RAG_OLLAMA_BASE_URL)
+            return init_chat_model(
+                model="llama3.2",
+                model_provider="ollama",
+                configurable_fields={"base_url": RAG_OLLAMA_BASE_URL},
+            )
         elif model == "deepseek":
             return OllamaLLM(
                 model="deepseek-r1:1.5b", base_url="http://34.101.167.227:11434"
@@ -89,19 +95,22 @@ class Chain:
             output_parser=StrOutputParser(),
         )
 
-    def create_agent(self) -> CompiledGraph:
-        model = init_chat_model(
-            "gpt-4o",
-            model_provider="openai",
-        )
+    def create_agent(self, model: str) -> CompiledGraph:
+        model = self.init_llm(model)
 
         tools = [
+            Chain.retrieve,
             Tool(
                 name="current_weather",
                 func=get_current_weather,
                 description="Get the current weather for a location.",
             ),
-            Chain.retrieve,
+            StructuredTool(
+                name="servis_pengiriman_email",
+                func=send_email,
+                description="Servis yang membantu mengirimkan email secara otomatis",
+                args_schema=EmailInputSchema,
+            ),
         ]
 
         return create_react_agent(model, tools)
@@ -128,12 +137,8 @@ class Chain:
 
     @tool(response_format="content_and_artifact")
     @staticmethod
-    def retrieve(query: str):
+    def retrieve(query: str, collection_name: str = "administration"):
         """Retrieve information related to a query."""
-        # collection_name = lambda inputs: inputs["collection_name"]
-        collection_name = "administration"
-        print("collection_name")
-        print(collection_name)
         retrieved_docs = vector_store_service.similarity_search(query, collection_name)
         serialized = "\n\n".join(
             (f"Source: {doc.metadata}\n" f"Content: {doc.page_content}")

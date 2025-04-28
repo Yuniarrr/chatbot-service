@@ -52,19 +52,18 @@ async def chat_to_assistant(
 
             accumulated_text = ""
 
-            agent_executor = chain_service.create_agent()
+            agent_executor = chain_service.create_agent(data.model)
 
             for step in agent_executor.stream(
                 {
                     "messages": [HumanMessage(content=data.message)],
                     "collection_name": data.collection_name,
-                    "model": data.model,
                 },
                 stream_mode="values",
             ):
                 print("step")
                 print(step)
-                yield "test"
+                yield step["messages"][-1]
 
             _new_chat_from_assistant = MessageCreateModel(
                 **{
