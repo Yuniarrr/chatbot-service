@@ -8,3 +8,6 @@ __pycache__
 data
 ui-test
 google.json
+client_secret.json
+token.json
+credentials.json

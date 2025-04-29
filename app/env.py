@@ -141,3 +141,11 @@ if not os.environ.get("OPENAI_API_KEY"):
 
 GOOGLE_EMAIL = os.environ.get("GOOGLE_EMAIL")
 GOOGLE_PASSWORD = os.environ.get("GOOGLE_PASSWORD")
+
+####################################
+# GOOGLE SETTINGS
+####################################
+
+GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
+GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET")
+GOOGLE_CALENDAR_JSON = os.environ.get("GOOGLE_CALENDAR_JSON", "client_secret.json")

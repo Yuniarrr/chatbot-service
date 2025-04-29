@@ -63,7 +63,7 @@ async def chat_to_assistant(
             ):
                 print("step")
                 print(step)
-                yield step["messages"][-1]
+                yield step["messages"][-1].content
 
             _new_chat_from_assistant = MessageCreateModel(
                 **{

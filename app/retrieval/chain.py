@@ -29,7 +29,13 @@ from langgraph.graph.graph import CompiledGraph
 from app.retrieval.vector_store import vector_store_service
 from app.core.logger import SRC_LOG_LEVELS
 from app.env import RAG_MODEL, RAG_OLLAMA_BASE_URL
-from app.services.list_tool import get_current_weather, send_email, EmailInputSchema
+from app.services.list_tool import (
+    get_current_weather,
+    send_email,
+    EmailInputSchema,
+    add_to_calendar,
+    CalendarInputSchema,
+)
 
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["RAG"])
@@ -110,6 +116,12 @@ class Chain:
                 func=send_email,
                 description="Servis yang membantu mengirimkan email secara otomatis",
                 args_schema=EmailInputSchema,
+            ),
+            StructuredTool(
+                name="servis_tambah_jadwal_ke_kalender",
+                func=add_to_calendar,
+                description="Servis yang membantu menambahkan jadwal ke kalender secara otomatis",
+                args_schema=CalendarInputSchema,
             ),
         ]
 

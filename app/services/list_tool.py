@@ -1,15 +1,21 @@
 import os
+from typing import List, Optional
 import requests
 import smtplib
 import logging
 import traceback
 
+from datetime import datetime
 from pydantic import BaseModel, EmailStr
 from email.message import EmailMessage
 from email.utils import make_msgid
+from google.oauth2.credentials import Credentials
+from google.auth.transport.requests import Request
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
 
 from app.core.logger import SRC_LOG_LEVELS
-from app.env import GOOGLE_EMAIL, GOOGLE_PASSWORD
+from app.env import GOOGLE_EMAIL, GOOGLE_PASSWORD, GOOGLE_CALENDAR_JSON
 
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["SERVICE"])
@@ -92,3 +98,78 @@ def send_email(email: str, subject: str, body: str) -> str:
         log.error(f"Error: {error}")
         log.info(traceback.print_exc())
         return "Gagal mengirimkan email"
+
+
+class CalendarInputSchema(BaseModel):
+    summary: str
+    start_datetime: datetime
+    end_datetime: datetime
+    attendees: List[str]
+    description: Optional[str] = None
+    location: Optional[str] = "Google Meet"
+
+
+def add_to_calendar(
+    summary: str,
+    start_datetime: datetime,
+    end_datetime: datetime,
+    attendees: List[str],
+    description: Optional[str] = None,
+    location: Optional[str] = "Google Meet",
+):
+    SCOPES = ["https://www.googleapis.com/auth/calendar"]
+
+    BASE_DIR = os.path.dirname(
+        os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    )
+    TOKEN_PATH = os.path.join(BASE_DIR, "token.json")  # <-- token, NOT credentials
+    CREDENTIALS_PATH = os.path.join(BASE_DIR, "credentials.json")
+
+    print("TOKEN_PATH")
+    print(TOKEN_PATH)
+    print("CREDENTIALS_PATH")
+    print(CREDENTIALS_PATH)
+
+    creds = None
+
+    # Attempt to load existing token
+    if os.path.exists(TOKEN_PATH):
+        creds = Credentials.from_authorized_user_file(TOKEN_PATH, SCOPES)
+
+    # If no valid credentials, launch browser-based login
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            # Requires user to log in once in browser
+            flow = InstalledAppFlow.from_client_secrets_file(CREDENTIALS_PATH, SCOPES)
+            creds = flow.run_local_server(port=0)
+            with open(TOKEN_PATH, "w") as token_file:
+                token_file.write(creds.to_json())
+
+    service = build("calendar", "v3", credentials=creds)
+
+    event = {
+        "summary": "Test from CATI",
+        "location": location,
+        "description": description,
+        "start": {
+            "dateTime": start_datetime.isoformat(),
+            "timeZone": "Asia/Jakarta",
+        },
+        "end": {
+            "dateTime": end_datetime.isoformat(),
+            "timeZone": "Asia/Jakarta",
+        },
+        "attendees": [{"email": email} for email in attendees],
+        "reminders": {
+            "useDefault": False,
+            "overrides": [
+                {"method": "email", "minutes": 24 * 60},
+                {"method": "popup", "minutes": 10},
+            ],
+        },
+    }
+
+    event = service.events().insert(calendarId="primary", body=event).execute()
+    return "Event created: %s" % (event.get("htmlLink"))
