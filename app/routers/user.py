@@ -55,9 +55,25 @@ async def register(
         raise InternalServerException(str(e))
 
 
+@router.get("/", response_model=ResponseModel)
+async def get_all_file(
+    current_user: Annotated[TokenData, Depends(get_not_user)],
+    skip: int = Query(0, ge=0),
+    limit: int = Query(10, ge=1),
+):
+    try:
+        users = await user_service.get_users(skip=skip, limit=limit)
+
+        return ResponseModel(
+            status_code=200, message=SUCCESS_MESSAGE.RETRIEVED, data=users["data"]
+        )
+    except Exception as e:
+        raise InternalServerException(str(e))
+
+
 @router.get("/me", response_model=ResponseModel)
 async def get_user_login_data(
-    current_user: Annotated[TokenData, Depends(get_verified_user)]
+    current_user: Annotated[TokenData, Depends(get_verified_user)],
 ):
     try:
         del current_user.password

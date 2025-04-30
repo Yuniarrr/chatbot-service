@@ -88,7 +88,11 @@ async def login(form_data: LoginForm):
             data={
                 "access_token": access_token,
                 "refresh_token": refresh_token,
-                "role": is_email_exist.role,
+                "user": {
+                    "id": is_email_exist.id,
+                    "role": is_email_exist.role,
+                    "email": is_email_exist.email,
+                },
             },
         )
     except Exception as e:

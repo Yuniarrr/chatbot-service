@@ -73,7 +73,9 @@ class UserService:
     async def get_users(self, skip: Optional[int] = None, limit: Optional[int] = None):
         try:
             async with session_manager.session() as db:
-                return await users.get_multi(db=db, offset=skip, limit=limit)
+                return await users.get_multi(
+                    db=db, offset=skip, limit=limit, schema_to_select=UserReadModel
+                )
         except Exception as e:
             log.error(f"Error get users: {e}")
             raise DatabaseException(str(e))

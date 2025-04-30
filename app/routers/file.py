@@ -109,6 +109,22 @@ async def add_new_file(
         raise InternalServerException(str(e))
 
 
+@router.get("/", response_model=ResponseModel)
+async def get_all_file(
+    current_user: Annotated[TokenData, Depends(get_not_user)],
+    skip: int = Query(0, ge=0),
+    limit: int = Query(10, ge=1),
+):
+    try:
+        files = await file_service.get_files(skip=skip, limit=limit)
+
+        return ResponseModel(
+            status_code=200, message=SUCCESS_MESSAGE.RETRIEVED, data=files["data"]
+        )
+    except Exception as e:
+        raise InternalServerException(str(e))
+
+
 @router.get("/{file_id}", response_model=ResponseModel)
 async def get_file_by_id(
     file_id: str,
