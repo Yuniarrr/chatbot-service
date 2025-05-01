@@ -2,14 +2,10 @@ import json
 import logging
 import uuid
 
-from typing import Annotated, Optional
-from fastapi import APIRouter, Form, Query, Request, UploadFile, File, Depends
+from fastapi import APIRouter, UploadFile, File, Depends, Request
 from sse_starlette import EventSourceResponse
-from langchain_core.runnables import RunnablePassthrough, RunnableSerializable
-from langchain_core.output_parsers import StrOutputParser
-from langgraph.graph import StateGraph, END
 from langchain_core.messages import HumanMessage
-
+from twilio.twiml.messaging_response import MessagingResponse, Message
 
 from app.core.constants import SUCCESS_MESSAGE
 from app.core.exceptions import InternalServerException
@@ -21,7 +17,6 @@ from app.utils.auth import (
     get_verified_user,
 )
 from app.services.message import message_service
-from app.retrieval.vector_store import vector_store_service
 from app.retrieval.chain import AgentState, chain_service
 
 log = logging.getLogger(__name__)
@@ -79,5 +74,21 @@ async def chat_to_assistant(
             chain_streamer(form_data),
             media_type="text/event-stream",
         )
+    except Exception as e:
+        raise InternalServerException(str(e))
+
+
+@router.post("/message")
+async def reply(request: Request):
+    try:
+        form_data = await request.form()
+        msg = form_data.get("Body")
+        print(msg)
+
+        resp = MessagingResponse()
+        resp.message("Bismillah")
+        print("response")
+        print(resp)
+        return str(resp)
     except Exception as e:
         raise InternalServerException(str(e))
