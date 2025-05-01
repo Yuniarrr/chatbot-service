@@ -149,3 +149,11 @@ GOOGLE_PASSWORD = os.environ.get("GOOGLE_PASSWORD")
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET")
 GOOGLE_CALENDAR_JSON = os.environ.get("GOOGLE_CALENDAR_JSON", "client_secret.json")
+
+####################################
+# REDIS SETTINGS
+####################################
+
+REDIS_HOST = os.environ.get("REDIS_HOST", "localhost")
+REDIS_PORT = os.environ.get("REDIS_PORT", 6379)
+QUEUE = os.environ.get("QUEUE", "chatbot_service")

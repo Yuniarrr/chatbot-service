@@ -15,6 +15,7 @@ from app.core.exceptions import (
     NotFoundException,
 )
 from app.retrieval.loaders import Loader
+from app.task import process_uploaded_file
 from app.utils.auth import (
     TokenData,
     get_not_user,
@@ -31,6 +32,7 @@ from app.models.files import (
 from app.services.retrieval import retrieval_service
 from app.retrieval.embed import embedding_service
 from app.retrieval.vector_store import vector_store_service
+from app.env import QUEUE
 
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["ROUTER"])
@@ -104,6 +106,15 @@ async def add_new_file(
         return ResponseModel(
             status_code=201, message=SUCCESS_MESSAGE.CREATED, data=updated
         )
+
+        # process_uploaded_file.apply_async(
+        #     args=(id, filename, file.content_type, file_path, collection_name),
+        #     queue=QUEUE,
+        # )
+
+        # return ResponseModel(
+        #     status_code=201, message=SUCCESS_MESSAGE.CREATED, data=_new_file
+        # )
 
     except Exception as e:
         raise InternalServerException(str(e))

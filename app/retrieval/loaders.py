@@ -1,5 +1,6 @@
 import logging
 import ftfy
+import pytesseract
 
 # from langchain_community.document_loaders.parsers.images import TesseractBlobParser
 from langchain_community.document_loaders import (
@@ -14,6 +15,7 @@ from langchain_community.document_loaders import (
     UnstructuredPowerPointLoader,
 )
 from langchain_core.documents import Document
+from pdf2image import convert_from_path
 
 from app.core.logger import SRC_LOG_LEVELS
 
@@ -38,28 +40,29 @@ class Loader:
 
             print("pass docs load")
 
-            return [
+            fixed_docs = [
                 Document(
                     page_content=ftfy.fix_text(doc.page_content), metadata=doc.metadata
                 )
                 for doc in docs
             ]
+
+            # Cek apakah semua hasilnya kosong atau whitespace
+            if all(doc.page_content.strip() == "" for doc in fixed_docs):
+                print("Semua page_content kosong. Fallback ke OCR.")
+                return self._ocr_pdf(file_path)
+
+            return fixed_docs
         except Exception as e:
-            print(f"Error load file: {e}")
-            log.error(f"Error load file: {e}")
+            print(f"Fallback to OCR due to error: {e}")
+            log.warning(f"OCR fallback for {file_name} because: {e}")
+            return self._ocr_pdf(file_path)
 
     def _get_loader(self, file_name: str, file_content_type: str, file_path: str):
         file_ext = file_name.split(".")[-1].lower()
 
         if file_ext == "pdf":
             loader = PyPDFLoader(file_path, extract_images=True)
-            # loader = PyMuPDFLoader(
-            #     file_path,
-            #     extract_images=self.kwargs.get("PDF_EXTRACT_IMAGES"),
-            #     images_parser=TesseractBlobParser(langs=["eng"]),
-            #     extract_tables="markdown",
-            #     mode="page",
-            # )
         elif file_ext == "csv":
             loader = CSVLoader(file_path)
         elif file_ext in ["htm", "html"]:
@@ -90,3 +93,30 @@ class Loader:
             loader = TextLoader(file_path, autodetect_encoding=True)
 
         return loader
+
+    def _ocr_pdf(self, file_path: str) -> list[Document]:
+        try:
+            images = convert_from_path(
+                file_path, poppler_path=r"C:\poppler-24.08.0\Library\bin"
+            )
+            text = ""
+            for image in images:
+                text += pytesseract.image_to_string(image) + "\n"
+
+            temp_txt_path = file_path + ".ocr.txt"
+            with open(temp_txt_path, "w", encoding="utf-8") as f:
+                f.write(text)
+
+            loader = TextLoader(temp_txt_path, autodetect_encoding=True)
+            docs = loader.load()
+
+            return [
+                Document(
+                    page_content=ftfy.fix_text(doc.page_content),
+                    metadata=doc.metadata,
+                )
+                for doc in docs
+            ]
+        except Exception as ocr_error:
+            log.error(f"OCR processing failed: {ocr_error}")
+            return []
