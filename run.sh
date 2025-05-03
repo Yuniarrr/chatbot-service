@@ -10,7 +10,7 @@ if [ -d ".venv" ]; then
 fi
 
 # Set default values if not provided
-PORT="${PORT:-8080}"
+PORT="${PORT:-3000}"
 HOST="${HOST:-0.0.0.0}"
 
 # Run Uvicorn with the correct app path

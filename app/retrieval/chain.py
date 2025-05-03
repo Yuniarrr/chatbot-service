@@ -79,6 +79,7 @@ class Chain:
             return init_chat_model(
                 "gemini-2.0-flash-001", model_provider="google_genai"
             )
+            # model = init_chat_model("gemini-2.0-flash-001", model_provider="google_vertexai")
             # with open(
             #     os.path.join(os.path.dirname(__file__), "./google.json")
             # ) as source:

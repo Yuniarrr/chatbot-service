@@ -4,7 +4,7 @@ import uuid
 
 from fastapi import APIRouter, UploadFile, File, Depends, Request
 from sse_starlette import EventSourceResponse
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import HumanMessage, SystemMessage
 from twilio.twiml.messaging_response import MessagingResponse, Message
 
 from app.core.constants import SUCCESS_MESSAGE
@@ -48,10 +48,14 @@ async def chat_to_assistant(
             accumulated_text = ""
 
             agent_executor = chain_service.create_agent(data.model)
+            system_prompt = chain_service.agent_system_prompt()
 
             for step in agent_executor.stream(
                 {
-                    "messages": [HumanMessage(content=data.message)],
+                    "messages": [
+                        SystemMessage(content=system_prompt),
+                        HumanMessage(content=data.message),
+                    ],
                     "collection_name": data.collection_name,
                 },
                 stream_mode="values",
