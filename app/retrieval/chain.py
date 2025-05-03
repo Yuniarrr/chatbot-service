@@ -25,10 +25,12 @@ from langchain_core.tools import StructuredTool
 # from langgraph.prebuilt import ToolInvocation, ToolExecutor
 from langchain_core.runnables import RunnablePassthrough, RunnableSerializable
 from langgraph.graph.graph import CompiledGraph
+from psycopg_pool import AsyncConnectionPool
+from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 
 from app.retrieval.vector_store import vector_store_service
 from app.core.logger import SRC_LOG_LEVELS
-from app.env import RAG_MODEL, RAG_OLLAMA_BASE_URL
+from app.env import RAG_MODEL, RAG_OLLAMA_BASE_URL, DATABASE_URL
 from app.services.list_tool import (
     get_current_weather,
     send_email,
@@ -46,6 +48,12 @@ class AgentState(TypedDict):
 
 
 class Chain:
+    def __init__(self):
+        self._checkpointer = None
+
+    def set_checkpointer(self, checkpointer: AsyncPostgresSaver):
+        self._checkpointer = checkpointer
+
     def init_prompt(self):
         system_msg = (
             "Anda adalah CATI, asisten virtual yang membantu pengguna dengan menjawab pertanyaan seputar administarasi dan informasi mengenai Departemen Teknologi Informasi di Institut Teknologi Sepuluh Nopember. "
@@ -103,6 +111,9 @@ class Chain:
         )
 
     def create_agent(self, model: str) -> CompiledGraph:
+        if self._checkpointer is None:
+            raise RuntimeError("Checkpointer is not initialized")
+
         model = self.init_llm(model)
 
         tools = [
@@ -126,7 +137,23 @@ class Chain:
             ),
         ]
 
-        return create_react_agent(model, tools)
+        return create_react_agent(model, tools, checkpointer=self._checkpointer)
+
+    async def init_checkpointer_connection(self):
+        print("Initialize checkpointer connection...")
+        DB_URI = f"postgresql://{DATABASE_URL}?sslmode=disable"
+        connection_kwargs = {
+            "autocommit": True,
+            "prepare_threshold": 0,
+        }
+
+        async with AsyncConnectionPool(
+            conninfo=DB_URI, max_size=20, kwargs=connection_kwargs
+        ) as pool:
+            self._checkpointer = AsyncPostgresSaver(pool)
+            await self._checkpointer.setup()
+
+        print("Successfully initialize checkpointer connection...")
 
     def document_retrieval_tool(self):
         init_llm = lambda inputs: self.init_llm(model=inputs["model"])

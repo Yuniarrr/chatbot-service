@@ -50,7 +50,7 @@ async def chat_to_assistant(
             agent_executor = chain_service.create_agent(data.model)
             system_prompt = chain_service.agent_system_prompt()
 
-            for step in agent_executor.stream(
+            async for step in agent_executor.astream(
                 {
                     "messages": [
                         SystemMessage(content=system_prompt),
@@ -58,6 +58,7 @@ async def chat_to_assistant(
                     ],
                     "collection_name": data.collection_name,
                 },
+                {"configurable": {"thread_id": data.conversation_id}},
                 stream_mode="values",
             ):
                 print("step")

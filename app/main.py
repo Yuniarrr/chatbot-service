@@ -1,3 +1,6 @@
+import asyncio
+import sys
+
 from contextlib import asynccontextmanager
 from fastapi import (
     FastAPI,
@@ -6,13 +9,16 @@ from fastapi import (
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from psycopg_pool import AsyncConnectionPool
+from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 
-from app.env import PY_ENV
+from app.env import PY_ENV, DATABASE_URL
 from app.routers import auth, user, conversation, chat
 from app.routers.file import router
 from app.core.database import session_manager, pgvector_session_manager
 from app.core.exceptions import DatabaseException, DuplicateValueException
 from app.retrieval.vector_store import vector_store_service
+from app.retrieval.chain import chain_service
 
 print(
     rf"""
@@ -34,11 +40,24 @@ async def lifespan(app: FastAPI):
     vector_store_service.initialize_embedding_model()
     vector_store_service.initialize_pg_vector()
     await pgvector_session_manager.initialize()
-    try:
-        yield
-    finally:
-        await session_manager.close()
-        await pgvector_session_manager.close()
+    DB_URI = f"postgresql://{DATABASE_URL}?sslmode=disable"
+    connection_kwargs = {
+        "autocommit": True,
+        "prepare_threshold": 0,
+    }
+
+    async with AsyncConnectionPool(
+        conninfo=DB_URI, max_size=20, kwargs=connection_kwargs
+    ) as pool:
+        checkpointer = AsyncPostgresSaver(pool)
+        await checkpointer.setup()
+        chain_service.set_checkpointer(checkpointer)
+
+        try:
+            yield {"pool": pool}
+        finally:
+            await session_manager.close()
+            await pgvector_session_manager.close()
 
 
 app = FastAPI(
@@ -85,3 +104,12 @@ async def database_exception_handler(request, exc: DatabaseException):
 @app.exception_handler(DuplicateValueException)
 async def duplicate_value_exception_handler(request, exc: DuplicateValueException):
     return JSONResponse(status_code=400, content={"message": str(exc.detail)})
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    if sys.platform.startswith("win"):
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
+    uvicorn.run("app.main:app", host="0.0.0.0", port=3000)

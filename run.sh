@@ -10,8 +10,10 @@ if [ -d ".venv" ]; then
 fi
 
 # Set default values if not provided
-PORT="${PORT:-3000}"
-HOST="${HOST:-0.0.0.0}"
+# PORT="${PORT:-3000}"
+# HOST="${HOST:-0.0.0.0}"
 
-# Run Uvicorn with the correct app path
-exec uvicorn app.main:app --host "$HOST" --port "$PORT" --forwarded-allow-ips='*'
+# # Run Uvicorn with the correct app path
+# exec uvicorn app.main:app --host "$HOST" --port "$PORT" --forwarded-allow-ips='*'
+
+python -m app.main
