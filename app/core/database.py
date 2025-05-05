@@ -24,7 +24,7 @@ Base = declarative_base()
 class DatabaseSessionManager:
     def __init__(self, db_url: str, engine_kwargs: dict[str, Any] = {}):
         self.engine_kwargs = engine_kwargs
-        self._engine = AsyncEngine
+        self._engine: AsyncEngine = None
         self._sessionmaker = None
         self._database_url = db_url
 

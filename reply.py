@@ -1,52 +1,102 @@
-from bottle import route, run, post, request, error, Bottle
-from twilio.twiml.messaging_response import MessagingResponse
-from langchain_core.runnables import RunnablePassthrough, RunnableSerializable
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
+import asyncio
+import sys
 
+from contextlib import asynccontextmanager
+from fastapi import (
+    FastAPI,
+    Request,
+)
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
+from psycopg_pool import AsyncConnectionPool
+from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
+from langchain_core.messages import HumanMessage, AIMessage
+from twilio.twiml.messaging_response import MessagingResponse
+from fastapi.responses import Response
+
+from app.env import PY_ENV, DATABASE_URL
+from app.core.database import session_manager, pgvector_session_manager
+from app.core.exceptions import DatabaseException, DuplicateValueException
 from app.retrieval.vector_store import vector_store_service
 from app.retrieval.chain import chain_service
-from app.core.database import session_manager, pgvector_session_manager
 
-app = Bottle()
+print(
+    rf"""
+  ___     _  _______ __  
+ / __\   / \|__   __|  |
+| |     / _ \  | |  |  |
+| |__  / /_\ \ | |  |  |
+ \___//_/   \_\|_|  |__|
+
+CHATBOT IT
+https://github.com/Yuniarrr/chatbot-service
+"""
+)
 
 
-async def initialize_services():
+@asynccontextmanager
+async def lifespan(app: FastAPI):
     await session_manager.initialize()
     vector_store_service.initialize_embedding_model()
     vector_store_service.initialize_pg_vector()
     await pgvector_session_manager.initialize()
+    DB_URI = f"postgresql://{DATABASE_URL}?sslmode=disable"
+    connection_kwargs = {
+        "autocommit": True,
+        "prepare_threshold": 0,
+    }
+
+    async with AsyncConnectionPool(
+        conninfo=DB_URI, max_size=20, kwargs=connection_kwargs
+    ) as pool:
+        checkpointer = AsyncPostgresSaver(pool)
+        await checkpointer.setup()
+        chain_service.set_checkpointer(checkpointer)
+
+        try:
+            yield {"pool": pool}
+        finally:
+            await session_manager.close()
+            await pgvector_session_manager.close()
 
 
-async def shutdown_services():
-    await session_manager.close()
-    await pgvector_session_manager.close()
+app = FastAPI(
+    docs_url=f"/{PY_ENV}/docs" if PY_ENV == "dev" else None,
+    openapi_url=f"/{PY_ENV}/openapi.json" if PY_ENV == "dev" else None,
+    redoc_url=None,
+    root_path=f"/api/v1/{PY_ENV}",
+    title="Chatbot Service",
+    lifespan=lifespan,
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.post("/message")
-def reply_agentic_rag():
-    msg = request.forms.get("Body")
+async def reply(request: Request):
+    form_data = await request.form()
+    message = form_data.get("Body")
+    print(message)
 
-    print("msg")
-    print(msg)
-    print("MediaUrl0")
-    print(request.forms.get("MediaUrl0"))
+    agent_executor = chain_service.create_agent("gemini")
 
-    agent_executor = chain_service.create_agent("openai")
-    system_prompt = chain_service.agent_system_prompt()
-
-    response = agent_executor.invoke(
+    response = await agent_executor.ainvoke(
         {
             "messages": [
-                SystemMessage(content=system_prompt),
-                HumanMessage(content=msg),
+                HumanMessage(content=message),
             ]
-        }
+        },
+        {"configurable": {"thread_id": "1"}},
     )
 
     messages = response["messages"]
-
-    print(messages)
 
     ai_content = next(
         (
@@ -60,45 +110,43 @@ def reply_agentic_rag():
     print("ai_content")
     print(ai_content)
 
-    twilio_response = MessagingResponse()
-    twilio_response.message(ai_content)
-    return str(twilio_response)
+    resp = MessagingResponse()
+    resp.message(ai_content)
+    print("response")
+    print(resp)
+    return Response(content=str(resp), media_type="application/xml")
 
 
-def reply_rag_chain():
-    msg = request.forms.get("Body")
+# except Exception as e:
+#     raise InternalServerException(str(e))
 
-    rag_chain = (
-        {
-            "context": vector_store_service.get_retriever(
-                collection_name="administration"
-            ),
-            "question": RunnablePassthrough(),
-        }
-        | chain_service.init_prompt()
-        | chain_service.init_llm("openai")
-        | StrOutputParser()
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    return JSONResponse(
+        status_code=422,
+        content={
+            "status_code": 422,
+            "message": "Validation error",
+            "error": exc.errors(),
+        },
     )
 
-    res_chain = rag_chain.invoke(msg)
 
-    print("response")
-    print(res_chain)
-
-    twilio_response = MessagingResponse()
-    twilio_response.message(res_chain)
-    return str(twilio_response)
+@app.exception_handler(DatabaseException)
+async def database_exception_handler(request, exc: DatabaseException):
+    return JSONResponse(status_code=500, content={"message": str(exc.detail)})
 
 
-import asyncio
+@app.exception_handler(DuplicateValueException)
+async def duplicate_value_exception_handler(request, exc: DuplicateValueException):
+    return JSONResponse(status_code=400, content={"message": str(exc.detail)})
+
 
 if __name__ == "__main__":
+    import uvicorn
 
-    async def main():
-        try:
-            await initialize_services()
-            run(app, host="localhost", port=8080, debug=True)
-        finally:
-            await shutdown_services()
+    if sys.platform.startswith("win"):
+        asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 
-    asyncio.run(main())
+    uvicorn.run("app.main:app", host="0.0.0.0", port=8080)

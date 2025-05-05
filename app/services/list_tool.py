@@ -16,6 +16,8 @@ from googleapiclient.discovery import build
 
 from app.core.logger import SRC_LOG_LEVELS
 from app.env import GOOGLE_EMAIL, GOOGLE_PASSWORD, GOOGLE_CALENDAR_JSON
+from app.models.feedbacks import FeedbackCreateModel, FeedbackType
+from app.services.feedback import feedback_service
 
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["SERVICE"])
@@ -173,3 +175,28 @@ def add_to_calendar(
 
     event = service.events().insert(calendarId="primary", body=event).execute()
     return "Event created: %s" % (event.get("htmlLink"))
+
+
+class FeedbackInputSchema(BaseModel):
+    type: FeedbackType
+    message: str
+    sender: Optional[str] = None
+
+
+async def add_to_feedback(
+    type: FeedbackType, message: str, sender: Optional[str] = None
+):
+    try:
+        _new_feedback = FeedbackCreateModel(
+            **{"type": type, "message": message, "sender": sender}
+        )
+
+        await feedback_service.insert_new_file(_new_feedback)
+
+        return (
+            "Berhasil menambahkan feedback ke database. Terimakasih atas feedback nya"
+        )
+    except Exception as error:
+        log.error(f"Error: {error}")
+        log.info(traceback.print_exc())
+        return "Terjadi kegagalan dalam menyimpan feedback ke database"

@@ -1,4 +1,5 @@
 import enum
+import uuid as uuid_pkg
 
 from typing import Union, Optional, Annotated
 from datetime import datetime
@@ -25,12 +26,8 @@ class FeedbackType(enum.Enum):
 class Feedback(Base):
     __tablename__ = "feedback"
 
-    id: Mapped[int] = mapped_column(
-        "id",
-        autoincrement=True,
-        nullable=False,
-        unique=True,
-        primary_key=True,
+    id: Mapped[uuid_pkg.UUID] = mapped_column(
+        "id", default=uuid_pkg.uuid4, primary_key=True, unique=True
     )
 
     type: Mapped[FeedbackType] = mapped_column(

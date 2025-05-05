@@ -21,7 +21,7 @@ from app.env import (
     REFRESH_TOKEN_EXPIRE_DAYS,
 )
 from app.core.constants import ERROR_MESSAGES
-from app.models.users import users, Role
+from app.models.users import UserReadWithPasswordModel, users, Role
 from app.core.database import session_manager
 from app.core.logger import SRC_LOG_LEVELS
 from app.services.user import user_service
@@ -123,7 +123,7 @@ async def get_current_user(
     db: Annotated[AsyncSession, Depends(session_manager.connect)],
     request: Request,
     auth_token: HTTPAuthorizationCredentials = Depends(bearer_security),
-):
+) -> Optional[UserReadWithPasswordModel]:
     token = None
     api_key = request.headers.get("x-api-key")
 
@@ -182,7 +182,9 @@ async def get_current_user(
         )
 
 
-def get_verified_user(user=Depends(get_current_user)):
+def get_verified_user(
+    user=Depends(get_current_user),
+) -> Optional[UserReadWithPasswordModel]:
     if user.role.value not in {
         Role.USER.value,
         Role.ADMINISTRATOR.value,
@@ -195,7 +197,9 @@ def get_verified_user(user=Depends(get_current_user)):
     return user
 
 
-def get_admin_user(user=Depends(get_current_user)):
+def get_admin_user(
+    user=Depends(get_current_user),
+) -> Optional[UserReadWithPasswordModel]:
     if user.role.value != Role.ADMINISTRATOR.value:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -204,7 +208,9 @@ def get_admin_user(user=Depends(get_current_user)):
     return user
 
 
-def get_developer_user(user=Depends(get_current_user)):
+def get_developer_user(
+    user=Depends(get_current_user),
+) -> Optional[UserReadWithPasswordModel]:
     if user.role.value != Role.DEVELOPER.value:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -213,7 +219,7 @@ def get_developer_user(user=Depends(get_current_user)):
     return user
 
 
-def get_not_user(user=Depends(get_current_user)):
+def get_not_user(user=Depends(get_current_user)) -> Optional[UserReadWithPasswordModel]:
     if user.role.value == Role.USER.value:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

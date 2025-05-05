@@ -18,13 +18,12 @@ log.setLevel(SRC_LOG_LEVELS["SERVICE"])
 
 class ConversationService:
     async def create_new_conversation(
-        self, title: str, user_id: str
+        self, title: str, user_id: Optional[str] = None, sender: Optional[str] = None
     ) -> Optional[ConversationReadModel]:
         try:
             async with session_manager.session() as db:
                 conversation = ConversationCreateModel(
-                    title=title,
-                    user_id=user_id,
+                    title=title, user_id=user_id, sender=sender
                 )
                 new_conversation = await conversations.create(
                     db=db, object=conversation, commit=True
@@ -56,6 +55,20 @@ class ConversationService:
                 return await conversations.get_joined(
                     db=db, id=id, join_schema_to_select=ConversationReadWithMessageModel
                 )
+        except Exception as e:
+            raise DatabaseException(str(e))
+
+    async def get_conversation_by_sender(
+        self, sender: str
+    ) -> Optional[ConversationReadModel]:
+        try:
+            async with session_manager.session() as db:
+                conversation = await conversations.get(db=db, sender=sender)
+
+                if not conversation:
+                    return None
+
+                return ConversationReadModel.model_validate(conversation)
         except Exception as e:
             raise DatabaseException(str(e))
 

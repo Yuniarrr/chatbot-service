@@ -30,6 +30,8 @@ class Conversation(Base):
         DateTime(timezone=True), default=None
     )
 
+    sender: Mapped[Union[str, None]] = mapped_column(String, nullable=True)
+
     user_id: Mapped[Union[str, None]] = mapped_column(
         ForeignKey("user.id", ondelete="CASCADE"),
         index=True,
@@ -49,6 +51,7 @@ class ConversationBaseModel(BaseModel):
         Field(examples=["content here"]),
     ]
     user_id: Optional[UUID] = None
+    sender: Optional[str] = None
 
 
 class ConversationModel(TimestampSchema):

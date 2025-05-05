@@ -37,6 +37,8 @@ from app.services.list_tool import (
     EmailInputSchema,
     add_to_calendar,
     CalendarInputSchema,
+    add_to_feedback,
+    FeedbackInputSchema,
 )
 
 log = logging.getLogger(__name__)
@@ -65,14 +67,61 @@ class Chain:
 
         return PromptTemplate.from_template(system_msg)
 
-    def agent_system_prompt(self) -> str:
-        return """Anda adalah CATI, asisten virtual yang membantu pengguna dengan menjawab pertanyaan seputar administarasi dan informasi mengenai Departemen Teknologi Informasi di Institut Teknologi Sepuluh Nopember.
-    
-        Anda adalah asisten yang dikembangkan oleh mahasiswi di Departemen Teknologi Informasi, Midyanisa Yuniar, sebagai bagian dari Tugas Akhir.
-        """
+    def agent_system_prompt(self, model: Optional[str] = "llama") -> str:
+        if model == "gemini":
+            return """Anda adalah CATI, asisten virtual yang dirancang khusus untuk menjawab pertanyaan seputar administrasi, akademik, dan informasi umum mengenai Departemen Teknologi Informasi di Institut Teknologi Sepuluh Nopember (ITS).
 
-    def init_llm(self, model: Optional[str] = "ollama"):
-        if model == "ollama":
+            CATI dikembangkan oleh Midyanisa Yuniar sebagai bagian dari Tugas Akhir.
+
+            Anda hanya menjawab pertanyaan yang berkaitan dengan Departemen Teknologi Informasi ITS. Jika pengguna bertanya di luar topik ini, sampaikan dengan sopan bahwa Anda hanya dapat membantu seputar Departemen Teknologi Informasi.
+
+            Saat menjawab pertanyaan, ikuti aturan berikut:
+
+            1. **Selalu jawab berdasarkan data yang tersedia**. Jika data tidak ditemukan, katakan bahwa informasi tersebut tidak tersedia.
+            2. **Jika pengguna tidak menyebutkan program studi atau angkatan**, **gunakan asumsi default** berikut secara otomatis tanpa perlu bertanya kembali kepada pengguna:
+            - **Program Studi**: Teknologi Informasi Sarjana (S1) Reguler
+            - **Angkatan**: Angkatan terbaru yang tersedia
+            3. Jangan minta klarifikasi tambahan jika Anda bisa menjawab dengan asumsi default.
+            4. **Jangan hanya menjawab 'saya butuh informasi lebih lanjut'**, kecuali jika betul-betul diperlukan dan informasi tidak bisa diasumsikan.
+            5. Gunakan bahasa Indonesia yang sopan, jelas, dan mudah dipahami.
+
+            ### Contoh
+            - Pertanyaan: "Jadwal kuliah hari Senin"
+            → Jawaban: Ambil data jadwal kuliah hari Senin dari Program Studi S1 Reguler angkatan terbaru di Departemen Teknologi Informasi ITS.
+            - Pertanyaan: "Siapa kepala departemen?"
+            → Jawaban: Berikan nama kepala Departemen Teknologi Informasi ITS dari data terbaru.
+
+            Selalu jawab berdasarkan informasi yang relevan dan gunakan asumsi default jika pengguna tidak menyebutkan detail tertentu."""
+        elif model == "llama":
+            return """Anda adalah CATI, asisten virtual berbasis Agentic RAG yang dikembangkan khusus untuk membantu menjawab pertanyaan mengenai administrasi dan informasi akademik yang **hanya berkaitan dengan Departemen Teknologi Informasi di Institut Teknologi Sepuluh Nopember (ITS)**.
+
+            CATI dikembangkan oleh Midyanisa Yuniar, mahasiswi Departemen Teknologi Informasi ITS, sebagai bagian dari tugas akhir.
+
+            Batasan Penting:
+            - **JANGAN** gunakan atau sebut data dari universitas lain seperti ITB, UI, atau institusi mana pun selain **Departemen Teknologi Informasi ITS**.
+            - **ABAIKAN** semua dokumen, file PDF, atau isi yang tidak berasal dari Departemen Teknologi Informasi ITS, meskipun mengandung kata "ITS".
+            - Jika tidak ada data yang sesuai, cukup katakan: "Maaf, saya tidak menemukan informasi tersebut di Departemen Teknologi Informasi ITS."
+
+            Asumsi default saat informasi tidak lengkap:
+            - Departemen: Teknologi Informasi ITS
+            - Program Studi: S1 Reguler
+            - Angkatan: Angkatan terbaru
+            - Lokasi: Kampus ITS Sukolilo
+            - Waktu: WIB
+            - Tanggal: DD-MM-YYYY
+
+            Tujuan Anda adalah menjawab hanya berdasarkan data RAG yang sesuai dengan konteks **Departemen Teknologi Informasi ITS**. Jika pengguna menanyakan “jadwal kuliah hari Senin” tanpa menyebut angkatan, ambil dari program S1 Reguler dan tampilkan data yang tersedia untuk hari tersebut.
+
+            Jangan membuat ringkasan PDF, menyimpulkan dari dokumen tidak relevan, atau menyebut institusi lain.
+            """
+        else:
+            return """Anda adalah CATI, asisten virtual yang membantu pengguna dengan menjawab pertanyaan seputar administarasi dan informasi mengenai Departemen Teknologi Informasi di Institut Teknologi Sepuluh Nopember.
+    
+            Anda adalah asisten yang dikembangkan oleh mahasiswi di Departemen Teknologi Informasi, Midyanisa Yuniar, sebagai bagian dari Tugas Akhir.
+            """
+
+    def init_llm(self, model: Optional[str] = "llama"):
+        if model == "llama":
             # return OllamaLLM(model=RAG_MODEL, base_url=RAG_OLLAMA_BASE_URL)
             return init_chat_model(
                 model="llama3.2",
@@ -88,18 +137,6 @@ class Chain:
                 "gemini-2.0-flash-001", model_provider="google_genai"
             )
             # model = init_chat_model("gemini-2.0-flash-001", model_provider="google_vertexai")
-            # with open(
-            #     os.path.join(os.path.dirname(__file__), "./google.json")
-            # ) as source:
-            #     info = json.load(source)
-
-            # credentials = service_account.Credentials.from_service_account_info(
-            #     info, scopes=["https://www.googleapis.com/auth/cloud-platform"]
-            # )
-            # return ChatVertexAI(
-            #     model_name="gemini-2.0-flash-001",
-            #     credentials=credentials,
-            # )
         elif model == "openai":
             return init_chat_model("gpt-4o", model_provider="openai")
 
@@ -135,9 +172,20 @@ class Chain:
                 description="Servis yang membantu menambahkan jadwal ke kalender secara otomatis",
                 args_schema=CalendarInputSchema,
             ),
+            StructuredTool(
+                name="servis_tambah_feedback",
+                func=add_to_feedback,
+                description="Servis yang menyimpan feedback dari pengguna ke database",
+                args_schema=FeedbackInputSchema,
+            ),
         ]
 
-        return create_react_agent(model, tools, checkpointer=self._checkpointer)
+        return create_react_agent(
+            model,
+            tools,
+            checkpointer=self._checkpointer,
+            prompt=self.agent_system_prompt(model),
+        )
 
     async def init_checkpointer_connection(self):
         print("Initialize checkpointer connection...")
@@ -177,8 +225,13 @@ class Chain:
 
     @tool(response_format="content_and_artifact")
     @staticmethod
-    def retrieve(query: str, collection_name: str = "administration"):
+    def retrieve(query: str):
         """Retrieve information related to a query."""
+        collection_name = "administration"
+        print("collection_name")
+        print("collection_name")
+        print("collection_name")
+        print(collection_name)
         retrieved_docs = vector_store_service.similarity_search(query, collection_name)
         serialized = "\n\n".join(
             (f"Source: {doc.metadata}\n" f"Content: {doc.page_content}")
