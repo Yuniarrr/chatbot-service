@@ -1,6 +1,7 @@
 import enum
 import uuid as uuid_pkg
 
+from uuid import UUID
 from typing import Union, Optional, Annotated
 from datetime import datetime
 from zoneinfo import ZoneInfo
@@ -66,7 +67,7 @@ class FeedbackCreateModel(FeedbackBaseModel):
 
 
 class FeedbackReadModel(FeedbackBaseModel):
-    id: int
+    id: UUID
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 

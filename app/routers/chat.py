@@ -4,11 +4,10 @@ import uuid
 
 from fastapi import APIRouter, UploadFile, File, Depends, Request
 from sse_starlette import EventSourceResponse
-from langchain_core.messages import HumanMessage, AIMessage
+from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from twilio.twiml.messaging_response import MessagingResponse, Message
 from fastapi.responses import Response
 
-from app.core.constants import SUCCESS_MESSAGE
 from app.core.exceptions import InternalServerException
 from app.core.response import ResponseModel
 from app.core.logger import SRC_LOG_LEVELS
@@ -95,6 +94,9 @@ async def reply(request: Request):
         sender = form_data.get("From")
         # receiver = form_data.get("To")
 
+        print("message")
+        print(message)
+
         conversation = await conversation_service.get_conversation_by_sender(sender)
 
         if conversation == None:
@@ -107,21 +109,30 @@ async def reply(request: Request):
         response = await agent_executor.ainvoke(
             {
                 "messages": [
+                    SystemMessage(
+                        content=f"User ID atau sender pesan adalah: {sender}"
+                    ),
                     HumanMessage(content=message),
-                ]
+                ],
             },
             {"configurable": {"thread_id": str(conversation.id)}},
         )
 
+        print("response")
+        print(response)
+
         messages = response["messages"]
 
-        ai_content = next(
-            (
-                message.content
-                for message in messages
-                if isinstance(message, AIMessage) and message.content.strip() != ""
-            ),
-            "Terjadi kesalahan, tidak ada respon dari AI. Tolong hubungi developer.",
+        ai_messages = [
+            message.content
+            for message in messages
+            if isinstance(message, AIMessage) and message.content.strip() != ""
+        ]
+
+        ai_content = (
+            ai_messages[-1]
+            if ai_messages
+            else "Terjadi kesalahan, tidak ada respon dari AI. Tolong hubungi developer."
         )
 
         print("ai_content")

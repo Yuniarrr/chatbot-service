@@ -74,6 +74,8 @@ class Chain:
             CATI dikembangkan oleh Midyanisa Yuniar sebagai bagian dari Tugas Akhir.
 
             Anda hanya menjawab pertanyaan yang berkaitan dengan Departemen Teknologi Informasi ITS. Jika pengguna bertanya di luar topik ini, sampaikan dengan sopan bahwa Anda hanya dapat membantu seputar Departemen Teknologi Informasi.
+            
+            Setiap kali selesai membantu user atau pengguna dalam bentuk jawaban, selalu tanyakan mengenai adakah feedback atau saran yang dapat diberikan mengenai chatbot berbasis Agentic RAG yang sedang dikembangkan. Hal ini berguna untuk mengumpulkan data seberapa bermanfaat chatbot yang sedang dikembangkan. Gunakan tool servis_simpan_feedback untuk menyimpan saran atau feedback dari pengguna.
 
             Saat menjawab pertanyaan, ikuti aturan berikut:
 
@@ -96,6 +98,8 @@ class Chain:
             return """Anda adalah CATI, asisten virtual berbasis Agentic RAG yang dikembangkan khusus untuk membantu menjawab pertanyaan mengenai administrasi dan informasi akademik yang **hanya berkaitan dengan Departemen Teknologi Informasi di Institut Teknologi Sepuluh Nopember (ITS)**.
 
             CATI dikembangkan oleh Midyanisa Yuniar, mahasiswi Departemen Teknologi Informasi ITS, sebagai bagian dari tugas akhir.
+            
+            Setiap kali selesai membantu user atau pengguna dalam bentuk jawaban, selalu tanyakan mengenai adakah feedback atau saran yang dapat diberikan mengenai chatbot berbasis Agentic RAG yang sedang dikembangkan. Hal ini berguna untuk mengumpulkan data seberapa bermanfaat chatbot yang sedang dikembangkan. Gunakan tool servis_simpan_feedback untuk menyimpan saran atau feedback dari pengguna.
 
             Batasan Penting:
             - **JANGAN** gunakan atau sebut data dari universitas lain seperti ITB, UI, atau institusi mana pun selain **Departemen Teknologi Informasi ITS**.
@@ -118,6 +122,8 @@ class Chain:
             return """Anda adalah CATI, asisten virtual yang membantu pengguna dengan menjawab pertanyaan seputar administarasi dan informasi mengenai Departemen Teknologi Informasi di Institut Teknologi Sepuluh Nopember.
     
             Anda adalah asisten yang dikembangkan oleh mahasiswi di Departemen Teknologi Informasi, Midyanisa Yuniar, sebagai bagian dari Tugas Akhir.
+            
+            Setiap kali selesai membantu user atau pengguna dalam bentuk jawaban, selalu tanyakan mengenai adakah feedback atau saran yang dapat diberikan mengenai chatbot berbasis Agentic RAG yang sedang dikembangkan. Hal ini berguna untuk mengumpulkan data seberapa bermanfaat chatbot yang sedang dikembangkan. Gunakan tool servis_simpan_feedback untuk menyimpan saran atau feedback dari pengguna.
             """
 
     def init_llm(self, model: Optional[str] = "llama"):
@@ -173,10 +179,10 @@ class Chain:
                 args_schema=CalendarInputSchema,
             ),
             StructuredTool(
-                name="servis_tambah_feedback",
-                func=add_to_feedback,
-                description="Servis yang menyimpan feedback dari pengguna ke database",
+                name="servis_simpan_feedback",
+                description="Servis yang menyimpan feedback, saran, dan kritik dari pengguna ke database",
                 args_schema=FeedbackInputSchema,
+                coroutine=add_to_feedback,
             ),
         ]
 

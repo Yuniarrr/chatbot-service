@@ -4,9 +4,10 @@ import requests
 import smtplib
 import logging
 import traceback
+import asyncio
 
 from datetime import datetime
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from email.message import EmailMessage
 from email.utils import make_msgid
 from google.oauth2.credentials import Credentials
@@ -178,20 +179,25 @@ def add_to_calendar(
 
 
 class FeedbackInputSchema(BaseModel):
-    type: FeedbackType
-    message: str
-    sender: Optional[str] = None
+    type: FeedbackType = Field(
+        ..., description="Jenis feedback, misalnya NEGATIVE atau POSITIVE"
+    )
+    message: str = Field(..., description="Isi dari feedback yang ingin diberikan")
+    sender: Optional[str] = Field(
+        None,
+        description="Nama atau identitas pengirim feedback. Kosongkan jika ingin anonim.",
+    )
 
 
 async def add_to_feedback(
-    type: FeedbackType, message: str, sender: Optional[str] = None
+    type: FeedbackType, message: str, sender: Optional[str] = "anon"
 ):
     try:
         _new_feedback = FeedbackCreateModel(
             **{"type": type, "message": message, "sender": sender}
         )
 
-        await feedback_service.insert_new_file(_new_feedback)
+        await feedback_service.insert_new_feedback(_new_feedback)
 
         return (
             "Berhasil menambahkan feedback ke database. Terimakasih atas feedback nya"

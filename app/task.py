@@ -1,6 +1,6 @@
-from celery import Celery
+from redis import Redis
+from rq import Queue
 from asgiref.sync import async_to_sync
-import os
 
 from app.env import REDIS_HOST, REDIS_PORT
 from app.retrieval.embed import embedding_service
@@ -8,15 +8,9 @@ from app.retrieval.vector_store import vector_store_service
 from app.services.file import file_service
 from app.models.files import FileStatus, FileUpdateModel
 
-app = Celery("app.vector.tasks")
-app.conf.update(
-    broker_url=f"redis://{REDIS_HOST}:{REDIS_PORT}/0",
-    result_backend=f"redis://{REDIS_HOST}:{REDIS_PORT}/0",
-    broker_connection_retry_on_startup=True,
-)
+queue = Queue(connection=Redis(host=REDIS_HOST, port=REDIS_PORT))
 
 
-@app.task(name="tasks.process_uploaded_file", ignore_result=True)
 def process_uploaded_file(
     file_id: str,
     file_name: str,
@@ -25,7 +19,7 @@ def process_uploaded_file(
     collection_name: str,
 ):
     try:
-        print("celery process_uploaded_file")
+        print("redis process_uploaded_file")
         loader_document = embedding_service.loader(file_name, content_type, file_path)
         splitted_document = embedding_service.split_document(loader_document)
         enriched_document = embedding_service.add_addtional_data_to_docs(
@@ -39,6 +33,7 @@ def process_uploaded_file(
             file_id, FileUpdateModel(status=FileStatus.SUCCESS)
         )
     except Exception as e:
+        print(f"error in process_uploaded_file: {e}")
         async_to_sync(file_service.update_file_by_id)(
             file_id, FileUpdateModel(status=FileStatus.FAILED)
         )
