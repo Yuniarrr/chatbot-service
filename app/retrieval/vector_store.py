@@ -42,10 +42,15 @@ class VectorStore:
         self._vector_store = None
         self._k = 8
 
-    def initialize_embedding_model(self):
+    def initialize_embedding_model(
+        self, sentence_transformers_home: Optional[str] = None
+    ):
+        if not sentence_transformers_home:
+            sentence_transformers_home = SENTENCE_TRANSFORMERS_HOME
         print("Initialize embedding model...")
+        print(sentence_transformers_home)
         self._embedding_model = HuggingFaceEmbeddings(
-            model_name=SENTENCE_TRANSFORMERS_HOME
+            model_name=sentence_transformers_home
         )
         print("Successfully initialize embedding model")
 

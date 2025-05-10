@@ -9,3 +9,8 @@ login(os.getenv("HUGGINGFACEHUB_API_TOKEN"))
 
 print(f"============ {RAG_EMBEDDING_MODEL} ============")
 snapshot_download(repo_id=RAG_EMBEDDING_MODEL, local_dir=SENTENCE_TRANSFORMERS_HOME)
+
+# snapshot_download(
+#     repo_id="indobenchmark/indobert-base-p1",
+#     local_dir="data/indobenchmark/indobert-base-p1",
+# )

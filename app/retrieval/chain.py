@@ -235,15 +235,15 @@ class Chain:
         """Retrieve information related to a query."""
         collection_name = "administration"
         print("collection_name")
-        print("collection_name")
-        print("collection_name")
         print(collection_name)
+
         retrieved_docs = vector_store_service.similarity_search(query, collection_name)
         serialized = "\n\n".join(
             (f"Source: {doc.metadata}\n" f"Content: {doc.page_content}")
             for doc in retrieved_docs
         )
-        return serialized, retrieved_docs
+        # return serialized, retrieved_docs
+        return serialized, {"contexts": [doc.page_content for doc in retrieved_docs]}
 
     @staticmethod
     def _format_docs(docs):

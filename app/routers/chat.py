@@ -56,6 +56,9 @@ async def chat_to_assistant(
             async for step in agent_executor.astream(
                 {
                     "messages": [
+                        SystemMessage(
+                            content=f"User ID atau sender pesan adalah: {current_user.id}"
+                        ),
                         HumanMessage(content=data.message),
                     ],
                     "collection_name": data.collection_name,
