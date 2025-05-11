@@ -1,8 +1,6 @@
 import logging
-from typing import Optional
 
 from app.models.feedbacks import FeedbackCreateModel, FeedbackReadModel, feedbacks
-from app.models.users import RegisterForm
 from app.core.database import session_manager
 from app.core.logger import SRC_LOG_LEVELS
 from app.core.exceptions import DatabaseException

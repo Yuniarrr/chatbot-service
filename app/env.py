@@ -79,6 +79,8 @@ VECTOR_TABLE_NAME = os.environ.get("VECTOR_TABLE_NAME", "chatbot_vector")
 
 DATA_DIR = PARENT_DIR / "data"
 UPLOAD_DIR = DATA_DIR / "uploads"
+if not os.path.exists(UPLOAD_DIR):
+    raise Exception(f"Directory not found: {UPLOAD_DIR}")
 
 ####################################
 # RAG SETTINGS

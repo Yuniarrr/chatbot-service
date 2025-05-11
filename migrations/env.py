@@ -13,6 +13,7 @@ from app.models.tools import Tool
 from app.models.knowledge import Knowledge
 from app.models.feedbacks import Feedback
 from app.models.conversations import Conversation
+from app.models.opportunities import Opportunities
 
 # from app.models.conversations import Conversation
 # from app.models.messages import Message
