@@ -18,7 +18,9 @@ from googleapiclient.discovery import build
 from app.core.logger import SRC_LOG_LEVELS
 from app.env import GOOGLE_EMAIL, GOOGLE_PASSWORD, GOOGLE_CALENDAR_JSON
 from app.models.feedbacks import FeedbackCreateModel, FeedbackType
+from app.models.opportunities import OpportunityType
 from app.services.feedback import feedback_service
+from app.services.opportunity import opportunity_service
 
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["SERVICE"])
@@ -206,3 +208,44 @@ async def add_to_feedback(
         log.error(f"Error: {error}")
         log.info(traceback.print_exc())
         return "Terjadi kegagalan dalam menyimpan feedback ke database"
+
+
+class OpportunityInputSchema(BaseModel):
+    type: Optional[OpportunityType] = Field(
+        ...,
+        description="Jenis progran atau opportunity, misalnya BEASISWA, MAGANG, LOMBA, SERTIFIKASI",
+    )
+    title: Optional[str] = Field(..., description="Nama program atau opportunity")
+    skip: Optional[int] = Field(
+        default=0,
+        description="Parameter ini menentukan jumlah data yang harus dilewati sebelum mulai mengambil data. Misalnya, jika skip diatur ke 10, maka sistem akan melewatkan 10 data pertama dan mulai mengambil data setelahnya. Ini berguna saat Anda ingin mengakses data dari halaman yang lebih dalam atau memulai pengambilan data dari titik tertentu.",
+    )
+    limit: Optional[int] = Field(
+        default=10,
+        description="Parameter ini menentukan jumlah maksimum data yang akan diambil. Misalnya, jika limit diatur ke 10, maka hanya 10 data pertama (setelah melewati skip jika ada) yang akan diambil dan dikembalikan.",
+    )
+
+
+async def get_opportunity(
+    type: Optional[OpportunityType] = None,
+    title: Optional[str] = None,
+    skip: Optional[int] = 0,
+    limit: Optional[int] = 10,
+):
+    try:
+        opportunities = await opportunity_service.get_opportunity_by_filter(
+            type=type,
+            title=title,
+            skip=skip,
+            limit=limit,
+        )
+
+        # Jika data ditemukan, return hasilnya
+        if opportunities:
+            return opportunities
+        else:
+            return "Tidak ada data peluang yang ditemukan."
+    except Exception as error:
+        log.error(f"Error: {error}")
+        log.info(traceback.print_exc())
+        return "Terjadi kegagalan dalam mengambil data dari database opportunity"

@@ -39,6 +39,8 @@ from app.services.list_tool import (
     CalendarInputSchema,
     add_to_feedback,
     FeedbackInputSchema,
+    get_opportunity,
+    OpportunityInputSchema,
 )
 
 log = logging.getLogger(__name__)
@@ -184,6 +186,12 @@ class Chain:
                 args_schema=FeedbackInputSchema,
                 coroutine=add_to_feedback,
             ),
+            StructuredTool(
+                name="servis_get_opportunity",
+                description="Servis yang akan memberikan data terkait program seperti beasiswa, magang, lomba, dan internship",
+                args_schema=OpportunityInputSchema,
+                coroutine=get_opportunity,
+            ),
         ]
 
         return create_react_agent(
@@ -242,8 +250,8 @@ class Chain:
             (f"Source: {doc.metadata}\n" f"Content: {doc.page_content}")
             for doc in retrieved_docs
         )
-        # return serialized, retrieved_docs
-        return serialized, {"contexts": [doc.page_content for doc in retrieved_docs]}
+        return serialized, retrieved_docs
+        # return serialized, {"contexts": [doc.page_content for doc in retrieved_docs]}
 
     @staticmethod
     def _format_docs(docs):

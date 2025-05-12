@@ -55,6 +55,22 @@ alembic upgrade head
 ./create-migrations.sh
 ```
 
+## Git indentity unknown
+
+1. Check username
+
+```sh
+echo $USERNAME
+```
+
+2. Then
+
+```sh
+export HOME=/c/Users/LENOVO
+echo 'export HOME=/c/Users/LENOVO' >> ~/.bashrc
+source ~/.bashrc
+```
+
 ## Tips
 
 1. Change python version: [here](https://stackoverflow.com/questions/70422866/how-to-create-a-venv-with-a-different-python-version)

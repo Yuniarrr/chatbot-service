@@ -6,7 +6,7 @@ from uuid import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 from zoneinfo import ZoneInfo
 from sqlalchemy import DateTime, String, Enum as SQLEnum, String, Text, Date
-from datetime import datetime
+from datetime import datetime, date
 from pydantic import BaseModel, ConfigDict, Field
 from fastcrud import FastCRUD
 
@@ -30,7 +30,7 @@ class Opportunity(Base):
 
     title: Mapped[str] = mapped_column(Text, nullable=False)
     description: Mapped[Union[str, None]] = mapped_column(Text, nullable=True)
-    organizer: Mapped[Union[str, None]] = mapped_column(String(50), nullable=True)
+    organizer: Mapped[Union[str, None]] = mapped_column(Text, nullable=True)
     type: Mapped[OpportunityType] = mapped_column(
         SQLEnum(OpportunityType),
         default=OpportunityType.SERTIFIKASI,
@@ -61,8 +61,8 @@ class OpportunitiesForm(BaseModel):
     description: Optional[str] = None
     organizer: Optional[str] = None
     type: OpportunityType = OpportunityType.SERTIFIKASI
-    start_date: Optional[Date] = None
-    end_date: Optional[Date] = None
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
     link: Optional[str] = None
     image_url: Optional[str] = None
 
@@ -77,8 +77,8 @@ class OpportunitiesBaseModel(BaseModel):
     description: Optional[str] = None
     organizer: Optional[str] = None
     type: OpportunityType = OpportunityType.SERTIFIKASI
-    start_date: Optional[Date] = None
-    end_date: Optional[Date] = None
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
     link: Optional[str] = None
     image_url: Optional[str] = None
     uploader: Optional[str] = None
@@ -109,11 +109,15 @@ class OpportunitiesUpdateInternalModel(OpportunitiesUpdateModel):
     updated_at: datetime
 
 
+class OpportunitiesDeleteModel(OpportunitiesBaseModel):
+    pass
+
+
 CRUDOpportunities = FastCRUD[
-    Opportunity,
     OpportunitiesBaseModel,
+    OpportunitiesModel,
     OpportunitiesCreateModel,
-    OpportunitiesReadModel,
+    OpportunitiesCreateModel,
     OpportunitiesUpdateModel,
     OpportunitiesUpdateInternalModel,
 ]

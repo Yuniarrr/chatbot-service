@@ -7,13 +7,14 @@ from alembic import context
 
 from app.env import DATABASE_URL
 from app.core.database import Base
-from app.models.users import User
-from app.models.files import File
-from app.models.tools import Tool
-from app.models.knowledge import Knowledge
-from app.models.feedbacks import Feedback
-from app.models.conversations import Conversation
-from app.models.opportunities import Opportunities
+
+# from app.models.users import User
+# from app.models.files import File
+# from app.models.tools import Tool
+# from app.models.knowledge import Knowledge
+# from app.models.feedbacks import Feedback
+# from app.models.conversations import Conversation
+from app.models.opportunities import Opportunity
 
 # from app.models.conversations import Conversation
 # from app.models.messages import Message

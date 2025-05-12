@@ -5,6 +5,7 @@ import uuid
 from typing import Annotated, Optional
 from fastapi import APIRouter, Form, Query, Request, UploadFile, File, Depends
 from pydantic import BaseModel
+from uuid import UUID
 
 from app.core.response import ResponseModel
 from app.core.constants import ERROR_MESSAGES, SUCCESS_MESSAGE
@@ -132,11 +133,11 @@ async def get_all_file(
 
 @router.get("/{file_id}", response_model=ResponseModel)
 async def get_file_by_id(
-    file_id: str,
+    file_id: UUID,
     current_user: Annotated[TokenData, Depends(get_not_user)],
 ):
     try:
-        file = await file_service.get_file_by_id(file_id)
+        file = await file_service.get_file_by_id(str(file_id))
         if not file:
             raise NotFoundException(ERROR_MESSAGES.NOT_FOUND("file"))
 
@@ -149,12 +150,12 @@ async def get_file_by_id(
 
 @router.delete("/{file_id}", response_model=ResponseModel)
 async def delete_file_by_id(
-    file_id: str,
+    file_id: UUID,
     current_user: Annotated[TokenData, Depends(get_not_user)],
     delete_file: bool = Query(False, description="Delete file from database"),
 ):
     try:
-        file = await file_service.get_file_by_id(file_id)
+        file = await file_service.get_file_by_id(str(file_id))
         if not file:
             raise NotFoundException(ERROR_MESSAGES.NOT_FOUND("file"))
 
@@ -173,7 +174,7 @@ async def delete_file_by_id(
 
         collection_name = file.meta.get("collection_name")
         vector_ids = await vector_store_service.get_vector_ids(
-            file_id,
+            str(file_id),
         )
 
         vector_ids_list = [item["id"] for item in vector_ids]
