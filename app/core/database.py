@@ -1,8 +1,6 @@
 import contextlib
 import json
 
-from sqlalchemy.ext.asyncio import create_async_engine
-from typing import Any, AsyncIterator
 from sqlalchemy.ext.asyncio import (
     AsyncConnection,
     AsyncSession,
@@ -10,9 +8,9 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
     AsyncEngine,
 )
-from sqlalchemy.orm import declarative_base, sessionmaker
+from sqlalchemy.orm import declarative_base
 from sqlalchemy import Dialect, types
-from typing import Any, Optional
+from typing import Any, Optional, AsyncIterator
 from sqlalchemy.sql.type_api import _T
 from typing_extensions import Self
 

@@ -30,7 +30,6 @@ from app.models.files import (
     ProcessFileForm,
     FileReadModel,
 )
-from app.services.retrieval import retrieval_service
 from app.retrieval.embed import embedding_service
 from app.retrieval.vector_store import vector_store_service
 from app.task import queue, process_uploaded_file

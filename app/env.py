@@ -159,3 +159,6 @@ GOOGLE_CALENDAR_JSON = os.environ.get("GOOGLE_CALENDAR_JSON", "client_secret.jso
 REDIS_HOST = os.environ.get("REDIS_HOST", "localhost")
 REDIS_PORT = os.environ.get("REDIS_PORT", 6377)
 QUEUE = os.environ.get("QUEUE", "chatbot_service")
+
+BASE_URL = os.environ.get("BASE_URL", "http://localhost:8080/api/v1")
+ASSET_URL = BASE_URL + "/" + PY_ENV + "/uploads"

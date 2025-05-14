@@ -3,6 +3,7 @@ import ftfy
 import pytesseract
 
 # from langchain_community.document_loaders.parsers.images import TesseractBlobParser
+from PIL import Image
 from langchain_community.document_loaders import (
     BSHTMLLoader,
     CSVLoader,
@@ -32,8 +33,14 @@ class Loader:
         self, file_name: str, file_content_type: str, file_path: str
     ) -> list[Document]:
         try:
+            file_ext = file_name.split(".")[-1].lower()
             print(file_name, file_content_type, file_path)
             loader = self._get_loader(file_name, file_content_type, file_path)
+
+            if loader is None and file_ext in ["jpg", "jpeg", "png"]:
+                print("Handling image file with OCR")
+                return self._ocr_image(file_path)
+
             print(loader)
             print("sebelum docs load")
             docs = loader.load()
@@ -89,6 +96,8 @@ class Loader:
             loader = UnstructuredPowerPointLoader(file_path)
         elif file_ext == "msg":
             loader = OutlookMessageLoader(file_path)
+        elif file_ext in ["jpg", "jpeg", "png"]:
+            return None
         else:
             loader = TextLoader(file_path, autodetect_encoding=True)
 
@@ -119,4 +128,17 @@ class Loader:
             ]
         except Exception as ocr_error:
             log.error(f"OCR processing failed: {ocr_error}")
+            return []
+
+    def _ocr_image(self, file_path: str) -> list[Document]:
+        try:
+            text = pytesseract.image_to_string(Image.open(file_path))
+            return [
+                Document(
+                    page_content=ftfy.fix_text(text.strip()),
+                    metadata={"source": file_path},
+                )
+            ]
+        except Exception as e:
+            log.error(f"OCR failed for image {file_path}: {e}")
             return []

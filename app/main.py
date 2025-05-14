@@ -5,7 +5,6 @@ import sys
 from contextlib import asynccontextmanager
 from fastapi import (
     FastAPI,
-    HTTPException,
     Request,
 )
 from mimetypes import guess_type
@@ -21,7 +20,6 @@ from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 
 # from fastapi.staticfiles import StaticFiles
 from starlette.staticfiles import StaticFiles
-from fastapi import Depends, Request, Response
 
 from app.env import PY_ENV, DATABASE_URL, UPLOAD_DIR
 from app.routers import auth, user, conversation, chat, opportunity
@@ -78,7 +76,6 @@ app = FastAPI(
     root_path=f"/api/v1/{PY_ENV}",
     title="Chatbot Service",
     lifespan=lifespan,
-    # middleware=middleware,
 )
 
 
