@@ -41,6 +41,8 @@ from app.services.list_tool import (
     FeedbackInputSchema,
     get_opportunity,
     OpportunityInputSchema,
+    AddNewOpportunityInputSchema,
+    add_new_opportunity,
 )
 
 log = logging.getLogger(__name__)
@@ -188,9 +190,17 @@ class Chain:
             ),
             StructuredTool(
                 name="servis_get_opportunity",
-                description="Servis yang akan memberikan data terkait program seperti beasiswa, magang, lomba, dan internship",
+                description="Servis yang akan memberikan data terkait program seperti beasiswa, magang, lomba, internship, dan seminar",
                 args_schema=OpportunityInputSchema,
                 coroutine=get_opportunity,
+            ),
+            StructuredTool(
+                name="servis_add_opportunity",
+                description="Servis yang akan menambahkan dan menyimpan data seperti beasiswa, magang, lomba, internship, dan seminar"
+                "Pastikan jika mengunggah file atau gambar, isikan field image_url dengan URL dari file yang sudah diberikan "
+                "pada SystemMessage (contoh: https://example.com/image.jpg).",
+                args_schema=AddNewOpportunityInputSchema,
+                coroutine=add_new_opportunity,
             ),
         ]
 

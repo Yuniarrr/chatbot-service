@@ -1,8 +1,15 @@
 import logging
+from typing import Union
 import ftfy
 import pytesseract
+import re
+import aiohttp
+import requests
+import bs4
 
 # from langchain_community.document_loaders.parsers.images import TesseractBlobParser
+from urllib.parse import urlparse
+from bs4 import BeautifulSoup
 from PIL import Image
 from langchain_community.document_loaders import (
     BSHTMLLoader,
@@ -14,6 +21,8 @@ from langchain_community.document_loaders import (
     UnstructuredEPubLoader,
     UnstructuredExcelLoader,
     UnstructuredPowerPointLoader,
+    RecursiveUrlLoader,
+    WebBaseLoader,
 )
 from langchain_core.documents import Document
 from pdf2image import convert_from_path
@@ -65,6 +74,31 @@ class Loader:
             log.warning(f"OCR fallback for {file_name} because: {e}")
             return self._ocr_pdf(file_path)
 
+    def load_url(self, url: str, is_recursive_url: bool = False) -> list[Document]:
+        try:
+            loader = self._get_loader_url(url, is_recursive_url)
+            docs = loader.load()
+
+            if not docs:
+                raise ValueError("Tidak ada dokumen yang dihasilkan dari loader.")
+
+            fixed_docs = []
+            for doc in docs:
+                cleaned_content = self._clean_page_content(doc.page_content)
+                structured_content = self._structure_paragraphs(cleaned_content)
+                truncated = self._remove_intro_until_bantuan(structured_content)
+
+                fixed_doc = Document(
+                    page_content=ftfy.fix_text(truncated),
+                    metadata=doc.metadata,
+                )
+                fixed_docs.append(fixed_doc)
+
+            return fixed_docs
+        except Exception as e:
+            print(f"Error load: {e}")
+            log.warning(f"Error load {url} because: {e}")
+
     def _get_loader(self, file_name: str, file_content_type: str, file_path: str):
         file_ext = file_name.split(".")[-1].lower()
 
@@ -102,6 +136,51 @@ class Loader:
             loader = TextLoader(file_path, autodetect_encoding=True)
 
         return loader
+
+    def _get_loader_url(self, url: str, is_recursive_url: bool):
+        if is_recursive_url:
+            print("RecursiveUrlLoader")
+            loader = RecursiveUrlLoader(
+                url=url,
+                extractor=self._bs4_extractor,
+                metadata_extractor=self._metadata_extractor,
+                prevent_outside=True,
+                base_url=self._get_base_url(url),
+            )
+        else:
+            # "parse_only": bs4.SoupStrainer(class_="wpb_wrapper"),
+            print("WebBaseLoader")
+            loader = WebBaseLoader(
+                web_path=url,
+                bs_kwargs={
+                    "parse_only": bs4.SoupStrainer(self.has_classes),
+                },
+                bs_get_text_kwargs={"separator": " | ", "strip": True},
+            )
+
+        return loader
+
+    def has_classes(tag):
+        return tag.name and all(
+            cls in tag.get("class", []) for cls in ["title-news", "content-news"]
+        )
+
+    def _bs4_extractor(self, html: str) -> str:
+        soup = BeautifulSoup(html, "lxml")
+        return re.sub(r"\n\n+", "\n\n", soup.text).strip()
+
+    def _metadata_extractor(
+        self,
+        raw_html: str,
+        url: str,
+        response: Union[requests.Response, aiohttp.ClientResponse],
+    ) -> dict:
+        content_type = getattr(response, "headers").get("Content-Type", "")
+        return {"source": url, "content_type": content_type}
+
+    def _get_base_url(self, url: str) -> str:
+        parsed = urlparse(url)
+        return f"{parsed.scheme}://{parsed.netloc}"
 
     def _ocr_pdf(self, file_path: str) -> list[Document]:
         try:
@@ -142,3 +221,45 @@ class Loader:
         except Exception as e:
             log.error(f"OCR failed for image {file_path}: {e}")
             return []
+
+    def _clean_page_content(self, text: str) -> str:
+        text = text.replace("\xa0", " ")
+        text = re.sub(r"\s*\|\s*", " ", text)
+        text = re.sub(r"\s+", " ", text)
+        return text.strip()
+
+    def _structure_paragraphs(self, text: str) -> str:
+        sentences = re.split(r"(?<=[.?!])\s+", text)
+        paragraphs = "\n\n".join(
+            [" ".join(sentences[i : i + 3]) for i in range(0, len(sentences), 3)]
+        )
+        return paragraphs
+
+    def _remove_intro_until_bantuan(self, text: str) -> str:
+        index = text.find(": Bantuan")
+        if index != -1:
+            return text[index + len("Bantuan") :].lstrip()
+        return text
+
+
+class CustomITSLoader(WebBaseLoader):
+    def _scrape(self, url: str, **kwargs) -> str:
+        print(f"[DEBUG] Scraping: {url}")
+        res = self.session.get(url)
+        soup = BeautifulSoup(res.text, "lxml")
+
+        # Ambil judul dari vc_column-inner ke-2
+        judul_divs = soup.find_all("div", class_="vc_column-inner")
+        judul = (
+            judul_divs[1].find("h3").get_text(strip=True) if len(judul_divs) > 1 else ""
+        )
+
+        # Ambil konten dari wpb_wrapper ke-2
+        wrapper_divs = soup.find_all("div", class_="wpb_wrapper")
+        konten = (
+            wrapper_divs[1].get_text(separator="\n", strip=True)
+            if len(wrapper_divs) > 1
+            else ""
+        )
+
+        return judul + "\n\n" + konten

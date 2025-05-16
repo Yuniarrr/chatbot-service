@@ -32,6 +32,10 @@ class Embedding:
         loader = Loader(PDF_EXTRACT_IMAGES=True)
         return loader.load(filename, file_content_type, file_path)
 
+    def loader_url(self, url: str):
+        loader = Loader()
+        return loader.load_url(url)
+
     def split_text(self, text: str) -> List[str]:
         return self._splitter.split_text(text)
 

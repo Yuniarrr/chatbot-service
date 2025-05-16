@@ -108,6 +108,29 @@ class VectorStore:
         # ).invoke(query)
         return self._vector_store.similarity_search(query, k=self._k)
 
+    def similarity_search_with_score(
+        self, query: str, collection_name: Optional[str] = None
+    ) -> List[Document]:
+        """Searches and returns movies.
+
+        Args:
+        query: The user query to search for related items
+
+        Returns:
+        List[Document]: A list of Documents
+        """
+        log.info("Performing similarity search")
+
+        if collection_name == self._table_name:
+            self.initialize_pg_vector(self._table_name)
+        else:
+            self.initialize_pg_vector(collection_name)
+
+        # return self._vector_store.as_retriever(
+        #     search_type="similarity", search_kwargs={"k": self._k}
+        # ).invoke(query)
+        return self._vector_store.similarity_search_with_score(query, k=self._k)
+
     def sim_search(
         self, query: str, collection_name: Optional[str] = None
     ) -> List[Document]:

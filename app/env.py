@@ -162,3 +162,10 @@ QUEUE = os.environ.get("QUEUE", "chatbot_service")
 
 BASE_URL = os.environ.get("BASE_URL", "http://localhost:8080/api/v1")
 ASSET_URL = BASE_URL + "/" + PY_ENV + "/uploads"
+
+####################################
+# TWILIO SETTINGS
+####################################
+
+TWILIO_ACCOUNT_SID = os.environ.get("TWILIO_ACCOUNT_SID")
+TWILIO_AUTH_TOKEN = os.environ.get("TWILIO_AUTH_TOKEN")

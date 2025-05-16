@@ -6,6 +6,7 @@ from typing import Annotated, Optional
 from fastapi import APIRouter, Form, Query, Request, UploadFile, File, Depends
 from pydantic import BaseModel
 from uuid import UUID
+from urllib.parse import urlparse
 
 from app.core.response import ResponseModel
 from app.core.constants import ERROR_MESSAGES, SUCCESS_MESSAGE
@@ -33,6 +34,7 @@ from app.models.files import (
 from app.retrieval.embed import embedding_service
 from app.retrieval.vector_store import vector_store_service
 from app.task import queue, process_uploaded_file
+from app.retrieval.loaders import CustomITSLoader
 
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["ROUTER"])
@@ -45,44 +47,79 @@ router = APIRouter()
 async def add_new_file(
     current_user: Annotated[TokenData, Depends(get_not_user)],
     request: Request,
-    file: UploadFile = File(...),
+    file: Optional[UploadFile] = File(None),
     collection_name: Optional[str] = Form("administration"),
+    url: Optional[str] = Form(None),
 ):
-    print(f"file.content_type: {file.content_type}")
     print(collection_name)
     try:
-        unsanitized_filename = file.filename
-        filename = os.path.basename(unsanitized_filename)
+        if not file and not url:
+            raise BadRequestException("Either a file or URL must be provided.")
 
         id = str(uuid.uuid4())
-        name = filename
-        filename = f"{id}_{filename}"
-        contents, file_path = uploader_service.upload_file(file.file, filename)
 
-        _new_file = FileCreateModel(
-            **{
-                "id": id,
-                "user_id": current_user.id,
-                "file_name": filename,
-                "file_path": file_path,
-                "status": FileStatus.AWAITING,
-                "meta": {
-                    "name": name,
-                    "content_type": file.content_type,
-                    "size": len(contents),
-                    "collection_name": collection_name,
-                },
-            }
-        )
+        if file:
+            print(f"file.content_type: {file.content_type}")
+            unsanitized_filename = file.filename
+            filename = os.path.basename(unsanitized_filename)
 
-        await file_service.insert_new_file(_new_file)
+            name = filename
+            filename = f"{id}_{filename}"
+            contents, file_path = uploader_service.upload_file(file.file, filename)
+
+            _new_file = FileCreateModel(
+                **{
+                    "id": id,
+                    "user_id": current_user.id,
+                    "file_name": filename,
+                    "file_path": file_path,
+                    "status": FileStatus.AWAITING,
+                    "meta": {
+                        "name": name,
+                        "content_type": file.content_type,
+                        "size": len(contents),
+                        "collection_name": collection_name,
+                    },
+                }
+            )
+
+            await file_service.insert_new_file(_new_file)
+        elif url:
+            parsed = urlparse(url)
+            _new_file = FileCreateModel(
+                **{
+                    "id": id,
+                    "user_id": current_user.id,
+                    "file_name": url,
+                    "file_path": url,
+                    "status": FileStatus.AWAITING,
+                    "meta": {
+                        "name": f"{parsed.scheme}://{parsed.netloc}",
+                        "content_type": "application/octet-stream",
+                        "size": 0,
+                        "collection_name": collection_name,
+                    },
+                }
+            )
+
+            await file_service.insert_new_file(_new_file)
 
         try:
-            loader_document = embedding_service.loader(
-                _new_file.file_name,
-                _new_file.meta.get("content_type"),
-                _new_file.file_path,
-            )
+            if file:
+                loader_document = embedding_service.loader(
+                    _new_file.file_name,
+                    _new_file.meta.get("content_type"),
+                    _new_file.file_path,
+                )
+            elif url:
+                loader_document = embedding_service.loader_url(url)
+                # print("sebelum loader CustomITSLoader")
+                # loader = CustomITSLoader(url)
+                # print("call loader CustomITSLoader")
+                # loader_document = loader.load()
+
+            print("loader_document")
+            print(loader_document)
 
             splitted_document = embedding_service.split_document(loader_document)
 
@@ -106,10 +143,6 @@ async def add_new_file(
         return ResponseModel(
             status_code=201, message=SUCCESS_MESSAGE.CREATED, data=updated
         )
-
-        # return ResponseModel(
-        #     status_code=201, message=SUCCESS_MESSAGE.CREATED, data=_new_file
-        # )
     except Exception as e:
         raise InternalServerException(str(e))
 

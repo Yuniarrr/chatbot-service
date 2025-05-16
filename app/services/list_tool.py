@@ -18,7 +18,7 @@ from googleapiclient.discovery import build
 from app.core.logger import SRC_LOG_LEVELS
 from app.env import GOOGLE_EMAIL, GOOGLE_PASSWORD, GOOGLE_CALENDAR_JSON
 from app.models.feedbacks import FeedbackCreateModel, FeedbackType
-from app.models.opportunities import OpportunityType
+from app.models.opportunities import OpportunitiesCreateModel, OpportunityType
 from app.services.feedback import feedback_service
 from app.services.opportunity import opportunity_service
 
@@ -213,7 +213,7 @@ async def add_to_feedback(
 class OpportunityInputSchema(BaseModel):
     type: Optional[OpportunityType] = Field(
         ...,
-        description="Jenis progran atau opportunity, misalnya BEASISWA, MAGANG, LOMBA, SERTIFIKASI",
+        description="Jenis progran atau opportunity, misalnya BEASISWA, MAGANG, LOMBA, SERTIFIKASI, SEMINAR",
     )
     title: Optional[str] = Field(..., description="Nama program atau opportunity")
     skip: Optional[int] = Field(
@@ -249,3 +249,70 @@ async def get_opportunity(
         log.error(f"Error: {error}")
         log.info(traceback.print_exc())
         return "Terjadi kegagalan dalam mengambil data dari database opportunity"
+
+
+class AddNewOpportunityInputSchema(BaseModel):
+    title: str = Field(description="Nama program atau opportunity")
+    description: Optional[str] = Field(
+        None, description="Deskripsi lebih lengkap mengenai program atau opportunity"
+    )
+    organizer: Optional[str] = Field(
+        None, description="Penyelenggara program atau opportunity"
+    )
+    type: OpportunityType = Field(
+        None,
+        description="Jenis progran atau opportunity, misalnya BEASISWA, MAGANG, LOMBA, SERTIFIKASI, SEMINAR",
+    )
+    start_date: Optional[str] = Field(
+        None,
+        description="Tanggal dimulainya program atau opportunity dengan format YYYY-MM-DD",
+    )
+    end_date: Optional[str] = Field(
+        None,
+        description="Tanggal dimulainya program atau opportunity dengan format YYYY-MM-DD",
+    )
+    link: Optional[str] = Field(
+        None,
+        description="URL lainnya yang mungkin perlu ditambahkan",
+    )
+    image_url: Optional[str] = Field(
+        None,
+        description="URL gambar atau poster kegiatan",
+    )
+    sender: str = Field(
+        None,
+        description="Nama atau identitas pengirim opportunity. Kosongkan jika ingin anonim.",
+    )
+
+
+async def add_new_opportunity(
+    title: str,
+    type: OpportunityType,
+    description: Optional[str] = None,
+    organizer: Optional[str] = None,
+    start_date: Optional[str] = None,
+    end_date: Optional[str] = None,
+    link: Optional[str] = None,
+    image_url: Optional[str] = None,
+    sender: Optional[str] = None,
+):
+    try:
+        _new_opportunity = OpportunitiesCreateModel(
+            **{
+                "title": title,
+                "description": description,
+                "organizer": organizer,
+                "type": type,
+                "start_date": start_date,
+                "end_date": end_date,
+                "link": link,
+                "image_url": image_url,
+                "uploader": sender,
+            }
+        )
+        await opportunity_service.insert_new_opportunity(form_data=_new_opportunity)
+        return f"Berhasil menambahkan {type.name.lower()} ke database. Terimakasih atas penambahan datanya."
+    except Exception as error:
+        log.error(f"Error: {error}")
+        log.info(traceback.print_exc())
+        return "Terjadi kegagalan dalam menyimpan data opportunity ke database"

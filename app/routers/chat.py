@@ -25,6 +25,7 @@ from app.retrieval.chain import chain_service
 from app.services.conversation import conversation_service
 from app.services.uploader import uploader_service
 from app.env import ASSET_URL
+from app.utils.twillio_util import download_twilio_media
 
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["ROUTER"])
@@ -153,12 +154,18 @@ async def chat_to_assistant(
 async def reply(request: Request):
     try:
         form_data = await request.form()
+        print(form_data)
         message = form_data.get("Body")
         sender = form_data.get("From")
         # receiver = form_data.get("To")
 
         print("message")
         print(message)
+        print(form_data.get("MediaUrl0"))
+
+        media = None
+        if form_data.get("MediaUrl0") is not None:
+            media = await download_twilio_media(form_data.get("MediaUrl0"))
 
         conversation = await conversation_service.get_conversation_by_sender(sender)
 
@@ -169,14 +176,43 @@ async def reply(request: Request):
 
         agent_executor = chain_service.create_agent("gemini")
 
+        content_blocks = [{"type": "text", "text": message}]
+        if media and media["content_type"].startswith("image/"):
+            content_blocks.append(
+                {
+                    "type": "image",
+                    "source_type": "base64",
+                    "data": media["file_data"],
+                    "mime_type": media["content_type"],
+                    "image_url": {"url": media["final_url"]},
+                }
+            )
+        elif media and media["content_type"].startswith("application/"):
+            content_blocks.append(
+                {
+                    "type": "file",
+                    "source_type": "base64",
+                    "data": media["file_data"],
+                    "mime_type": media["content_type"],
+                    "filename": media["filename"],
+                }
+            )
+
+        messages = [
+            SystemMessage(
+                content=f"User ID atau sender pesan adalah: {sender}."
+                + (
+                    f" Gunakan url berikut sebagai image_url, jika akan menambahkan atau menyimpan data ke opportunity {ASSET_URL + '/' + media['filename']}"
+                    if media
+                    else ""
+                )
+            ),
+            HumanMessage(content=content_blocks),
+        ]
+
         response = await agent_executor.ainvoke(
             {
-                "messages": [
-                    SystemMessage(
-                        content=f"User ID atau sender pesan adalah: {sender}"
-                    ),
-                    HumanMessage(content=message),
-                ],
+                "messages": messages,
             },
             {"configurable": {"thread_id": str(conversation.id)}},
         )

@@ -19,6 +19,7 @@ class OpportunityType(enum.Enum):
     MAGANG = "MAGANG"
     LOMBA = "LOMBA"
     SERTIFIKASI = "SERTIFIKASI"
+    SEMINAR = "SEMINAR"
 
 
 class Opportunity(Base):
