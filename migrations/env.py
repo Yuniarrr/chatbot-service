@@ -14,7 +14,8 @@ from app.core.database import Base
 # from app.models.knowledge import Knowledge
 # from app.models.feedbacks import Feedback
 # from app.models.conversations import Conversation
-from app.models.opportunities import Opportunity
+# from app.models.opportunities import Opportunity
+from app.models.collections import Collection
 
 # from app.models.conversations import Conversation
 # from app.models.messages import Message

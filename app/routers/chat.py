@@ -126,7 +126,7 @@ async def chat_to_assistant(
                 stream_mode="values",
             ):
                 print("step")
-                print(step)
+                # print(step)
                 accumulated_text = step["messages"][-1].content
                 yield step["messages"][-1].content
 

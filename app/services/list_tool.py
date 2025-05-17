@@ -26,6 +26,10 @@ log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["SERVICE"])
 
 
+class QueryInput(BaseModel):
+    query: str
+
+
 def get_current_weather(city: str) -> str:
     """
     Get the current weather for a given city.

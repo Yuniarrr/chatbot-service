@@ -117,7 +117,7 @@ class OpportunitiesDeleteModel(OpportunitiesBaseModel):
 CRUDOpportunities = FastCRUD[
     OpportunitiesBaseModel,
     OpportunitiesModel,
-    OpportunitiesCreateModel,
+    OpportunitiesReadModel,
     OpportunitiesCreateModel,
     OpportunitiesUpdateModel,
     OpportunitiesUpdateInternalModel,

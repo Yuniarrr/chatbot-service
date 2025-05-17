@@ -113,13 +113,6 @@ async def add_new_file(
                 )
             elif url:
                 loader_document = embedding_service.loader_url(url)
-                # print("sebelum loader CustomITSLoader")
-                # loader = CustomITSLoader(url)
-                # print("call loader CustomITSLoader")
-                # loader_document = loader.load()
-
-            print("loader_document")
-            print(loader_document)
 
             splitted_document = embedding_service.split_document(loader_document)
 
@@ -129,7 +122,9 @@ async def add_new_file(
                 file_name=_new_file.file_name,
             )
 
-            vector_store_service.add_vectostore(splitted_document, collection_name)
+            await vector_store_service.add_vectostore(
+                splitted_document, collection_name
+            )
         except Exception as e:
             update_file = FileUpdateModel(**{"status": FileStatus.FAILED})
             await file_service.update_file_by_id(_new_file.id, update_file)
@@ -211,7 +206,7 @@ async def delete_file_by_id(
 
         vector_ids_list = [item["id"] for item in vector_ids]
 
-        vector_store_service.delete_by_ids(vector_ids_list, collection_name)
+        await vector_store_service.delete_by_ids(vector_ids_list, collection_name)
 
         return ResponseModel(status_code=200, message=SUCCESS_MESSAGE.DELETED)
     except Exception as e:

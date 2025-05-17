@@ -3,6 +3,7 @@ import os
 import json
 from typing import Annotated, Optional, TypedDict
 import operator
+import asyncio
 
 from langchain_google_vertexai import ChatVertexAI
 from langchain_ollama import OllamaLLM
@@ -20,9 +21,7 @@ from sqlalchemy import Sequence
 from langchain_core.runnables import RunnableLambda, Runnable
 from langchain_core.tools import tool
 from langchain_core.tools import StructuredTool
-
-
-# from langgraph.prebuilt import ToolInvocation, ToolExecutor
+from langchain_community.document_transformers import LongContextReorder
 from langchain_core.runnables import RunnablePassthrough, RunnableSerializable
 from langgraph.graph.graph import CompiledGraph
 from psycopg_pool import AsyncConnectionPool
@@ -43,7 +42,9 @@ from app.services.list_tool import (
     OpportunityInputSchema,
     AddNewOpportunityInputSchema,
     add_new_opportunity,
+    QueryInput,
 )
+from app.services.collection import collection_service
 
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["RAG"])
@@ -164,7 +165,12 @@ class Chain:
         model = self.init_llm(model)
 
         tools = [
-            Chain.retrieve,
+            StructuredTool(
+                name="retrieve",
+                description="Retrieve and reorder relevant documents based on query.",
+                args_schema=QueryInput,
+                coroutine=Chain.retrieve,
+            ),
             Tool(
                 name="current_weather",
                 func=get_current_weather,
@@ -247,21 +253,50 @@ class Chain:
 
         return retrieval_callable
 
-    @tool(response_format="content_and_artifact")
     @staticmethod
-    def retrieve(query: str):
-        """Retrieve information related to a query."""
-        collection_name = "administration"
-        print("collection_name")
-        print(collection_name)
+    async def retrieve(query: str):
+        """Retrieve and reorder information from all active collections."""
+        try:
+            # Step 1: Get all active collections from the DB
+            collections_list = await collection_service.get_active_collections()
+            if not collections_list:
+                return "No active collections found.", []
 
-        retrieved_docs = vector_store_service.similarity_search(query, collection_name)
-        serialized = "\n\n".join(
-            (f"Source: {doc.metadata}\n" f"Content: {doc.page_content}")
-            for doc in retrieved_docs
-        )
-        return serialized, retrieved_docs
-        # return serialized, {"contexts": [doc.page_content for doc in retrieved_docs]}
+            # Step 2: Perform parallel similarity search
+            async def search_collection(name: str):
+                try:
+                    return await vector_store_service.async_similarity_search(
+                        query, collection_name=name
+                    )
+                except Exception as e:
+                    print(f"Error searching {name}: {e}")
+                    return []
+
+            tasks = [
+                search_collection(col["name"])
+                for col in collections_list.get("data", [])
+                if "name" in col and col["name"]
+            ]
+
+            results = await asyncio.gather(*tasks)
+            all_docs = [doc for sublist in results for doc in sublist]
+
+            if not all_docs:
+                return "No relevant documents found.", []
+
+            # Step 3: Reorder the documents for relevance
+            # reordering = LongContextReorder()
+            # reordered_docs = reordering.transform_documents(all_docs)
+
+            # Step 4: Serialize the output for display
+            serialized = "\n\n".join(
+                f"Source: {doc.metadata}\nContent: {doc.page_content}"
+                for doc in all_docs
+            )
+
+            return serialized, all_docs
+        except Exception as e:
+            return f"Error during retrieval: {e}", []
 
     @staticmethod
     def _format_docs(docs):

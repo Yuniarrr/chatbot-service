@@ -10,6 +10,7 @@ from huggingface_hub import snapshot_download
 from sentence_transformers import SentenceTransformer
 from langchain_huggingface import HuggingFaceEmbeddings
 from sqlalchemy.dialects import postgresql
+from sqlalchemy.ext.asyncio import create_async_engine
 
 from app.core.database import pgvector_session_manager
 from app.core.exceptions import DatabaseException
@@ -54,21 +55,30 @@ class VectorStore:
         )
         print("Successfully initialize embedding model")
 
-    def initialize_pg_vector(self, collection_name: Optional[str] = VECTOR_TABLE_NAME):
+    def initialize_pg_vector(
+        self, collection_name: Optional[str] = VECTOR_TABLE_NAME
+    ) -> PGVector:
         log.info("Initializing PGVector")
 
         if self._embedding_model == None:
             print("Embedding model not initialize")
-            return
+            return self.initialize_embedding_model()
 
-        self._vector_store = PGVector(
+        engine = create_async_engine("postgresql+psycopg://" + PGVECTOR_DB_URL)
+
+        vector_store = PGVector(
             embeddings=self._embedding_model,
             collection_name=collection_name,
-            connection="postgresql+psycopg://" + PGVECTOR_DB_URL,
+            # connection="postgresql+psycopg://" + PGVECTOR_DB_URL,
+            connection=engine,
             use_jsonb=True,
         )
 
-    def add_vectostore(
+        self._vector_store = vector_store
+
+        return vector_store
+
+    async def add_vectostore(
         self, docs: List[Document], collection_name: Optional[str] = None
     ):
         """
@@ -79,11 +89,13 @@ class VectorStore:
         print("Adding documents to vector store")
 
         if collection_name == self._table_name:
-            self.initialize_pg_vector(self._table_name)
+            # self.initialize_pg_vector(self._table_name)
+            vector_store = self._vector_store
         else:
-            self.initialize_pg_vector(collection_name)
+            # self.initialize_pg_vector(collection_name)
+            vector_store = self.initialize_pg_vector(collection_name)
 
-        return self._vector_store.add_documents(docs)
+        return await vector_store.aadd_documents(docs)
 
     def similarity_search(
         self, query: str, collection_name: Optional[str] = None
@@ -103,12 +115,30 @@ class VectorStore:
         else:
             self.initialize_pg_vector(collection_name)
 
-        # return self._vector_store.as_retriever(
-        #     search_type="similarity", search_kwargs={"k": self._k}
-        # ).invoke(query)
         return self._vector_store.similarity_search(query, k=self._k)
 
-    def similarity_search_with_score(
+    async def async_similarity_search(
+        self, query: str, collection_name: Optional[str] = None
+    ) -> List[Document]:
+        """Searches and returns movies.
+
+        Args:
+        query: The user query to search for related items
+        Returns:
+        List[Document]: A list of Documents
+        """
+        log.info("Performing similarity search")
+
+        if collection_name == self._table_name:
+            # self.initialize_pg_vector(self._table_name)
+            vector_store = self.initialize_pg_vector(self._table_name)
+        else:
+            # self.initialize_pg_vector(collection_name)
+            vector_store = self.initialize_pg_vector(collection_name)
+
+        return await vector_store.asimilarity_search(query, k=self._k)
+
+    async def similarity_search_with_score(
         self, query: str, collection_name: Optional[str] = None
     ) -> List[Document]:
         """Searches and returns movies.
@@ -122,34 +152,14 @@ class VectorStore:
         log.info("Performing similarity search")
 
         if collection_name == self._table_name:
-            self.initialize_pg_vector(self._table_name)
+            # self.initialize_pg_vector(self._table_name)
+            vector_store = self._vector_store
         else:
-            self.initialize_pg_vector(collection_name)
+            # self.initialize_pg_vector(collection_name)
+            vector_store = self.initialize_pg_vector(collection_name)
 
-        # return self._vector_store.as_retriever(
-        #     search_type="similarity", search_kwargs={"k": self._k}
-        # ).invoke(query)
-        return self._vector_store.similarity_search_with_score(query, k=self._k)
-
-    def sim_search(
-        self, query: str, collection_name: Optional[str] = None
-    ) -> List[Document]:
-        """Searches and returns movies.
-
-        Args:
-        query: The user query to search for related items
-
-        Returns:
-        List[Document]: A list of Documents
-        """
-        log.info("Performing similarity search")
-
-        if collection_name == self._table_name:
-            self.initialize_pg_vector(self._table_name)
-        else:
-            self.initialize_pg_vector(collection_name)
-
-        return self._vector_store.similarity_search(query=query)
+            # Chain.retrieve,
+        return vector_store.asimilarity_search_with_score(query, k=self._k)
 
     def get_retriever(self, collection_name: Optional[str] = None):
         log.info("Getting retriever")
@@ -161,23 +171,25 @@ class VectorStore:
 
         return self._vector_store.as_retriever(search_kwargs={"k": self._k})
 
-    def delete_by_ids(self, ids: List[str], collection_name: Optional[str] = None):
+    async def delete_by_ids(
+        self, ids: List[str], collection_name: Optional[str] = None
+    ):
         """Load all local embeddings to the vector store."""
         log.info("Deleting documents from vector store")
 
         if collection_name == self._table_name:
-            self.initialize_pg_vector(self._table_name)
+            # self.initialize_pg_vector(self._table_name)
+            vector_store = self._vector_store
         else:
-            self.initialize_pg_vector(collection_name)
+            # self.initialize_pg_vector(collection_name)
+            vector_store = self.initialize_pg_vector(collection_name)
 
-        self._vector_store.delete(ids=ids)
+        await vector_store.adelete(ids=ids)
 
     def rec_as_dict(self, rec):
         return dict(zip(Langchain_Embedding.columns.keys(), rec))
 
     async def get_vector_ids(self, file_id: str):
-        print("Get vector id")
-
         try:
             sql = sa.text(
                 """

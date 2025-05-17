@@ -44,6 +44,8 @@ class FileService:
         try:
             async with session_manager.session() as db:
                 files_list = await files.get_multi(db=db, skip=skip, limit=limit)
+                if not files_list:
+                    return []
                 return files_list
         except Exception as e:
             log.error(f"Error get files: {e}")
