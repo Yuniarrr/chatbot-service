@@ -174,7 +174,7 @@ async def reply(request: Request):
                 title="Chat from WhatsApp", sender=sender
             )
 
-        agent_executor = chain_service.create_agent("gemini")
+        agent_executor = chain_service.create_agent("openai")
 
         content_blocks = [{"type": "text", "text": message}]
         if media and media["content_type"].startswith("image/"):
@@ -197,6 +197,25 @@ async def reply(request: Request):
                     "filename": media["filename"],
                 }
             )
+
+        _new_chat_from_user = MessageCreateModel(
+            **{
+                "message": message,
+                "conversation_id": str(conversation.id),
+                "from_message": FromMessage.USER,
+                **(
+                    {
+                        "file_url": f"{ASSET_URL}/{media['filename']}",
+                        "file_size": media["file_size"],
+                        "file_name": media["filename"],
+                    }
+                    if media
+                    else {}
+                ),
+            }
+        )
+
+        await message_service.create_new_message(_new_chat_from_user)
 
         messages = [
             SystemMessage(
@@ -236,6 +255,16 @@ async def reply(request: Request):
 
         print("ai_content")
         print(ai_content)
+
+        _new_chat_from_assistant = MessageCreateModel(
+            **{
+                "message": ai_content,
+                "conversation_id": str(conversation.id),
+                "from_message": FromMessage.BOT,
+            }
+        )
+
+        await message_service.create_new_message(_new_chat_from_assistant)
 
         resp = MessagingResponse()
         resp.message(ai_content)

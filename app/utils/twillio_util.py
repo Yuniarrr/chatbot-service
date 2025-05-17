@@ -18,7 +18,9 @@ async def download_twilio_media(url: str):
         extension = content_type.split("/")[-1] if "/" in content_type else "bin"
         filename = f"{uuid.uuid4()}.{extension}"
 
-        contents = response.content  # raw bytes
+        contents = response.content
+        file_size = len(contents)
+
         _, file_path = uploader_service.upload_to_local(contents, filename)
 
         with open(file_path, "rb") as f:
@@ -30,4 +32,5 @@ async def download_twilio_media(url: str):
             "content_type": content_type,
             "filename": filename,
             "final_url": str(response.url),
+            "file_size": file_size,
         }
