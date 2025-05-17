@@ -3,9 +3,12 @@ import base64
 import logging
 import uuid
 import os
+import asyncio
+import time
 
+from twilio.rest import Client
 from typing import Optional
-from fastapi import APIRouter, Form, UploadFile, File, Depends, Request
+from fastapi import APIRouter, Form, UploadFile, File, Depends, Request, BackgroundTasks
 from sse_starlette import EventSourceResponse
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from twilio.twiml.messaging_response import MessagingResponse, Message
@@ -24,7 +27,7 @@ from app.services.message import message_service
 from app.retrieval.chain import chain_service
 from app.services.conversation import conversation_service
 from app.services.uploader import uploader_service
-from app.env import ASSET_URL
+from app.env import ASSET_URL, TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN
 from app.utils.twillio_util import download_twilio_media
 
 log = logging.getLogger(__name__)
@@ -151,25 +154,37 @@ async def chat_to_assistant(
 
 
 @router.post("/message")
-async def reply(request: Request):
+async def reply(request: Request, background_tasks: BackgroundTasks):
+    form_data = await request.form()
+    print(form_data)
+
+    # Quick ACK for Twilio webhook
+    fast_resp = MessagingResponse()
+    fast_resp.message("Pesan Anda sedang diproses...")
+    response = Response(content=str(fast_resp), media_type="application/xml")
+
+    # Trigger background processing
+    background_tasks.add_task(process_in_background, form_data)
+
+    return response
+
+
+async def process_in_background(form_data):
+    message = form_data.get("Body")
+    sender = form_data.get("From")
+    to = form_data.get("To")
+    media_url = form_data.get("MediaUrl0")
+    print("form_data")
+    print(form_data)
     try:
-        form_data = await request.form()
-        print(form_data)
-        message = form_data.get("Body")
-        sender = form_data.get("From")
-        # receiver = form_data.get("To")
+        start_time = time.time()
 
-        print("message")
-        print(message)
-        print(form_data.get("MediaUrl0"))
+        # Parallel media download and conversation fetch
+        media_task = download_twilio_media(media_url) if media_url else asyncio.sleep(0)
+        conversation_task = conversation_service.get_conversation_by_sender(sender)
+        media, conversation = await asyncio.gather(media_task, conversation_task)
 
-        media = None
-        if form_data.get("MediaUrl0") is not None:
-            media = await download_twilio_media(form_data.get("MediaUrl0"))
-
-        conversation = await conversation_service.get_conversation_by_sender(sender)
-
-        if conversation == None:
+        if conversation is None:
             conversation = await conversation_service.create_new_conversation(
                 title="Chat from WhatsApp", sender=sender
             )
@@ -177,7 +192,9 @@ async def reply(request: Request):
         agent_executor = chain_service.create_agent("openai")
 
         content_blocks = [{"type": "text", "text": message}]
-        if media and media["content_type"].startswith("image/"):
+        if isinstance(media, dict) and media.get("content_type", "").startswith(
+            "image/"
+        ):
             content_blocks.append(
                 {
                     "type": "image",
@@ -187,7 +204,9 @@ async def reply(request: Request):
                     "image_url": {"url": media["final_url"]},
                 }
             )
-        elif media and media["content_type"].startswith("application/"):
+        elif isinstance(media, dict) and media.get("content_type", "").startswith(
+            "application/"
+        ):
             content_blocks.append(
                 {
                     "type": "file",
@@ -209,12 +228,11 @@ async def reply(request: Request):
                         "file_size": media["file_size"],
                         "file_name": media["filename"],
                     }
-                    if media
+                    if media and isinstance(media, dict)
                     else {}
                 ),
             }
         )
-
         await message_service.create_new_message(_new_chat_from_user)
 
         messages = [
@@ -222,7 +240,7 @@ async def reply(request: Request):
                 content=f"User ID atau sender pesan adalah: {sender}."
                 + (
                     f" Gunakan url berikut sebagai image_url, jika akan menambahkan atau menyimpan data ke opportunity {ASSET_URL + '/' + media['filename']}"
-                    if media
+                    if media and isinstance(media, dict)
                     else ""
                 )
             ),
@@ -236,15 +254,10 @@ async def reply(request: Request):
             {"configurable": {"thread_id": str(conversation.id)}},
         )
 
-        print("response")
-        print(response)
-
-        messages = response["messages"]
-
         ai_messages = [
-            message.content
-            for message in messages
-            if isinstance(message, AIMessage) and message.content.strip() != ""
+            msg.content
+            for msg in response["messages"]
+            if isinstance(msg, AIMessage) and msg.content.strip()
         ]
 
         ai_content = (
@@ -253,9 +266,6 @@ async def reply(request: Request):
             else "Terjadi kesalahan, tidak ada respon dari AI. Tolong hubungi developer."
         )
 
-        print("ai_content")
-        print(ai_content)
-
         _new_chat_from_assistant = MessageCreateModel(
             **{
                 "message": ai_content,
@@ -263,15 +273,28 @@ async def reply(request: Request):
                 "from_message": FromMessage.BOT,
             }
         )
-
         await message_service.create_new_message(_new_chat_from_assistant)
 
-        resp = MessagingResponse()
-        resp.message(ai_content)
-        return Response(content=str(resp), media_type="application/xml")
+        # Send AI response via Twilio
+        await asyncio.to_thread(send_whatsapp_message, sender, ai_content, to)
+
+        print(f"Total processing time: {time.time() - start_time:.2f} seconds")
     except Exception as e:
         log.exception("Error processing message")
-        print(str(e))
-        error_resp = MessagingResponse()
-        error_resp.message("Terjadi kesalahan dalam sistem. Tolong hubungi developer.")
-        return Response(content=str(error_resp), media_type="application/xml")
+        print("Exception:", str(e))
+        await asyncio.to_thread(
+            send_whatsapp_message,
+            sender,
+            "Terjadi kesalahan dalam sistem. Tolong hubungi developer.",
+            to,
+        )
+
+
+# Twilio messaging function
+def send_whatsapp_message(to: str, body: str, from_: str):
+    client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
+    client.messages.create(
+        body=body,
+        from_=from_,
+        to=to,
+    )
