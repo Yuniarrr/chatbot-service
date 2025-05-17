@@ -21,13 +21,13 @@ from langchain_community.document_loaders import (
     UnstructuredEPubLoader,
     UnstructuredExcelLoader,
     UnstructuredPowerPointLoader,
-    RecursiveUrlLoader,
     WebBaseLoader,
 )
 from langchain_core.documents import Document
 from pdf2image import convert_from_path
 
 from app.core.logger import SRC_LOG_LEVELS
+from app.retrieval.custom_loader import CustomWebBaseLoader
 
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["RAG"])
@@ -74,9 +74,9 @@ class Loader:
             log.warning(f"OCR fallback for {file_name} because: {e}")
             return self._ocr_pdf(file_path)
 
-    def load_url(self, url: str, is_recursive_url: bool = False) -> list[Document]:
+    def load_url(self, url: str) -> list[Document]:
         try:
-            loader = self._get_loader_url(url, is_recursive_url)
+            loader = self._get_loader_url(url)
             docs = loader.load()
 
             if not docs:
@@ -98,6 +98,7 @@ class Loader:
         except Exception as e:
             print(f"Error load: {e}")
             log.warning(f"Error load {url} because: {e}")
+            return []
 
     def _get_loader(self, file_name: str, file_content_type: str, file_path: str):
         file_ext = file_name.split(".")[-1].lower()
@@ -137,26 +138,12 @@ class Loader:
 
         return loader
 
-    def _get_loader_url(self, url: str, is_recursive_url: bool):
-        if is_recursive_url:
-            print("RecursiveUrlLoader")
-            loader = RecursiveUrlLoader(
-                url=url,
-                extractor=self._bs4_extractor,
-                metadata_extractor=self._metadata_extractor,
-                prevent_outside=True,
-                base_url=self._get_base_url(url),
-            )
-        else:
-            # "parse_only": bs4.SoupStrainer(class_="wpb_wrapper"),
-            print("WebBaseLoader")
-            loader = WebBaseLoader(
-                web_path=url,
-                bs_kwargs={
-                    "parse_only": bs4.SoupStrainer(self.has_classes),
-                },
-                bs_get_text_kwargs={"separator": " | ", "strip": True},
-            )
+    def _get_loader_url(self, url: str):
+        print("WebBaseLoader")
+        loader = CustomWebBaseLoader(
+            web_path=url,
+            bs_get_text_kwargs={"separator": " | ", "strip": True},
+        )
 
         return loader
 
