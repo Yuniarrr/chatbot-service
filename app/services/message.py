@@ -23,6 +23,7 @@ class MessageService:
                 await db.refresh(new_message)
                 return MessageReadModel.model_validate(new_message)
         except Exception as e:
+            log.error(f"Error create_new_message: {e}")
             raise DatabaseException(str(e))
 
     async def get_messages_by_conversation_id(
@@ -42,6 +43,7 @@ class MessageService:
                     sort_orders="desc",
                 )
         except Exception as e:
+            log.error(f"Error get_messages_by_conversation_id: {e}")
             raise DatabaseException(str(e))
 
 

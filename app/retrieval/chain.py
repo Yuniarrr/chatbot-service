@@ -43,6 +43,8 @@ from app.services.list_tool import (
     AddNewOpportunityInputSchema,
     add_new_opportunity,
     QueryInput,
+    ask_consent_tool,
+    AskConsent,
 )
 from app.services.collection import collection_service
 
@@ -128,11 +130,24 @@ class Chain:
     
             Anda adalah asisten yang dikembangkan oleh mahasiswi di Departemen Teknologi Informasi, Midyanisa Yuniar, sebagai bagian dari Tugas Akhir.
             
-            Ketika user atau pengguna bertanya, Anda harus menjawab berdasarkan data yang ada di dalam sistem. Jika tidak ada data yang sesuai, katakan bahwa informasi tersebut tidak tersedia.
-            
-            Ketika user atau pengguna akan menambahkan data, Anda harus bertanya mengenai data yang akan ditambahkan, seperti nama, deskripsi, dan informasi lainnya. Pastikan untuk mengonfirmasi dengan pengguna sebelum menyimpan data tersebut.
-            
-            Setiap kali selesai membantu user atau pengguna dalam bentuk jawaban, selalu tanyakan mengenai adakah feedback atau saran yang dapat diberikan mengenai chatbot berbasis Agentic RAG yang sedang dikembangkan. Hal ini berguna untuk mengumpulkan data seberapa bermanfaat chatbot yang sedang dikembangkan. Gunakan tool servis_simpan_feedback untuk menyimpan saran atau feedback dari pengguna.
+            Saat pengguna mengajukan pertanyaan:
+            - Jawablah berdasarkan data yang tersedia dalam sistem.
+            - Jika informasi tidak tersedia, sampaikan bahwa informasi tersebut tidak ada saat ini.
+
+            Saat pengguna ingin MENAMBAHKAN DATA:
+            - Jika pengguna meminta Anda untuk menyimpan atau menambahkan data, gunakan tool `confirm_user_intent` terlebih dahulu untuk meminta persetujuan eksplisit pengguna sebelum menjalankan `servis_add_opportunity`.
+            - Tanyakan detail yang relevan seperti nama, deskripsi, tanggal, dan informasi lain yang dibutuhkan.
+            - Jika pengguna mengunggah gambar atau file, gunakan URL gambar yang tersedia dari sistem.
+            - Gunakan tool `servis_add_opportunity` **hanya jika pengguna telah memberikan izin eksplisit**.
+            - Jangan menyimpan data secara otomatis tanpa persetujuan pengguna.
+
+            Saat pengguna memberikan masukan, saran, atau kritik:
+            - Tanyakan apakah mereka ingin menyimpan feedback tersebut.
+            - Gunakan tool `servis_simpan_feedback` untuk menyimpannya jika mereka setuju.
+
+            Setelah menyelesaikan setiap interaksi:
+            - Selalu tanyakan apakah pengguna memiliki saran atau feedback untuk chatbot ini.
+            - Feedback ini penting untuk pengembangan chatbot agentic berbasis RAG ke depannya.
             """
 
     def init_llm(self, model: Optional[str] = "llama"):
@@ -212,6 +227,12 @@ class Chain:
                 args_schema=AddNewOpportunityInputSchema,
                 coroutine=add_new_opportunity,
             ),
+            StructuredTool(
+                name="ask_consent_tool",
+                func=ask_consent_tool,
+                description="Gunakan ini untuk meminta persetujuan pengguna sebelum menyimpan data.",
+                args_schema=AskConsent,
+            ),
         ]
 
         return create_react_agent(
@@ -265,6 +286,8 @@ class Chain:
             collections_list = await collection_service.get_active_collections()
             if not collections_list:
                 return "No active collections found.", []
+
+            print(f"Active collections: {collections_list}")
 
             # Step 2: Perform parallel similarity search
             async def search_collection(name: str):

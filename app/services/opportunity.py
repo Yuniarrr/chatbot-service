@@ -59,7 +59,7 @@ class OpportunityService:
     async def delete_opportunity_by_id(self, id: str):
         try:
             async with session_manager.session() as db:
-                await opportunities.db_delete(db, id)
+                await opportunities.db_delete(db=db, id=id, allow_multiple=False)
         except Exception as e:
             log.error(f"Error deleting opportunity: {e}")
             raise DatabaseException(str(e))

@@ -30,6 +30,16 @@ class QueryInput(BaseModel):
     query: str
 
 
+class AskConsent(BaseModel):
+    """Memastikan apakah pengguna ingin menyimpan data."""
+
+    action: str
+
+
+def ask_consent_tool(action: str):
+    return f"Sebelum saya menyimpan data, apakah Anda yakin ingin melanjutkan dengan {action}? (ya/tidak)"
+
+
 def get_current_weather(city: str) -> str:
     """
     Get the current weather for a given city.

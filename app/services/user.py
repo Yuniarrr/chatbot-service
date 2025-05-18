@@ -111,7 +111,7 @@ class UserService:
     async def delete_user_by_id(self, id: str):
         try:
             async with session_manager.session() as db:
-                await users.db_delete(db=db, id=id)
+                await users.db_delete(db=db, id=id, allow_multiple=False)
         except Exception as e:
             log.error(f"Error deleting user: {e}")
             raise DatabaseException(str(e))

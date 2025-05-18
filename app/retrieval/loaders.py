@@ -42,6 +42,7 @@ class Loader:
         self, file_name: str, file_content_type: str, file_path: str
     ) -> list[Document]:
         try:
+            print(f"Loading file: {file_name}")
             file_ext = file_name.split(".")[-1].lower()
             print(file_name, file_content_type, file_path)
             loader = self._get_loader(file_name, file_content_type, file_path)
@@ -76,11 +77,15 @@ class Loader:
 
     def load_url(self, url: str) -> list[Document]:
         try:
+            print(f"Loading URL: {url}")
             loader = self._get_loader_url(url)
             docs = loader.load()
 
             if not docs:
                 raise ValueError("Tidak ada dokumen yang dihasilkan dari loader.")
+
+            print("pass docs load url")
+            print(docs)
 
             fixed_docs = []
             for doc in docs:
@@ -94,16 +99,29 @@ class Loader:
                 )
                 fixed_docs.append(fixed_doc)
 
+            print("pass fixed docs")
+            print(fixed_docs)
             return fixed_docs
         except Exception as e:
             print(f"Error load: {e}")
             log.warning(f"Error load {url} because: {e}")
             return []
 
+    def _sanitize_pdf_header(self, file_path):
+        print("Memeriksa header PDF...")
+        with open(file_path, "rb") as f:
+            content = f.read()
+        index = content.find(b"%PDF")
+        if index > 0:
+            print("PDF header ditemukan bukan di awal file, disesuaikan...")
+            with open(file_path, "wb") as f:
+                f.write(content[index:])
+
     def _get_loader(self, file_name: str, file_content_type: str, file_path: str):
         file_ext = file_name.split(".")[-1].lower()
 
         if file_ext == "pdf":
+            self._sanitize_pdf_header(file_path)
             loader = PyPDFLoader(file_path, extract_images=True)
         elif file_ext == "csv":
             loader = CSVLoader(file_path)
@@ -111,8 +129,6 @@ class Loader:
             loader = BSHTMLLoader(file_path, open_encoding="unicode_escape")
         elif file_ext == "md":
             loader = TextLoader(file_path, autodetect_encoding=True)
-        elif file_content_type == "application/epub+zip":
-            loader = UnstructuredEPubLoader(file_path)
         elif (
             file_content_type
             == "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
@@ -128,7 +144,11 @@ class Loader:
             "application/vnd.ms-powerpoint",
             "application/vnd.openxmlformats-officedocument.presentationml.presentation",
         ] or file_ext in ["ppt", "pptx"]:
-            loader = UnstructuredPowerPointLoader(file_path)
+            loader = UnstructuredPowerPointLoader(
+                file_path,
+                mode="elements",
+                strategy="fast",
+            )
         elif file_ext == "msg":
             loader = OutlookMessageLoader(file_path)
         elif file_ext in ["jpg", "jpeg", "png"]:
@@ -175,8 +195,19 @@ class Loader:
                 file_path, poppler_path=r"C:\poppler-24.08.0\Library\bin"
             )
             text = ""
-            for image in images:
-                text += pytesseract.image_to_string(image) + "\n"
+
+            for idx, image in enumerate(images):
+                try:
+                    page_text = pytesseract.image_to_string(image)
+                    text += page_text + "\n"
+                except Exception as page_error:
+                    print(f"OCR gagal pada halaman {idx + 1}: {page_error}")
+                    log.warning(f"OCR gagal pada halaman {idx + 1}: {page_error}")
+                    continue  # skip halaman ini
+
+            if not text.strip():
+                log.error("OCR selesai tapi hasil kosong.")
+                return []
 
             temp_txt_path = file_path + ".ocr.txt"
             with open(temp_txt_path, "w", encoding="utf-8") as f:

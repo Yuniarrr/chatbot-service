@@ -3,7 +3,16 @@ import os
 import uuid
 
 from typing import Annotated, Optional
-from fastapi import APIRouter, Form, Query, Request, UploadFile, File, Depends
+from fastapi import (
+    APIRouter,
+    Form,
+    Query,
+    Request,
+    UploadFile,
+    File,
+    Depends,
+    BackgroundTasks,
+)
 from pydantic import BaseModel
 from uuid import UUID
 from urllib.parse import urlparse
@@ -22,7 +31,7 @@ from app.utils.auth import (
     TokenData,
     get_not_user,
 )
-from app.services.file import file_service
+from app.services.file import file_service, process_file
 from app.services.uploader import uploader_service
 from app.models.files import (
     FileCreateModel,
@@ -47,6 +56,7 @@ router = APIRouter()
 async def add_new_file(
     current_user: Annotated[TokenData, Depends(get_not_user)],
     request: Request,
+    background_tasks: BackgroundTasks,
     file: Optional[UploadFile] = File(None),
     collection_name: Optional[str] = Form("administration"),
     url: Optional[str] = Form(None),
@@ -104,39 +114,10 @@ async def add_new_file(
 
             await file_service.insert_new_file(_new_file)
 
-        try:
-            if file:
-                loader_document = embedding_service.loader(
-                    _new_file.file_name,
-                    _new_file.meta.get("content_type"),
-                    _new_file.file_path,
-                )
-            elif url:
-                loader_document = embedding_service.loader_url(url)
-
-            splitted_document = embedding_service.split_document(loader_document)
-
-            splitted_document = embedding_service.add_addtional_data_to_docs(
-                docs=splitted_document,
-                file_id=str(_new_file.id),
-                file_name=_new_file.file_name,
-            )
-
-            await vector_store_service.add_vectostore(
-                splitted_document, collection_name
-            )
-        except Exception as e:
-            update_file = FileUpdateModel(**{"status": FileStatus.FAILED})
-            await file_service.update_file_by_id(_new_file.id, update_file)
-
-            log.error(f"Error processing file: {_new_file.id}")
-            raise InternalServerException(f"Error in processing file {e}")
-
-        update_file = FileUpdateModel(**{"status": FileStatus.SUCCESS})
-        updated = await file_service.update_file_by_id(_new_file.id, update_file)
+        background_tasks.add_task(process_file, _new_file, file, url, collection_name)
 
         return ResponseModel(
-            status_code=201, message=SUCCESS_MESSAGE.CREATED, data=updated
+            status_code=201, message=SUCCESS_MESSAGE.CREATED, data=_new_file
         )
     except Exception as e:
         raise InternalServerException(str(e))
@@ -186,27 +167,24 @@ async def delete_file_by_id(
         if not file:
             raise NotFoundException(ERROR_MESSAGES.NOT_FOUND("file"))
 
-        await file_service.update_file_by_id(
-            file.id,
-            FileUpdateModel(
-                **{
-                    "status": FileStatus.DETACHED,
-                }
-            ),
-        )
+        collection_name = file.meta.get("collection_name")
+        if not collection_name:
+            raise ValueError("Missing collection name in file metadata")
+
+        vector_ids = await vector_store_service.get_vector_ids(str(file_id))
+        vector_ids_list = [item["id"] for item in vector_ids]
+
+        if vector_ids_list:
+            await vector_store_service.delete_by_ids(vector_ids_list, collection_name)
 
         if delete_file:
             uploader_service.delete_from_local(file.file_name)
-            await file_service.delete_file_by_id(file.id)
-
-        collection_name = file.meta.get("collection_name")
-        vector_ids = await vector_store_service.get_vector_ids(
-            str(file_id),
-        )
-
-        vector_ids_list = [item["id"] for item in vector_ids]
-
-        await vector_store_service.delete_by_ids(vector_ids_list, collection_name)
+            await file_service.delete_file_by_id(str(file_id))
+        else:
+            await file_service.update_file_by_id(
+                str(file_id),
+                FileUpdateModel(status=FileStatus.DETACHED),
+            )
 
         return ResponseModel(status_code=200, message=SUCCESS_MESSAGE.DELETED)
     except Exception as e:

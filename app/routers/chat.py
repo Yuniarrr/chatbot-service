@@ -14,7 +14,8 @@ from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from twilio.twiml.messaging_response import MessagingResponse, Message
 from fastapi.responses import Response
 
-from app.core.exceptions import InternalServerException
+from app.core.constants import ERROR_MESSAGES
+from app.core.exceptions import InternalServerException, NotFoundException
 from app.core.response import ResponseModel
 from app.core.logger import SRC_LOG_LEVELS
 from app.models.messages import FromMessage, MessageCreateModel, MessageForm
@@ -48,6 +49,12 @@ async def chat_to_assistant(
     current_user=Depends(get_verified_user),
 ):
     try:
+        conversation = await conversation_service.get_conversation_by_id(
+            str(conversation_id)
+        )
+        if not conversation:
+            raise NotFoundException(ERROR_MESSAGES.NOT_FOUND("conversation"))
+
         file_data = ""
         filename = ""
         if file:
@@ -239,7 +246,8 @@ async def process_in_background(form_data):
             SystemMessage(
                 content=f"User ID atau sender pesan adalah: {sender}."
                 + (
-                    f" Gunakan url berikut sebagai image_url, jika akan menambahkan atau menyimpan data ke opportunity {ASSET_URL + '/' + media['filename']}"
+                    f"User telah mengunggah gambar yang mungkin berisi informasi untuk disimpan. "
+                    f"Gunakan URL ini sebagai image_url jika perlu menyimpan data: {ASSET_URL}/{media['filename']}."
                     if media and isinstance(media, dict)
                     else ""
                 )

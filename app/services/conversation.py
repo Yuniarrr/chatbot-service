@@ -47,7 +47,7 @@ class ConversationService:
         except Exception as e:
             raise DatabaseException(str(e))
 
-    async def get_conversation_by_id(
+    async def get_conversation_with_message_by_id(
         self, id: str
     ) -> Optional[ConversationReadWithMessageModel]:
         try:
@@ -55,6 +55,18 @@ class ConversationService:
                 return await conversations.get_joined(
                     db=db, id=id, join_schema_to_select=ConversationReadWithMessageModel
                 )
+        except Exception as e:
+            raise DatabaseException(str(e))
+
+    async def get_conversation_by_id(self, id: str) -> Optional[ConversationReadModel]:
+        try:
+            async with session_manager.session() as db:
+                conversation = await conversations.get(db=db, id=id)
+
+                if not conversation:
+                    return None
+
+                return ConversationReadModel.model_validate(conversation)
         except Exception as e:
             raise DatabaseException(str(e))
 
@@ -88,7 +100,7 @@ class ConversationService:
     async def delete_conversation_by_id(self, id: str):
         try:
             async with session_manager.session() as db:
-                await conversations.db_delete(db=db, id=id)
+                await conversations.db_delete(db=db, id=id, allow_multiple=False)
         except Exception as e:
             raise DatabaseException(str(e))
 
