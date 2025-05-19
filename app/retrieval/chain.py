@@ -26,6 +26,8 @@ from langchain_core.runnables import RunnablePassthrough, RunnableSerializable
 from langgraph.graph.graph import CompiledGraph
 from psycopg_pool import AsyncConnectionPool
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
+from sklearn.metrics.pairwise import cosine_similarity
+from sklearn.preprocessing import normalize
 
 from app.retrieval.vector_store import vector_store_service
 from app.core.logger import SRC_LOG_LEVELS
@@ -45,8 +47,11 @@ from app.services.list_tool import (
     QueryInput,
     ask_consent_tool,
     AskConsent,
+    CollectionSelectorInput,
+    select_collection,
 )
 from app.services.collection import collection_service
+from app.retrieval.embed import embedding_service
 
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["RAG"])
@@ -186,14 +191,9 @@ class Chain:
         tools = [
             StructuredTool(
                 name="retrieve",
-                description="Retrieve and reorder relevant documents based on query.",
+                description="Retrieve documents based on query.",
                 args_schema=QueryInput,
                 coroutine=Chain.retrieve,
-            ),
-            Tool(
-                name="current_weather",
-                func=get_current_weather,
-                description="Get the current weather for a location.",
             ),
             StructuredTool(
                 name="servis_pengiriman_email",
@@ -227,18 +227,24 @@ class Chain:
                 args_schema=AddNewOpportunityInputSchema,
                 coroutine=add_new_opportunity,
             ),
+            # StructuredTool(
+            #     name="ask_consent_tool",
+            #     func=ask_consent_tool,
+            #     description="Gunakan ini untuk meminta persetujuan pengguna sebelum menyimpan data.",
+            #     args_schema=AskConsent,
+            # ),
             StructuredTool(
-                name="ask_consent_tool",
-                func=ask_consent_tool,
-                description="Gunakan ini untuk meminta persetujuan pengguna sebelum menyimpan data.",
-                args_schema=AskConsent,
+                name="pilih_koleksi_terbaik",
+                coroutine=select_collection,
+                description="Pilih koleksi paling relevan dari daftar berdasarkan query pengguna",
+                args_schema=CollectionSelectorInput,
             ),
         ]
 
         return create_react_agent(
             model,
             tools,
-            checkpointer=self._checkpointer,
+            # checkpointer=self._checkpointer,
             prompt=self.agent_system_prompt(model),
         )
 
@@ -280,48 +286,49 @@ class Chain:
 
     @staticmethod
     async def retrieve(query: str):
-        """Retrieve and reorder information from all active collections."""
+        """Retrieve information from all active collections."""
         try:
+            print(f"Retrieving information for query: {query}")
             # Step 1: Get all active collections from the DB
             collections_list = await collection_service.get_active_collections()
-            if not collections_list:
+            collections = collections_list.get("data", [])
+            if not collections:
                 return "No active collections found.", []
 
-            print(f"Active collections: {collections_list}")
+            print(f"Active collections: {collections}")
 
-            # Step 2: Perform parallel similarity search
-            async def search_collection(name: str):
-                try:
-                    return await vector_store_service.async_similarity_search(
-                        query, collection_name=name
-                    )
-                except Exception as e:
-                    print(f"Error searching {name}: {e}")
-                    return []
-
-            tasks = [
-                search_collection(col["name"])
-                for col in collections_list.get("data", [])
-                if "name" in col and col["name"]
+            collection_summaries = [
+                {"name": c["name"], "description": c["description"]}
+                for c in collections
             ]
 
-            results = await asyncio.gather(*tasks)
-            all_docs = [doc for sublist in results for doc in sublist]
+            agent_response = await select_collection(
+                query=query, collections=collection_summaries
+            )
+            print("agent_response")
+            print(agent_response)
+            chosen_collection_name = agent_response
 
-            if not all_docs:
-                return "No relevant documents found.", []
+            if chosen_collection_name not in [c["name"] for c in collections]:
+                return f"Nama koleksi '{chosen_collection_name}' tidak ditemukan.", []
 
-            # Step 3: Reorder the documents for relevance
-            # reordering = LongContextReorder()
-            # reordered_docs = reordering.transform_documents(all_docs)
-
-            # Step 4: Serialize the output for display
-            serialized = "\n\n".join(
-                f"Source: {doc.metadata}\nContent: {doc.page_content}"
-                for doc in all_docs
+            docs = await vector_store_service.async_similarity_search(
+                query, collection_name=chosen_collection_name
             )
 
-            return serialized, all_docs
+            # reordering = LongContextReorder()
+            # reordered_docs = reordering.transform_documents(docs)
+
+            print(f"Jumlah dokumen yang dikembalikan: {len(docs)}")
+
+            for doc in docs:
+                print(f"Document file name: {doc.metadata['file_name']}")
+
+            serialized = "\n\n".join(
+                f"Source: {doc.metadata}\nContent: {doc.page_content}" for doc in docs
+            )
+
+            return serialized, docs
         except Exception as e:
             return f"Error during retrieval: {e}", []
 

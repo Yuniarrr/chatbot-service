@@ -132,7 +132,7 @@ async def chat_to_assistant(
                     "collection_name": collection_name,
                     "user_id": current_user.id,
                 },
-                {"configurable": {"thread_id": conversation_id}},
+                # {"configurable": {"thread_id": conversation_id}},
                 stream_mode="values",
             ):
                 print("step")

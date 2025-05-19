@@ -1,5 +1,5 @@
 import os
-from typing import List, Optional
+from typing import Dict, List, Optional
 import requests
 import smtplib
 import logging
@@ -14,6 +14,9 @@ from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
+from langchain.chat_models import init_chat_model
+from langchain_core.output_parsers import JsonOutputParser
+from langchain_core.prompts import PromptTemplate
 
 from app.core.logger import SRC_LOG_LEVELS
 from app.env import GOOGLE_EMAIL, GOOGLE_PASSWORD, GOOGLE_CALENDAR_JSON
@@ -330,3 +333,49 @@ async def add_new_opportunity(
         log.error(f"Error: {error}")
         log.info(traceback.print_exc())
         return "Terjadi kegagalan dalam menyimpan data opportunity ke database"
+
+
+class CollectionSelectorInput(BaseModel):
+    query: str
+    collections: List[str]
+
+
+class CollectionChoice(BaseModel):
+    chosen_collection: str = Field(
+        description="Nama koleksi yang paling relevan dengan query"
+    )
+
+
+async def select_collection(query: str, collections: List[Dict[str, str]]) -> str:
+    """Gunakan LLM untuk memilih nama koleksi paling relevan dari daftar berdasarkan query."""
+    try:
+        model = init_chat_model("gpt-4o", model_provider="openai")
+        parser = JsonOutputParser(pydantic_object=CollectionChoice)
+
+        prompt = PromptTemplate(
+            template=(
+                "Berikut adalah query dari pengguna:\n"
+                "{query}\n\n"
+                "Dan ini daftar koleksi:\n"
+                "{collections}\n\n"
+                "{format_instructions}"
+            ),
+            input_variables=["query", "collections"],
+            partial_variables={"format_instructions": parser.get_format_instructions()},
+        )
+
+        chain = prompt | model | parser
+
+        collections_str = "\n".join(
+            f"- {col['name']}: {col['description']}" for col in collections
+        )
+
+        response_dict = await chain.ainvoke(
+            {"query": query, "collections": collections_str}
+        )
+
+        # response_dict adalah dict, akses dengan key
+        return response_dict["chosen_collection"]
+    except Exception as e:
+        print(f"Parsing error: {e}")
+        return "Tidak dapat menentukan koleksi relevan"

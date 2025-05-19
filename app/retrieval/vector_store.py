@@ -41,7 +41,7 @@ class VectorStore:
         self._table_name = VECTOR_TABLE_NAME
         self._embedding_model = None
         self._vector_store = None
-        self._k = 8
+        self._k = 15
 
     def initialize_embedding_model(
         self, sentence_transformers_home: Optional[str] = None

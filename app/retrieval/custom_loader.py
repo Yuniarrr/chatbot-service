@@ -1,6 +1,6 @@
 import ftfy
 
-from langchain.document_loaders import WebBaseLoader as BaseWebBaseLoader
+from langchain_community.document_loaders import WebBaseLoader as BaseWebBaseLoader
 from bs4 import BeautifulSoup
 from langchain_core.documents import Document
 

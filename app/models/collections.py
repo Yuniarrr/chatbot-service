@@ -3,7 +3,7 @@ import uuid as uuid_pkg
 from sqlalchemy.orm import Mapped, mapped_column
 from datetime import datetime
 from zoneinfo import ZoneInfo
-from sqlalchemy import DateTime
+from sqlalchemy import DateTime, Text
 from typing import Union
 from pydantic import BaseModel, ConfigDict
 from fastcrud import FastCRUD
@@ -19,6 +19,7 @@ class Collection(Base):
         "id", default=uuid_pkg.uuid4, primary_key=True, unique=True
     )
     name: Mapped[str] = mapped_column(unique=True, nullable=False)
+    description: Mapped[str] = mapped_column(Text, nullable=True)
     is_active: Mapped[bool] = mapped_column(default=True, nullable=False)
 
     created_at: Mapped[datetime] = mapped_column(
