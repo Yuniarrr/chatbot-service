@@ -321,6 +321,12 @@ class Chain:
 
             # docs = await retriever.ainvoke(query)
             docs = []
+            # retriever_contextual = (
+            #     await vector_store_service.get_contextual_compression(
+            #         retriever=retriever
+            #     )
+            # )
+            # docs = await retriever_contextual.ainvoke(query)
 
             async def log_structured_query():
                 parsed_structured_query = await retriever.query_constructor.ainvoke(

@@ -16,10 +16,23 @@ if sys.platform.startswith("win"):
 xls = pd.ExcelFile("./parse/jadwal-mata-kuliah.xlsx")
 df_jadwal = xls.parse("Jadwal Kuliah Genap 2425", header=None)
 
-# Tampilkan beberapa baris awal untuk melihat strukturnya
-df_jadwal.head(20)
+dosen_mapping = {}
+with open("./parse/dosen.txt", "r", encoding="utf-8") as f:
+    for line in f:
+        if ":" in line:
+            inisial, nama = line.strip().split(":", 1)
+            dosen_mapping[inisial.strip()] = nama.strip()
 
-# Mulai dari baris ke-6 sampai bawah (skip header deskriptif)
+
+def gabung_nama_dosen(nama_dosen_list):
+    if not nama_dosen_list:
+        return "Tidak diketahui"
+    elif len(nama_dosen_list) == 1:
+        return nama_dosen_list[0]
+    else:
+        return ", ".join(nama_dosen_list[:-1]) + " dan " + nama_dosen_list[-1]
+
+
 jadwal_data = df_jadwal.copy()
 
 # Deteksi baris yang merupakan header kolom ruang
@@ -70,18 +83,31 @@ for idx in range(header_row_index + 1, len(jadwal_data)):
         mk_info = cell.strip().split("\n")
         mk_info_joined = " ".join(mk_info)
         mata_kuliah = mk_info_joined.split("Semester")[0].strip()
+
         semester = ""
         dosen = ""
 
-        match = re.search(r"Semester\s+(.+?)\s*\|\s*(.+)", mk_info_joined)
-        if match:
-            semester = match.group(1).strip()
-            dosen = match.group(2).strip()
-        else:
-            # Coba match yang hanya punya "Semester X"
-            match_alt = re.search(r"Semester\s+(\d+)", mk_info_joined)
-            if match_alt:
-                semester = match_alt.group(1).strip()
+        # Cari semester dan dosen di tiap baris mk_info
+        for info_line in mk_info:
+            match = re.search(r"Semester\s+(.+?)\s*\|\s*(.+)", info_line)
+            if match:
+                semester = match.group(1).strip()
+                dosen = match.group(2).strip()
+                break
+
+        # Kalau dosen kosong, coba ambil semester saja
+        if dosen == "":
+            for info_line in mk_info:
+                match_alt = re.search(r"Semester\s+(\d+)", info_line)
+                if match_alt:
+                    semester = match_alt.group(1).strip()
+                    break
+
+        # Split dosen (bisa lebih dari satu)
+        dosen_list = [d.strip() for d in dosen.split(",") if d.strip()]
+        # Kalau inisial gak ada di mapping, tetap pakai inisial tsb
+        nama_dosen_list = [dosen_mapping.get(d, d) for d in dosen_list]
+        nama_dosen_str = gabung_nama_dosen(nama_dosen_list)
 
         jadwal_list.append(
             {
@@ -90,7 +116,7 @@ for idx in range(header_row_index + 1, len(jadwal_data)):
                 "ruang": ruang,
                 "mata_kuliah": mata_kuliah,
                 "semester": semester,
-                "dosen": dosen,
+                "dosen": nama_dosen_str,
                 "mk_info": mk_info,
             }
         )
@@ -100,17 +126,21 @@ with open("./parse/jadwal.json", "w", encoding="utf-8") as f:
     json.dump(jadwal_list, f, ensure_ascii=False, indent=4)
 
 extra_meta = {
-    "document_type": "jadwal",
-    "topik": "jadwal mata kuliah bersama",
+    "file_id": "99811cf5-3f1e-4506-adfa-f545d696077e",
+    "file_name": "99811cf5-3f1e-4506-adfa-f545d696077e_jadwal-mata-kuliah.xlsx",
+    "source": "F:\\project\\chatbot-ta\\chatbot-service\\data\\uploads\\99811cf5-3f1e-4506-adfa-f545d696077e_jadwal-mata-kuliah.xlsx",
+    "name": "jadwal-mata-kuliah.xlsx",
+    "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    "size": 80806,
+    "collection_name": "perkuliahan",
+    "document_type": "mata kuliah",
+    "topik": "jadwal mata kuliah di departemen teknologi informasi",
     "tahun_ajaran": "2024/2025",
-    "file_id": "fb0b2e1f-66cb-418a-8215-3204ca02d085",
-    "file_name": "fb0b2e1f-66cb-418a-8215-3204ca02d085_PUBLISH Mahasiswa - Perkuliahan Sem Genap 2024_2025.xlsx",
-    "source": "F:\\project\\chatbot-ta\\chatbot-service\\data\\uploads\\fb0b2e1f-66cb-418a-8215-3204ca02d085_PUBLISH Mahasiswa - Perkuliahan Sem Genap 2024_2025.xlsx",
 }
 
 docs = [
     Document(
-        page_content=f"{item['mata_kuliah']} diajarkan pada hari {item['hari']} pukul {item['jam']} di ruang {item['ruang']}.",
+        page_content=f"{item['mata_kuliah']} untuk semester {item['semester']} diajarkan pada hari {item['hari']} pukul {item['jam']} di ruang {item['ruang']} oleh {item['dosen']}.",
         metadata={**item, **extra_meta},
     )
     for item in jadwal_list
@@ -121,8 +151,8 @@ import asyncio
 
 async def main():
     vector_store_service.initialize_embedding_model()
-    vector_store_service.initialize_pg_vector("akademik")
-    await vector_store_service.add_vectostore(docs, "akademik")
+    vector_store_service.initialize_pg_vector("perkuliahan")
+    await vector_store_service.add_vectostore(docs, "perkuliahan")
 
 
 asyncio.run(main())

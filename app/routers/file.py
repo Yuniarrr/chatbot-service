@@ -63,10 +63,16 @@ async def add_new_file(
     url: Optional[str] = Form(None),
     document_type: Optional[str] = Form(None),
     topik: Optional[str] = Form(None),
+    content: Optional[str] = Form(None),
 ):
     try:
-        if not file and not url:
-            raise BadRequestException("Either a file or URL must be provided.")
+        provided_sources = [bool(file), bool(url), bool(content)]
+        if provided_sources.count(True) == 0:
+            raise BadRequestException("A file, URL, or content must be provided.")
+        elif provided_sources.count(True) > 1:
+            raise BadRequestException(
+                "Only one of file, URL, or content should be provided."
+            )
 
         id = str(uuid.uuid4())
 
@@ -98,6 +104,29 @@ async def add_new_file(
             )
 
             await file_service.insert_new_file(_new_file)
+        elif content is not None:
+            filename = f"{id}_content.txt"
+            contents, file_path = uploader_service.upload_text_content(
+                content, filename
+            )
+
+            _new_file = FileCreateModel(
+                id=id,
+                user_id=current_user.id,
+                file_name=filename,
+                file_path=file_path,
+                status=FileStatus.AWAITING,
+                meta={
+                    "name": filename,
+                    "content_type": "text/plain",
+                    "size": len(content.encode("utf-8")),
+                    "collection_name": collection_name,
+                    "document_type": document_type,
+                    "topik": topik,
+                },
+            )
+
+            await file_service.insert_new_file(_new_file)
         elif url:
             parsed = urlparse(url)
             _new_file = FileCreateModel(
@@ -119,6 +148,9 @@ async def add_new_file(
             )
 
             await file_service.insert_new_file(_new_file)
+
+        print("_new_file")
+        print(_new_file)
 
         background_tasks.add_task(
             process_file, _new_file, file, url, collection_name, _new_file.meta

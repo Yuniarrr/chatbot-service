@@ -17,6 +17,7 @@ from langchain_openai import ChatOpenAI
 from langchain.retrievers import ContextualCompressionRetriever, EnsembleRetriever
 from langchain_community.retrievers import BM25Retriever
 from langchain_core.retrievers import BaseRetriever
+from langchain.retrievers.document_compressors import LLMListwiseRerank
 
 from app.retrieval.model.colbert import ColBERT
 from app.retrieval.rerank import (
@@ -309,22 +310,23 @@ class VectorStore:
             retrievers=[bm25_retriever, vector_retriever], weights=[0.5, 0.5]
         )
 
-        # reranker = Reranker()
-        reranker = sentence_transformers.CrossEncoder(
-            "BAAI/bge-reranker-base",
-            trust_remote_code=True,
-        )
+        # reranker = sentence_transformers.CrossEncoder(
+        #     "BAAI/bge-reranker-base",
+        #     trust_remote_code=True,
+        # )
 
-        # reranker = AsyncReranker()
-        compressor = RerankCompressor(
-            embedding_function=self._embedding_model.embed_query,
-            top_n=self._k,
-            reranking_function=reranker,
-            r_score=0.3,
-        )
+        # compressor = RerankCompressor(
+        #     embedding_function=self._embedding_model.embed_query,
+        #     top_n=self._k,
+        #     reranking_function=reranker,
+        #     r_score=0.3,
+        # )
+        llm = llm = ChatOpenAI(temperature=0, model_name="gpt-4o")
+
+        _filter = LLMListwiseRerank.from_llm(llm, top_n=5)
 
         return ContextualCompressionRetriever(
-            base_compressor=compressor, base_retriever=ensemble_retriever
+            base_compressor=_filter, base_retriever=ensemble_retriever
         )
 
     async def get_all_documents(self, collection_name: str) -> list[Document]:
@@ -406,6 +408,15 @@ class VectorStore:
         ]
 
         return reranked_docs
+
+    async def get_contextual_compression(self, retriever):
+        llm = llm = ChatOpenAI(temperature=0, model_name="gpt-4o")
+
+        _filter = LLMListwiseRerank.from_llm(llm, top_n=self._k)
+
+        return ContextualCompressionRetriever(
+            base_compressor=_filter, base_retriever=retriever
+        )
 
 
 vector_store_service = VectorStore()

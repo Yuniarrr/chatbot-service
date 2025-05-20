@@ -5,7 +5,7 @@
         "ruang": "TW2 - 702",
         "mata_kuliah": "Arsitektur Enterprise C (3 SKS)",
         "semester": "2",
-        "dosen": "KG",
+        "dosen": "Ir. Khakim Ghozali, M.MT",
         "mk_info": [
             "Arsitektur Enterprise C (3 SKS)",
             "Semester 2 | KG"
@@ -17,7 +17,7 @@
         "ruang": "TW2 - 703",
         "mata_kuliah": "Struktur Data dan Pemograman Berorientasi Objek B (3 SKS)",
         "semester": "2",
-        "dosen": "RW",
+        "dosen": "Dr. Rizka Wakhidatus Sholikah, S. Kom",
         "mk_info": [
             "Struktur Data dan Pemograman",
             "Berorientasi Objek B (3 SKS)",
@@ -30,7 +30,7 @@
         "ruang": "TW2 - 704",
         "mata_kuliah": "Pengembangan Sistem/Aplikasi (Capstone Project) 2022 A",
         "semester": "6",
-        "dosen": "RR",
+        "dosen": "Ridho Rahman Hariadi, S.Kom., M.Sc.",
         "mk_info": [
             "Pengembangan Sistem/Aplikasi",
             "(Capstone Project) 2022 A",
@@ -43,7 +43,7 @@
         "ruang": "TW2 - 702",
         "mata_kuliah": "Arsitektur Enterprise A (3 SKS)",
         "semester": "2",
-        "dosen": "KG",
+        "dosen": "Ir. Khakim Ghozali, M.MT",
         "mk_info": [
             "Arsitektur Enterprise A (3 SKS)",
             "Semester 2 | KG"
@@ -55,7 +55,7 @@
         "ruang": "TW2 - 702",
         "mata_kuliah": "Sistem Operasi A (4 SKS)",
         "semester": "2",
-        "dosen": "HC, MH",
+        "dosen": "Dr. Ir. Henning Titi Ciptaningtyas, S.Kom, M.Kom. dan Ir. Muchammad Husni, M.Kom",
         "mk_info": [
             "Sistem Operasi A (4 SKS)",
             "Semester 2 | HC, MH"
@@ -80,7 +80,7 @@
         "ruang": "TW2 - 704",
         "mata_kuliah": "Arsitektur Enterprise B (3 SKS)",
         "semester": "2",
-        "dosen": "KG",
+        "dosen": "Ir. Khakim Ghozali, M.MT",
         "mk_info": [
             "Arsitektur Enterprise B (3 SKS)",
             "Semester 2 | KG"
@@ -92,7 +92,7 @@
         "ruang": "TW2 - 705",
         "mata_kuliah": "Kriptografi B (3 SKS)",
         "semester": "6",
-        "dosen": "HF",
+        "dosen": "Hafara Firdausi, S.Kom., M.Kom.",
         "mk_info": [
             "Kriptografi B (3 SKS)",
             "Semester 6 | HF"
@@ -104,7 +104,7 @@
         "ruang": "TW2 - 702",
         "mata_kuliah": "Sistem Basis Data A (4 SKS)",
         "semester": "2",
-        "dosen": "RW",
+        "dosen": "Dr. Rizka Wakhidatus Sholikah, S. Kom",
         "mk_info": [
             "Sistem Basis Data A (4 SKS)",
             "Semester 2 | RW"
@@ -116,7 +116,7 @@
         "ruang": "TW2 - 703",
         "mata_kuliah": "Penulisan Ilmiah A (2 SKS)",
         "semester": "6",
-        "dosen": "HC",
+        "dosen": "Dr. Ir. Henning Titi Ciptaningtyas, S.Kom, M.Kom.",
         "mk_info": [
             "Penulisan Ilmiah A (2 SKS)",
             "Semester 6 | HC"
@@ -128,7 +128,7 @@
         "ruang": "TW2 - 704",
         "mata_kuliah": "Integrasi Sistem A (3 SKS)",
         "semester": "4",
-        "dosen": "RR",
+        "dosen": "Ridho Rahman Hariadi, S.Kom., M.Sc.",
         "mk_info": [
             "Integrasi Sistem A (3 SKS)",
             "Semester 4 | RR"
@@ -140,7 +140,7 @@
         "ruang": "TW2 - 702",
         "mata_kuliah": "Manajemen Insiden Keamanan Siber A (3 SKS)",
         "semester": "4",
-        "dosen": "AI *(KELAS DIMULAI PUKUL 11.00 WIB)*",
+        "dosen": "Annisaa Sri Indrawanti, S. Kom., M. Kom",
         "mk_info": [
             "Manajemen Insiden",
             "Keamanan Siber A (3 SKS)",
@@ -154,7 +154,7 @@
         "ruang": "TW2 - 703",
         "mata_kuliah": "Teknologi Smartcity A (4 SKS)",
         "semester": "6",
-        "dosen": "IZ, MH",
+        "dosen": "Irzal Ahmad Sabilla, S. Kom.,M.Kom dan Ir. Muchammad Husni, M.Kom",
         "mk_info": [
             "Teknologi Smartcity A (4 SKS)",
             "Semester 6 | IZ, MH"
@@ -166,7 +166,7 @@
         "ruang": "SKPB (Tower 1)",
         "mata_kuliah": "KALKULUS 2 (3 SKS)",
         "semester": "2",
-        "dosen": "",
+        "dosen": "Tidak diketahui",
         "mk_info": [
             "KALKULUS 2 (3 SKS)",
             "Semester 2"
@@ -178,7 +178,7 @@
         "ruang": "TW2 - 702",
         "mata_kuliah": "Sistem Operasi B (4 SKS)",
         "semester": "2",
-        "dosen": "HG *(KELAS DIMULAI PUKUL 13.00 WIB)*",
+        "dosen": "Dr.tech.Ir. Raden Venantius Hari Ginardi, M.Sc",
         "mk_info": [
             "Sistem Operasi B (4 SKS)",
             "Semester 2 | HG",
@@ -191,7 +191,7 @@
         "ruang": "TW2 - Auditorium Lantai 2",
         "mata_kuliah": "Security Operations Center A (3 SKS)",
         "semester": "4, Semester 6",
-        "dosen": "HS",
+        "dosen": "Hatma Suryotrisongko, S.Kom., M.Eng., Ph.D.",
         "mk_info": [
             "Security Operations Center A (3 SKS)",
             "Semester 4, Semester 6 | HS"
@@ -203,7 +203,7 @@
         "ruang": "TW2 - 702",
         "mata_kuliah": "Sistem Basis Data B (4 SKS)",
         "semester": "2",
-        "dosen": "RW",
+        "dosen": "Dr. Rizka Wakhidatus Sholikah, S. Kom",
         "mk_info": [
             "Sistem Basis Data B (4 SKS)",
             "Semester 2 | RW"
@@ -215,7 +215,7 @@
         "ruang": "TW2 - 703",
         "mata_kuliah": "Manajemen Insiden Keamanan Siber B (3 SKS)",
         "semester": "4",
-        "dosen": "AI",
+        "dosen": "Annisaa Sri Indrawanti, S. Kom., M. Kom",
         "mk_info": [
             "Manajemen Insiden",
             "Keamanan Siber B (3 SKS)",
@@ -228,7 +228,7 @@
         "ruang": "TW2 - 704",
         "mata_kuliah": "Pengembangan Sistem/Aplikasi (Capstone Project) 2022 B",
         "semester": "6",
-        "dosen": "RR",
+        "dosen": "Ridho Rahman Hariadi, S.Kom., M.Sc.",
         "mk_info": [
             "Pengembangan Sistem/Aplikasi",
             "(Capstone Project) 2022 B",
@@ -241,7 +241,7 @@
         "ruang": "TW2 - 702",
         "mata_kuliah": "Sistem Basis Data C (4 SKS)",
         "semester": "2",
-        "dosen": "AI",
+        "dosen": "Annisaa Sri Indrawanti, S. Kom., M. Kom",
         "mk_info": [
             "Sistem Basis Data C (4 SKS)",
             "Semester 2 | AI"
@@ -253,7 +253,7 @@
         "ruang": "TW2 - 703",
         "mata_kuliah": "Kecerdasan Artifisial dan Machine Learning A (4 SKS)",
         "semester": "4",
-        "dosen": "IZ, DS",
+        "dosen": "Irzal Ahmad Sabilla, S. Kom.,M.Kom dan DS",
         "mk_info": [
             "Kecerdasan Artifisial dan",
             "Machine Learning A (4 SKS)",
@@ -266,7 +266,7 @@
         "ruang": "TW2 - 702",
         "mata_kuliah": "Sistem Operasi C (4 SKS)",
         "semester": "2",
-        "dosen": "HG",
+        "dosen": "Dr.tech.Ir. Raden Venantius Hari Ginardi, M.Sc",
         "mk_info": [
             "Sistem Operasi C (4 SKS)",
             "Semester 2 | HG"
@@ -278,7 +278,7 @@
         "ruang": "TW2 - 703",
         "mata_kuliah": "Manajemen Proyek A (3 SKS)",
         "semester": "6",
-        "dosen": "ED",
+        "dosen": "Edwin Riksakomara, S.Kom., M.T.",
         "mk_info": [
             "Manajemen Proyek A (3 SKS)",
             "Semester 6 | ED"
@@ -290,7 +290,7 @@
         "ruang": "TW2 - 704",
         "mata_kuliah": "Kecerdasan Artifisial dan Machine Learning B (4 SKS)",
         "semester": "4",
-        "dosen": "RW",
+        "dosen": "Dr. Rizka Wakhidatus Sholikah, S. Kom",
         "mk_info": [
             "Kecerdasan Artifisial dan",
             "Machine Learning B (4 SKS)",
@@ -303,7 +303,7 @@
         "ruang": "TW2 - 705",
         "mata_kuliah": "Teknologi Komputasi Awan A (3 SKS)",
         "semester": "4",
-        "dosen": "HC, FD",
+        "dosen": "Dr. Ir. Henning Titi Ciptaningtyas, S.Kom, M.Kom. dan Fuad Dary Rosyadi, S.Kom., M.Kom.",
         "mk_info": [
             "Teknologi Komputasi Awan A (3 SKS)",
             "Semester 4 | HC, FD"
@@ -315,7 +315,7 @@
         "ruang": "TW2 - 702",
         "mata_kuliah": "Interaksi Manusia dan Komputer A 2022 (3 SKS)",
         "semester": "6",
-        "dosen": "IZ",
+        "dosen": "Irzal Ahmad Sabilla, S. Kom.,M.Kom",
         "mk_info": [
             "Interaksi Manusia dan Komputer A",
             "2022 (3 SKS)",
@@ -328,7 +328,7 @@
         "ruang": "TW2 - 704",
         "mata_kuliah": "Integrasi Sistem B (3 SKS)",
         "semester": "4",
-        "dosen": "RR",
+        "dosen": "Ridho Rahman Hariadi, S.Kom., M.Sc.",
         "mk_info": [
             "Integrasi Sistem B (3 SKS)",
             "Semester 4 | RR"
@@ -340,7 +340,7 @@
         "ruang": "TW2 - 702",
         "mata_kuliah": "Interaksi Manusia dan Komputer C (2022+2023) (3 SKS)",
         "semester": "4 + Semester 6",
-        "dosen": "HF *(KELAS DIMULAI PUKUL 11.00 WIB)*",
+        "dosen": "Hafara Firdausi, S.Kom., M.Kom.",
         "mk_info": [
             "Interaksi Manusia dan Komputer C",
             "(2022+2023) (3 SKS)",
@@ -354,7 +354,7 @@
         "ruang": "TW2 - 703",
         "mata_kuliah": "Sistem Cerdas A (3 SKS)",
         "semester": "6",
-        "dosen": "IZ",
+        "dosen": "Irzal Ahmad Sabilla, S. Kom.,M.Kom",
         "mk_info": [
             "Sistem Cerdas A (3 SKS)",
             "Semester 6 | IZ"
@@ -366,7 +366,7 @@
         "ruang": "SKPB (Tower 1)",
         "mata_kuliah": "KALKULUS 2 (3 SKS)",
         "semester": "2",
-        "dosen": "",
+        "dosen": "Tidak diketahui",
         "mk_info": [
             "KALKULUS 2 (3 SKS)",
             "Semester 2"
@@ -378,7 +378,7 @@
         "ruang": "TW2 - 702",
         "mata_kuliah": "Struktur Data dan Pemograman Berorientasi Objek A (3 SKS)",
         "semester": "2",
-        "dosen": "HF *(KELAS DIMULAI PUKUL 13.00 WIB)*",
+        "dosen": "Hafara Firdausi, S.Kom., M.Kom.",
         "mk_info": [
             "Struktur Data dan Pemograman Berorientasi Objek A (3 SKS)",
             "Semester 2 | HF",
@@ -391,7 +391,7 @@
         "ruang": "TW2 - 703",
         "mata_kuliah": "Teknologi Multimedia A (3 SKS)",
         "semester": "6",
-        "dosen": "AI",
+        "dosen": "Annisaa Sri Indrawanti, S. Kom., M. Kom",
         "mk_info": [
             "Teknologi Multimedia A (3 SKS)",
             "Semester 6 | AI"
@@ -403,7 +403,7 @@
         "ruang": "TW2 - 704",
         "mata_kuliah": "Teknologi Multimedia B (2022+2023 (3 SKS)",
         "semester": "4 + Semester 6",
-        "dosen": "HC",
+        "dosen": "Dr. Ir. Henning Titi Ciptaningtyas, S.Kom, M.Kom.",
         "mk_info": [
             "Teknologi Multimedia B",
             "(2022+2023 (3 SKS)",
@@ -416,7 +416,7 @@
         "ruang": "SKPB (Tower 1)",
         "mata_kuliah": "KEBUDAYAAN DAN KEBANGSAAN  (2 SKS)",
         "semester": "4",
-        "dosen": "",
+        "dosen": "Tidak diketahui",
         "mk_info": [
             "KEBUDAYAAN DAN KEBANGSAAN ",
             "(2 SKS) Semester 4"
@@ -428,7 +428,7 @@
         "ruang": "TW2 - 702",
         "mata_kuliah": "Interaksi Manusia dan Komputer D (2023+2024) (3 SKS)",
         "semester": "4 + Semester 2",
-        "dosen": "HF",
+        "dosen": "Hafara Firdausi, S.Kom., M.Kom.",
         "mk_info": [
             "Interaksi Manusia dan Komputer D",
             "(2023+2024) (3 SKS)",
@@ -441,7 +441,7 @@
         "ruang": "TW2 - 703",
         "mata_kuliah": "Interaksi Manusia dan Komputer B 2024 (3 SKS)",
         "semester": "2",
-        "dosen": "IZ",
+        "dosen": "Irzal Ahmad Sabilla, S. Kom.,M.Kom",
         "mk_info": [
             "Interaksi Manusia dan Komputer B",
             "2024 (3 SKS)",
@@ -454,7 +454,7 @@
         "ruang": "TW2 - 704",
         "mata_kuliah": "Big Data dan Data Lakehouse B (3 SKS)",
         "semester": "4",
-        "dosen": "FD",
+        "dosen": "Fuad Dary Rosyadi, S.Kom., M.Kom.",
         "mk_info": [
             "Big Data dan Data Lakehouse B (3 SKS)",
             "Semester 4 | FD"
@@ -466,7 +466,7 @@
         "ruang": "TW2 - 705",
         "mata_kuliah": "Penulisan Ilmiah B (2 SKS)",
         "semester": "6",
-        "dosen": "HC",
+        "dosen": "Dr. Ir. Henning Titi Ciptaningtyas, S.Kom, M.Kom.",
         "mk_info": [
             "Penulisan Ilmiah B (2 SKS)",
             "Semester 6 | HC"
@@ -478,7 +478,7 @@
         "ruang": "TW2 - 702",
         "mata_kuliah": "Kriptografi (Pengayaan) A (3 SKS)",
         "semester": "6",
-        "dosen": "HF",
+        "dosen": "Hafara Firdausi, S.Kom., M.Kom.",
         "mk_info": [
             "Kriptografi (Pengayaan) A (3 SKS)",
             "Semester 6 | HF"
@@ -490,7 +490,7 @@
         "ruang": "TW2 - 703",
         "mata_kuliah": "Big Data dan Data Lakehouse A (3 SKS)",
         "semester": "4",
-        "dosen": "FD",
+        "dosen": "Fuad Dary Rosyadi, S.Kom., M.Kom.",
         "mk_info": [
             "Big Data dan Data Lakehouse A (3 SKS)",
             "Semester 4 | FD"

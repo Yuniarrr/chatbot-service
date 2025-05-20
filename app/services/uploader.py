@@ -57,5 +57,13 @@ class UploaderService:
 
         return contents, file_path
 
+    def upload_text_content(self, text: str, filename: str) -> Tuple[bytes, str]:
+        """Uploads a string as a .txt file to the local file system."""
+        if not text.strip():
+            raise ValueError("Text content is empty.")
+
+        contents = text.encode("utf-8")
+        return self.upload_to_local(contents, filename)
+
 
 uploader_service = UploaderService()

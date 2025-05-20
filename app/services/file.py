@@ -108,9 +108,12 @@ async def process_file(
             )
         elif url:
             loader_document = embedding_service.loader_url(url)
-
-        print("loader_document")
-        print(loader_document)
+        else:
+            loader_document = embedding_service.loader(
+                _new_file.file_name,
+                _new_file.meta.get("content_type", "text/plain"),
+                _new_file.file_path,
+            )
 
         splitted_document = embedding_service.split_document(loader_document)
 
