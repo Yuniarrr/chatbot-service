@@ -53,6 +53,16 @@ class File(Base):
 
 
 ####################
+# FORMS
+####################
+
+
+class UpdateFileForm(BaseModel):
+    status: Optional[FileStatus] = None
+    meta: Optional[dict] = None
+
+
+####################
 # SCHEMA
 ####################
 
@@ -88,11 +98,8 @@ class FileReadModel(FileBaseModel):
 
 
 class FileUpdateModel(BaseModel):
-    file_name: Optional[str] = None
-    file_path: Optional[str] = None
     status: Optional[FileStatus] = None
     meta: Optional[dict] = None
-    data: Optional[dict] = None
 
 
 class FileUpdateInternalModel(FileUpdateModel):

@@ -22,11 +22,14 @@ class Embedding:
         return splitted_document
 
     def add_addtional_data_to_docs(
-        self, docs: List[Document], file_id: str, file_name: str
+        self, docs: List[Document], file_id: str, file_name: str, meta: dict
     ) -> List[Document]:
         for doc in docs:
             doc.metadata["file_id"] = file_id
             doc.metadata["file_name"] = file_name
+
+            for k, v in meta.items():
+                doc.metadata[k] = v
         return docs
 
     def loader(self, filename: str, file_content_type: str, file_path: str):

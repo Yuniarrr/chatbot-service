@@ -312,17 +312,53 @@ class Chain:
             if chosen_collection_name not in [c["name"] for c in collections]:
                 return f"Nama koleksi '{chosen_collection_name}' tidak ditemukan.", []
 
-            docs = await vector_store_service.async_similarity_search(
-                query, collection_name=chosen_collection_name
+            print(f"Chosen collection: {chosen_collection_name}")
+
+            # 1. SelfQueryRetriever try
+            retriever = vector_store_service.get_self_query_retriever(
+                collection_name=chosen_collection_name, query=query
             )
 
-            # reordering = LongContextReorder()
-            # reordered_docs = reordering.transform_documents(docs)
+            # docs = await retriever.ainvoke(query)
+            docs = []
+
+            async def log_structured_query():
+                parsed_structured_query = await retriever.query_constructor.ainvoke(
+                    query
+                )
+                print("=== Structured Query ===")
+                print("Query:", parsed_structured_query.query)
+                print("Filter:", parsed_structured_query.filter)
+
+            asyncio.create_task(log_structured_query())
 
             print(f"Jumlah dokumen yang dikembalikan: {len(docs)}")
 
+            # 2. Jika 0, coba Hybrid retriever (BM25 + Vector + Reranker)
+            if len(docs) == 0:
+                print(
+                    "Fallback 1: menggunakan Hybrid Retriever (BM25 + Vector + Rerank)"
+                )
+                hybrid_retriever = await vector_store_service.get_hybrid_retriever(
+                    collection_name=chosen_collection_name,
+                )
+                docs = await hybrid_retriever.ainvoke(query)
+                # docs = await vector_store_service.retrieve_with_rerank(
+                #     query=query,
+                #     collection_name=chosen_collection_name,
+                # )
+                print(f"Jumlah dokumen dari Hybrid Retriever: {len(docs)}")
+
+            # 3. Jika masih 0, fallback ke full semantic similarity search tanpa filter
+            if len(docs) == 0:
+                print("Fallback: menggunakan full-text search (tanpa filter metadata)")
+                docs = await vector_store_service.async_similarity_search(
+                    query, collection_name=chosen_collection_name
+                )
+                print(f"Jumlah dokumen yang dikembalikan setelah fallback: {len(docs)}")
+
             for doc in docs:
-                print(f"Document file name: {doc.metadata['file_name']}")
+                print(f"Document file name: {doc.metadata.get('file_name', 'unknown')}")
 
             serialized = "\n\n".join(
                 f"Source: {doc.metadata}\nContent: {doc.page_content}" for doc in docs

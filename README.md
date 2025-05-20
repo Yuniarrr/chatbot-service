@@ -71,6 +71,12 @@ echo 'export HOME=/c/Users/LENOVO' >> ~/.bashrc
 source ~/.bashrc
 ```
 
+## Colbert
+
+```sh
+pip install git+https://github.com/stanford-futuredata/ColBERT.git
+```
+
 ## Tips
 
 1. Change python version: [here](https://stackoverflow.com/questions/70422866/how-to-create-a-venv-with-a-different-python-version)

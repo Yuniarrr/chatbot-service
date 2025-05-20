@@ -1,0 +1,499 @@
+[
+    {
+        "hari": "Senin",
+        "jam": "07.00-07.55",
+        "ruang": "TW2 - 702",
+        "mata_kuliah": "Arsitektur Enterprise C (3 SKS)",
+        "semester": "2",
+        "dosen": "KG",
+        "mk_info": [
+            "Arsitektur Enterprise C (3 SKS)",
+            "Semester 2 | KG"
+        ]
+    },
+    {
+        "hari": "Senin",
+        "jam": "07.00-07.55",
+        "ruang": "TW2 - 703",
+        "mata_kuliah": "Struktur Data dan Pemograman Berorientasi Objek B (3 SKS)",
+        "semester": "2",
+        "dosen": "RW",
+        "mk_info": [
+            "Struktur Data dan Pemograman",
+            "Berorientasi Objek B (3 SKS)",
+            "Semester 2 | RW"
+        ]
+    },
+    {
+        "hari": "Senin",
+        "jam": "07.00-07.55",
+        "ruang": "TW2 - 704",
+        "mata_kuliah": "Pengembangan Sistem/Aplikasi (Capstone Project) 2022 A",
+        "semester": "6",
+        "dosen": "RR",
+        "mk_info": [
+            "Pengembangan Sistem/Aplikasi",
+            "(Capstone Project) 2022 A",
+            "Semester 6 | RR"
+        ]
+    },
+    {
+        "hari": "Senin",
+        "jam": "10.00-10.55",
+        "ruang": "TW2 - 702",
+        "mata_kuliah": "Arsitektur Enterprise A (3 SKS)",
+        "semester": "2",
+        "dosen": "KG",
+        "mk_info": [
+            "Arsitektur Enterprise A (3 SKS)",
+            "Semester 2 | KG"
+        ]
+    },
+    {
+        "hari": "Senin",
+        "jam": "13.30-14.20",
+        "ruang": "TW2 - 702",
+        "mata_kuliah": "Sistem Operasi A (4 SKS)",
+        "semester": "2",
+        "dosen": "HC, MH",
+        "mk_info": [
+            "Sistem Operasi A (4 SKS)",
+            "Semester 2 | HC, MH"
+        ]
+    },
+    {
+        "hari": "Senin",
+        "jam": "13.30-14.20",
+        "ruang": "TW2 - 703",
+        "mata_kuliah": "Struktur Data dan Pemograman Berorientasi Objek C (3 SKS)",
+        "semester": "2",
+        "dosen": "AT",
+        "mk_info": [
+            "Struktur Data dan Pemograman",
+            "Berorientasi Objek C (3 SKS)",
+            "Semester 2 | AT"
+        ]
+    },
+    {
+        "hari": "Senin",
+        "jam": "13.30-14.20",
+        "ruang": "TW2 - 704",
+        "mata_kuliah": "Arsitektur Enterprise B (3 SKS)",
+        "semester": "2",
+        "dosen": "KG",
+        "mk_info": [
+            "Arsitektur Enterprise B (3 SKS)",
+            "Semester 2 | KG"
+        ]
+    },
+    {
+        "hari": "Senin",
+        "jam": "13.30-14.20",
+        "ruang": "TW2 - 705",
+        "mata_kuliah": "Kriptografi B (3 SKS)",
+        "semester": "6",
+        "dosen": "HF",
+        "mk_info": [
+            "Kriptografi B (3 SKS)",
+            "Semester 6 | HF"
+        ]
+    },
+    {
+        "hari": "Selasa",
+        "jam": "07.00-07.55",
+        "ruang": "TW2 - 702",
+        "mata_kuliah": "Sistem Basis Data A (4 SKS)",
+        "semester": "2",
+        "dosen": "RW",
+        "mk_info": [
+            "Sistem Basis Data A (4 SKS)",
+            "Semester 2 | RW"
+        ]
+    },
+    {
+        "hari": "Selasa",
+        "jam": "07.00-07.55",
+        "ruang": "TW2 - 703",
+        "mata_kuliah": "Penulisan Ilmiah A (2 SKS)",
+        "semester": "6",
+        "dosen": "HC",
+        "mk_info": [
+            "Penulisan Ilmiah A (2 SKS)",
+            "Semester 6 | HC"
+        ]
+    },
+    {
+        "hari": "Selasa",
+        "jam": "07.00-07.55",
+        "ruang": "TW2 - 704",
+        "mata_kuliah": "Integrasi Sistem A (3 SKS)",
+        "semester": "4",
+        "dosen": "RR",
+        "mk_info": [
+            "Integrasi Sistem A (3 SKS)",
+            "Semester 4 | RR"
+        ]
+    },
+    {
+        "hari": "Selasa",
+        "jam": "10.00-10.55",
+        "ruang": "TW2 - 702",
+        "mata_kuliah": "Manajemen Insiden Keamanan Siber A (3 SKS)",
+        "semester": "4",
+        "dosen": "AI *(KELAS DIMULAI PUKUL 11.00 WIB)*",
+        "mk_info": [
+            "Manajemen Insiden",
+            "Keamanan Siber A (3 SKS)",
+            "Semester 4 | AI",
+            "*(KELAS DIMULAI PUKUL 11.00 WIB)*"
+        ]
+    },
+    {
+        "hari": "Selasa",
+        "jam": "10.00-10.55",
+        "ruang": "TW2 - 703",
+        "mata_kuliah": "Teknologi Smartcity A (4 SKS)",
+        "semester": "6",
+        "dosen": "IZ, MH",
+        "mk_info": [
+            "Teknologi Smartcity A (4 SKS)",
+            "Semester 6 | IZ, MH"
+        ]
+    },
+    {
+        "hari": "Selasa",
+        "jam": "11.00-11.55",
+        "ruang": "SKPB (Tower 1)",
+        "mata_kuliah": "KALKULUS 2 (3 SKS)",
+        "semester": "2",
+        "dosen": "",
+        "mk_info": [
+            "KALKULUS 2 (3 SKS)",
+            "Semester 2"
+        ]
+    },
+    {
+        "hari": "Selasa",
+        "jam": "13.30-14.20",
+        "ruang": "TW2 - 702",
+        "mata_kuliah": "Sistem Operasi B (4 SKS)",
+        "semester": "2",
+        "dosen": "HG *(KELAS DIMULAI PUKUL 13.00 WIB)*",
+        "mk_info": [
+            "Sistem Operasi B (4 SKS)",
+            "Semester 2 | HG",
+            "*(KELAS DIMULAI PUKUL 13.00 WIB)*"
+        ]
+    },
+    {
+        "hari": "Selasa",
+        "jam": "13.30-14.20",
+        "ruang": "TW2 - Auditorium Lantai 2",
+        "mata_kuliah": "Security Operations Center A (3 SKS)",
+        "semester": "4, Semester 6",
+        "dosen": "HS",
+        "mk_info": [
+            "Security Operations Center A (3 SKS)",
+            "Semester 4, Semester 6 | HS"
+        ]
+    },
+    {
+        "hari": "Rabu",
+        "jam": "07.00-07.55",
+        "ruang": "TW2 - 702",
+        "mata_kuliah": "Sistem Basis Data B (4 SKS)",
+        "semester": "2",
+        "dosen": "RW",
+        "mk_info": [
+            "Sistem Basis Data B (4 SKS)",
+            "Semester 2 | RW"
+        ]
+    },
+    {
+        "hari": "Rabu",
+        "jam": "07.00-07.55",
+        "ruang": "TW2 - 703",
+        "mata_kuliah": "Manajemen Insiden Keamanan Siber B (3 SKS)",
+        "semester": "4",
+        "dosen": "AI",
+        "mk_info": [
+            "Manajemen Insiden",
+            "Keamanan Siber B (3 SKS)",
+            "Semester 4 | AI"
+        ]
+    },
+    {
+        "hari": "Rabu",
+        "jam": "07.00-07.55",
+        "ruang": "TW2 - 704",
+        "mata_kuliah": "Pengembangan Sistem/Aplikasi (Capstone Project) 2022 B",
+        "semester": "6",
+        "dosen": "RR",
+        "mk_info": [
+            "Pengembangan Sistem/Aplikasi",
+            "(Capstone Project) 2022 B",
+            "Semester 6 | RR"
+        ]
+    },
+    {
+        "hari": "Rabu",
+        "jam": "10.00-10.55",
+        "ruang": "TW2 - 702",
+        "mata_kuliah": "Sistem Basis Data C (4 SKS)",
+        "semester": "2",
+        "dosen": "AI",
+        "mk_info": [
+            "Sistem Basis Data C (4 SKS)",
+            "Semester 2 | AI"
+        ]
+    },
+    {
+        "hari": "Rabu",
+        "jam": "10.00-10.55",
+        "ruang": "TW2 - 703",
+        "mata_kuliah": "Kecerdasan Artifisial dan Machine Learning A (4 SKS)",
+        "semester": "4",
+        "dosen": "IZ, DS",
+        "mk_info": [
+            "Kecerdasan Artifisial dan",
+            "Machine Learning A (4 SKS)",
+            "Semester 4 | IZ, DS"
+        ]
+    },
+    {
+        "hari": "Rabu",
+        "jam": "13.30-14.20",
+        "ruang": "TW2 - 702",
+        "mata_kuliah": "Sistem Operasi C (4 SKS)",
+        "semester": "2",
+        "dosen": "HG",
+        "mk_info": [
+            "Sistem Operasi C (4 SKS)",
+            "Semester 2 | HG"
+        ]
+    },
+    {
+        "hari": "Rabu",
+        "jam": "13.30-14.20",
+        "ruang": "TW2 - 703",
+        "mata_kuliah": "Manajemen Proyek A (3 SKS)",
+        "semester": "6",
+        "dosen": "ED",
+        "mk_info": [
+            "Manajemen Proyek A (3 SKS)",
+            "Semester 6 | ED"
+        ]
+    },
+    {
+        "hari": "Rabu",
+        "jam": "13.30-14.20",
+        "ruang": "TW2 - 704",
+        "mata_kuliah": "Kecerdasan Artifisial dan Machine Learning B (4 SKS)",
+        "semester": "4",
+        "dosen": "RW",
+        "mk_info": [
+            "Kecerdasan Artifisial dan",
+            "Machine Learning B (4 SKS)",
+            "Semester 4 | RW"
+        ]
+    },
+    {
+        "hari": "Rabu",
+        "jam": "13.30-14.20",
+        "ruang": "TW2 - 705",
+        "mata_kuliah": "Teknologi Komputasi Awan A (3 SKS)",
+        "semester": "4",
+        "dosen": "HC, FD",
+        "mk_info": [
+            "Teknologi Komputasi Awan A (3 SKS)",
+            "Semester 4 | HC, FD"
+        ]
+    },
+    {
+        "hari": "Kamis",
+        "jam": "07.00-07.55",
+        "ruang": "TW2 - 702",
+        "mata_kuliah": "Interaksi Manusia dan Komputer A 2022 (3 SKS)",
+        "semester": "6",
+        "dosen": "IZ",
+        "mk_info": [
+            "Interaksi Manusia dan Komputer A",
+            "2022 (3 SKS)",
+            "Semester 6 | IZ"
+        ]
+    },
+    {
+        "hari": "Kamis",
+        "jam": "07.00-07.55",
+        "ruang": "TW2 - 704",
+        "mata_kuliah": "Integrasi Sistem B (3 SKS)",
+        "semester": "4",
+        "dosen": "RR",
+        "mk_info": [
+            "Integrasi Sistem B (3 SKS)",
+            "Semester 4 | RR"
+        ]
+    },
+    {
+        "hari": "Kamis",
+        "jam": "10.00-10.55",
+        "ruang": "TW2 - 702",
+        "mata_kuliah": "Interaksi Manusia dan Komputer C (2022+2023) (3 SKS)",
+        "semester": "4 + Semester 6",
+        "dosen": "HF *(KELAS DIMULAI PUKUL 11.00 WIB)*",
+        "mk_info": [
+            "Interaksi Manusia dan Komputer C",
+            "(2022+2023) (3 SKS)",
+            "Semester 4 + Semester 6 | HF",
+            "*(KELAS DIMULAI PUKUL 11.00 WIB)*"
+        ]
+    },
+    {
+        "hari": "Kamis",
+        "jam": "10.00-10.55",
+        "ruang": "TW2 - 703",
+        "mata_kuliah": "Sistem Cerdas A (3 SKS)",
+        "semester": "6",
+        "dosen": "IZ",
+        "mk_info": [
+            "Sistem Cerdas A (3 SKS)",
+            "Semester 6 | IZ"
+        ]
+    },
+    {
+        "hari": "Kamis",
+        "jam": "11.00-11.55",
+        "ruang": "SKPB (Tower 1)",
+        "mata_kuliah": "KALKULUS 2 (3 SKS)",
+        "semester": "2",
+        "dosen": "",
+        "mk_info": [
+            "KALKULUS 2 (3 SKS)",
+            "Semester 2"
+        ]
+    },
+    {
+        "hari": "Kamis",
+        "jam": "13.30-14.20",
+        "ruang": "TW2 - 702",
+        "mata_kuliah": "Struktur Data dan Pemograman Berorientasi Objek A (3 SKS)",
+        "semester": "2",
+        "dosen": "HF *(KELAS DIMULAI PUKUL 13.00 WIB)*",
+        "mk_info": [
+            "Struktur Data dan Pemograman Berorientasi Objek A (3 SKS)",
+            "Semester 2 | HF",
+            "*(KELAS DIMULAI PUKUL 13.00 WIB)*"
+        ]
+    },
+    {
+        "hari": "Kamis",
+        "jam": "13.30-14.20",
+        "ruang": "TW2 - 703",
+        "mata_kuliah": "Teknologi Multimedia A (3 SKS)",
+        "semester": "6",
+        "dosen": "AI",
+        "mk_info": [
+            "Teknologi Multimedia A (3 SKS)",
+            "Semester 6 | AI"
+        ]
+    },
+    {
+        "hari": "Kamis",
+        "jam": "13.30-14.20",
+        "ruang": "TW2 - 704",
+        "mata_kuliah": "Teknologi Multimedia B (2022+2023 (3 SKS)",
+        "semester": "4 + Semester 6",
+        "dosen": "HC",
+        "mk_info": [
+            "Teknologi Multimedia B",
+            "(2022+2023 (3 SKS)",
+            "Semester 4 + Semester 6 | HC"
+        ]
+    },
+    {
+        "hari": "Jumat",
+        "jam": "07.00-07.55",
+        "ruang": "SKPB (Tower 1)",
+        "mata_kuliah": "KEBUDAYAAN DAN KEBANGSAAN  (2 SKS)",
+        "semester": "4",
+        "dosen": "",
+        "mk_info": [
+            "KEBUDAYAAN DAN KEBANGSAAN ",
+            "(2 SKS) Semester 4"
+        ]
+    },
+    {
+        "hari": "Jumat",
+        "jam": "09.00-09.55",
+        "ruang": "TW2 - 702",
+        "mata_kuliah": "Interaksi Manusia dan Komputer D (2023+2024) (3 SKS)",
+        "semester": "4 + Semester 2",
+        "dosen": "HF",
+        "mk_info": [
+            "Interaksi Manusia dan Komputer D",
+            "(2023+2024) (3 SKS)",
+            "Semester 4 + Semester 2 | HF"
+        ]
+    },
+    {
+        "hari": "Jumat",
+        "jam": "09.00-09.55",
+        "ruang": "TW2 - 703",
+        "mata_kuliah": "Interaksi Manusia dan Komputer B 2024 (3 SKS)",
+        "semester": "2",
+        "dosen": "IZ",
+        "mk_info": [
+            "Interaksi Manusia dan Komputer B",
+            "2024 (3 SKS)",
+            "Semester 2 | IZ"
+        ]
+    },
+    {
+        "hari": "Jumat",
+        "jam": "09.00-09.55",
+        "ruang": "TW2 - 704",
+        "mata_kuliah": "Big Data dan Data Lakehouse B (3 SKS)",
+        "semester": "4",
+        "dosen": "FD",
+        "mk_info": [
+            "Big Data dan Data Lakehouse B (3 SKS)",
+            "Semester 4 | FD"
+        ]
+    },
+    {
+        "hari": "Jumat",
+        "jam": "09.00-09.55",
+        "ruang": "TW2 - 705",
+        "mata_kuliah": "Penulisan Ilmiah B (2 SKS)",
+        "semester": "6",
+        "dosen": "HC",
+        "mk_info": [
+            "Penulisan Ilmiah B (2 SKS)",
+            "Semester 6 | HC"
+        ]
+    },
+    {
+        "hari": "Jumat",
+        "jam": "13.30-14.20",
+        "ruang": "TW2 - 702",
+        "mata_kuliah": "Kriptografi (Pengayaan) A (3 SKS)",
+        "semester": "6",
+        "dosen": "HF",
+        "mk_info": [
+            "Kriptografi (Pengayaan) A (3 SKS)",
+            "Semester 6 | HF"
+        ]
+    },
+    {
+        "hari": "Jumat",
+        "jam": "13.30-14.20",
+        "ruang": "TW2 - 703",
+        "mata_kuliah": "Big Data dan Data Lakehouse A (3 SKS)",
+        "semester": "4",
+        "dosen": "FD",
+        "mk_info": [
+            "Big Data dan Data Lakehouse A (3 SKS)",
+            "Semester 4 | FD"
+        ]
+    }
+]

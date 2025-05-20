@@ -39,6 +39,7 @@ from app.models.files import (
     FileUpdateModel,
     ProcessFileForm,
     FileReadModel,
+    UpdateFileForm,
 )
 from app.retrieval.embed import embedding_service
 from app.retrieval.vector_store import vector_store_service
@@ -60,8 +61,9 @@ async def add_new_file(
     file: Optional[UploadFile] = File(None),
     collection_name: Optional[str] = Form("administration"),
     url: Optional[str] = Form(None),
+    document_type: Optional[str] = Form(None),
+    topik: Optional[str] = Form(None),
 ):
-    print(collection_name)
     try:
         if not file and not url:
             raise BadRequestException("Either a file or URL must be provided.")
@@ -89,6 +91,8 @@ async def add_new_file(
                         "content_type": file.content_type,
                         "size": len(contents),
                         "collection_name": collection_name,
+                        "document_type": document_type,
+                        "topik": topik,
                     },
                 }
             )
@@ -108,13 +112,17 @@ async def add_new_file(
                         "content_type": "application/octet-stream",
                         "size": 0,
                         "collection_name": collection_name,
+                        "document_type": document_type,
+                        "topik": topik,
                     },
                 }
             )
 
             await file_service.insert_new_file(_new_file)
 
-        background_tasks.add_task(process_file, _new_file, file, url, collection_name)
+        background_tasks.add_task(
+            process_file, _new_file, file, url, collection_name, _new_file.meta
+        )
 
         return ResponseModel(
             status_code=201, message=SUCCESS_MESSAGE.CREATED, data=_new_file
@@ -151,6 +159,37 @@ async def get_file_by_id(
 
         return ResponseModel(
             status_code=200, message=SUCCESS_MESSAGE.RETRIEVED, data=file
+        )
+    except Exception as e:
+        raise InternalServerException(str(e))
+
+
+@router.patch("/{file_id}", response_model=ResponseModel)
+async def update_file_by_id(
+    file_id: UUID,
+    current_user: Annotated[TokenData, Depends(get_not_user)],
+    form_data: UpdateFileForm,
+):
+    try:
+        file = await file_service.get_file_by_id(str(file_id))
+        if not file:
+            raise NotFoundException(ERROR_MESSAGES.NOT_FOUND("file"))
+
+        if file.status == FileStatus.AWAITING:
+            raise BadRequestException("File sedang dalam proses upload")
+
+        await file_service.update_file_by_id(str(file_id), form_data)
+
+        print("form_data.meta:", form_data.meta)
+
+        if form_data.meta is not None:
+            await vector_store_service.update_metadata_by_file_id(
+                str(file_id),
+                form_data.meta,
+            )
+
+        return ResponseModel(
+            status_code=200, message=SUCCESS_MESSAGE.UPDATED, data=form_data
         )
     except Exception as e:
         raise InternalServerException(str(e))

@@ -97,6 +97,7 @@ async def process_file(
     file: Optional[UploadFile] = None,
     url: Optional[str] = None,
     collection_name: Optional[str] = None,
+    meta: dict = {},
 ):
     try:
         if file:
@@ -117,6 +118,7 @@ async def process_file(
             docs=splitted_document,
             file_id=str(_new_file.id),
             file_name=_new_file.file_name,
+            meta=meta,
         )
 
         await vector_store_service.add_vectostore(splitted_document, collection_name)

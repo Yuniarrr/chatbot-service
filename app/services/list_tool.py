@@ -358,6 +358,9 @@ async def select_collection(query: str, collections: List[Dict[str, str]]) -> st
                 "{query}\n\n"
                 "Dan ini daftar koleksi:\n"
                 "{collections}\n\n"
+                "Pilihlah satu nama koleksi yang paling relevan dengan query. "
+                "Jika tidak ada yang sangat relevan, tetap pilih koleksi yang paling mendekati. "
+                "Jangan mengembalikan kosong atau jawaban selain nama koleksi yang valid.\n\n"
                 "{format_instructions}"
             ),
             input_variables=["query", "collections"],
