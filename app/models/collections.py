@@ -21,6 +21,7 @@ class Collection(Base):
     name: Mapped[str] = mapped_column(unique=True, nullable=False)
     description: Mapped[str] = mapped_column(Text, nullable=True)
     is_active: Mapped[bool] = mapped_column(default=True, nullable=False)
+    count: Mapped[int] = mapped_column(default=0, nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(ZoneInfo("UTC"))
@@ -38,6 +39,7 @@ class Collection(Base):
 class CollectionBaseModel(BaseModel):
     name: str
     is_active: bool = True
+    count: int = 0
 
 
 class CollectionModel(TimestampSchema):
