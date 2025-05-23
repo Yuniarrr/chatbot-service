@@ -18,12 +18,9 @@ from app.core.constants import ERROR_MESSAGES
 from app.core.exceptions import InternalServerException, NotFoundException
 from app.core.response import ResponseModel
 from app.core.logger import SRC_LOG_LEVELS
-from app.models.messages import FromMessage, MessageCreateModel, MessageForm
+from app.models.messages import FromMessage, MessageCreateModel
 from app.models.users import UserReadWithPasswordModel
-from app.utils.auth import (
-    TokenData,
-    get_verified_user,
-)
+from app.utils.auth import get_verified_user
 from app.services.message import message_service
 from app.retrieval.chain import chain_service
 from app.services.conversation import conversation_service
@@ -188,7 +185,7 @@ async def process_in_background(form_data):
 
         # Parallel media download and conversation fetch
         media_task = download_twilio_media(media_url) if media_url else asyncio.sleep(0)
-        conversation_task = conversation_service.get_conversation_by_sender(sender)
+        conversation_task = conversation_service.get_one_conversation_by_sender(sender)
         media, conversation = await asyncio.gather(media_task, conversation_task)
 
         if conversation is None:

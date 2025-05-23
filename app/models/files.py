@@ -6,8 +6,8 @@ from typing import Union, Optional, Annotated
 from datetime import datetime
 from zoneinfo import ZoneInfo
 from pydantic import BaseModel, ConfigDict, Field
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-from sqlalchemy import DateTime, String, Enum as SQLEnum, String, Text, ForeignKey, JSON
+from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import DateTime, Enum as SQLEnum, Text, ForeignKey, JSON
 from fastcrud import FastCRUD
 
 from app.core.database import Base

@@ -15,6 +15,7 @@ from app.utils.auth import (
     get_verified_user,
 )
 from app.services.conversation import conversation_service
+from app.services.message import message_service
 
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["ROUTER"])
@@ -33,6 +34,62 @@ async def create_new_chat(form_data: ConversationForm, user=Depends(get_verified
         )
         return ResponseModel(
             status_code=201, message=SUCCESS_MESSAGE.CREATED, data=new_conversation
+        )
+    except Exception as e:
+        raise InternalServerException(str(e))
+
+
+@router.get("/", response_model=Optional[ResponseModel])
+async def get_conversations(
+    user=Depends(get_verified_user),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(10, ge=1),
+):
+    try:
+        conversations = await conversation_service.get_unique_conversation_items(
+            skip=skip, limit=limit
+        )
+        return ResponseModel(
+            status_code=200, message=SUCCESS_MESSAGE.RETRIEVED, data=conversations
+        )
+    except Exception as e:
+        raise InternalServerException(str(e))
+
+
+@router.get("/{param}", response_model=Optional[ResponseModel])
+async def get_conversation(
+    param: str,
+    user=Depends(get_verified_user),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(10, ge=1),
+):
+    try:
+        if param.startswith("whatsapp"):
+            conversations = await conversation_service.get_conversation_by_sender(
+                sender=param, skip=skip, limit=limit
+            )
+        else:
+            conversations = await conversation_service.get_conversations_by_user_id(
+                user_id=param, skip=skip, limit=limit
+            )
+        return ResponseModel(
+            status_code=200, message=SUCCESS_MESSAGE.RETRIEVED, data=conversations
+        )
+    except Exception as e:
+        raise InternalServerException(str(e))
+
+
+@router.get("/message/{param}", response_model=Optional[ResponseModel])
+async def get_conversation(
+    param: str,
+    user=Depends(get_verified_user),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(10, ge=1),
+):
+    try:
+        messages = await message_service.get_messages_by_conversation_id(param)
+        return ResponseModel(
+            status_code=200, message=SUCCESS_MESSAGE.RETRIEVED, data=messages
         )
     except Exception as e:
         raise InternalServerException(str(e))

@@ -4,6 +4,7 @@ import json
 from typing import Annotated, Optional, TypedDict
 import operator
 import asyncio
+import joblib
 
 from langchain_google_vertexai import ChatVertexAI
 from langchain_ollama import OllamaLLM
@@ -62,8 +63,66 @@ class AgentState(TypedDict):
 
 
 class Chain:
+    collection_embeddings_cache = {}
+    model = None
+
     def __init__(self):
         self._checkpointer = None
+
+    @classmethod
+    async def init_collection_embeddings(cls):
+        collections_list = await collection_service.get_active_collections()
+        collections = collections_list.get("data", [])
+        for c in collections:
+            desc = f"{c['name']}: {c['description'] or ''}"
+            emb = vector_store_service._embedding_model.embed_query(desc)
+            cls.collection_embeddings_cache[c["name"]] = {
+                "embedding": emb,
+                "description": desc,
+            }
+
+    @classmethod
+    def pick_best_collection(cls, query: str, threshold=0.15) -> str | None:
+        if not cls.collection_embeddings_cache:
+            return None
+
+        query_embedding = vector_store_service._embedding_model.embed_query(query)
+        best_score = -1
+        best_name = None
+
+        for name, data in cls.collection_embeddings_cache.items():
+            score = cosine_similarity([query_embedding], [data["embedding"]])[0][0]
+            print(f"Similarity query vs collection '{name}': {score:.4f}")  # Debug
+            if score > best_score:
+                best_score = score
+                best_name = name
+
+        if best_score >= threshold:
+            print(f"Memilih koleksi '{best_name}' dengan skor {best_score:.4f}")
+            return best_name
+        else:
+            print(
+                f"Tidak ada koleksi yang melewati threshold {threshold}, best_score={best_score:.4f}"
+            )
+            return None
+
+    @classmethod
+    def load_model_collection(cls):
+        model_path = os.path.abspath(
+            os.path.join(
+                os.path.dirname(__file__),
+                "..",
+                "..",
+                "notebooks",
+                "predict_classification",
+                "best_improved_question_classifier.pkl",
+            )
+        )
+        print("model_path")
+        print(model_path)
+        model_data = joblib.load(model_path)
+        pipeline = model_data["pipeline"]
+        cls.model = pipeline
 
     def set_checkpointer(self, checkpointer: AsyncPostgresSaver):
         self._checkpointer = checkpointer
@@ -289,71 +348,20 @@ class Chain:
         """Retrieve information from all active collections."""
         try:
             print(f"Retrieving information for query: {query}")
-            # Step 1: Get all active collections from the DB
-            collections_list = await collection_service.get_active_collections()
-            collections = collections_list.get("data", [])
-            if not collections:
-                return "No active collections found.", []
-
-            print(f"Active collections: {collections}")
-
-            collection_summaries = [
-                {"name": c["name"], "description": c["description"]}
-                for c in collections
-            ]
-
-            agent_response = await select_collection(
-                query=query, collections=collection_summaries
-            )
+            agent_response = Chain.model.predict([query])[0]
             print("agent_response")
             print(agent_response)
             chosen_collection_name = agent_response
 
-            if chosen_collection_name not in [c["name"] for c in collections]:
-                return f"Nama koleksi '{chosen_collection_name}' tidak ditemukan.", []
-
             print(f"Chosen collection: {chosen_collection_name}")
 
-            # 1. SelfQueryRetriever try
-            retriever = vector_store_service.get_self_query_retriever(
-                collection_name=chosen_collection_name, query=query
-            )
-
-            # docs = await retriever.ainvoke(query)
             docs = []
-            # retriever_contextual = (
-            #     await vector_store_service.get_contextual_compression(
-            #         retriever=retriever
-            #     )
-            # )
-            # docs = await retriever_contextual.ainvoke(query)
-
-            async def log_structured_query():
-                parsed_structured_query = await retriever.query_constructor.ainvoke(
-                    query
-                )
-                print("=== Structured Query ===")
-                print("Query:", parsed_structured_query.query)
-                print("Filter:", parsed_structured_query.filter)
-
-            asyncio.create_task(log_structured_query())
+            hybrid_retriever = await vector_store_service.get_hybrid_retriever(
+                collection_name=chosen_collection_name,
+            )
+            docs = await hybrid_retriever.ainvoke(query)
 
             print(f"Jumlah dokumen yang dikembalikan: {len(docs)}")
-
-            # 2. Jika 0, coba Hybrid retriever (BM25 + Vector + Reranker)
-            if len(docs) == 0:
-                print(
-                    "Fallback 1: menggunakan Hybrid Retriever (BM25 + Vector + Rerank)"
-                )
-                hybrid_retriever = await vector_store_service.get_hybrid_retriever(
-                    collection_name=chosen_collection_name,
-                )
-                docs = await hybrid_retriever.ainvoke(query)
-                # docs = await vector_store_service.retrieve_with_rerank(
-                #     query=query,
-                #     collection_name=chosen_collection_name,
-                # )
-                print(f"Jumlah dokumen dari Hybrid Retriever: {len(docs)}")
 
             # 3. Jika masih 0, fallback ke full semantic similarity search tanpa filter
             if len(docs) == 0:

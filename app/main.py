@@ -22,7 +22,7 @@ from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from starlette.staticfiles import StaticFiles
 
 from app.env import PY_ENV, DATABASE_URL, UPLOAD_DIR
-from app.routers import auth, user, conversation, chat, opportunity
+from app.routers import auth, user, conversation, chat, opportunity, collection
 from app.routers.file import router
 from app.core.database import session_manager, pgvector_session_manager
 from app.core.exceptions import DatabaseException, DuplicateValueException
@@ -48,6 +48,7 @@ async def lifespan(app: FastAPI):
     await session_manager.initialize()
     vector_store_service.initialize_embedding_model()
     vector_store_service.initialize_pg_vector()
+    chain_service.load_model_collection()
     await pgvector_session_manager.initialize()
     DB_URI = f"postgresql://{DATABASE_URL}?sslmode=disable"
     connection_kwargs = {
@@ -107,6 +108,7 @@ app.include_router(user.router, prefix="/user", tags=["user"])
 app.include_router(conversation.router, prefix="/conversation", tags=["conversation"])
 app.include_router(chat.router, prefix="/chat", tags=["chat"])
 app.include_router(opportunity.router, prefix="/opportunity", tags=["opportunity"])
+app.include_router(collection.router, prefix="/collection", tags=["collection"])
 
 
 # @app.get("/uploads/{filename}")

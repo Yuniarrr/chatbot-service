@@ -88,7 +88,7 @@ class OpportunityService:
     async def get_opportunity_by_filter(
         self,
         type: Optional[OpportunityType] = None,
-        title: Optional[str] = None,
+        search: Optional[str] = None,
         skip: Optional[int] = 0,
         limit: Optional[int] = 10,
     ) -> list[OpportunitiesReadModel]:
@@ -102,8 +102,16 @@ class OpportunityService:
                     query = query.filter(Opportunity.type == type)
 
                 # Filter by title if provided
-                if title:
-                    query = query.filter(Opportunity.title.ilike(f"%{title}%"))
+                if search:
+                    search_term = f"%{search}%"
+                    query = query.filter(
+                        or_(
+                            Opportunity.title.ilike(search_term),
+                            Opportunity.description.ilike(search_term),
+                            Opportunity.organizer.ilike(search_term),
+                            Opportunity.link.ilike(search_term),
+                        )
+                    )
 
                 # Filter by end_date if it is provided and check if the date is passed
                 query = query.filter(

@@ -232,7 +232,7 @@ class OpportunityInputSchema(BaseModel):
         ...,
         description="Jenis progran atau opportunity, misalnya BEASISWA, MAGANG, LOMBA, SERTIFIKASI, SEMINAR",
     )
-    title: Optional[str] = Field(..., description="Nama program atau opportunity")
+    search: Optional[str] = Field(..., description="Pencarian program atau opportunity")
     skip: Optional[int] = Field(
         default=0,
         description="Parameter ini menentukan jumlah data yang harus dilewati sebelum mulai mengambil data. Misalnya, jika skip diatur ke 10, maka sistem akan melewatkan 10 data pertama dan mulai mengambil data setelahnya. Ini berguna saat Anda ingin mengakses data dari halaman yang lebih dalam atau memulai pengambilan data dari titik tertentu.",
@@ -245,14 +245,14 @@ class OpportunityInputSchema(BaseModel):
 
 async def get_opportunity(
     type: Optional[OpportunityType] = None,
-    title: Optional[str] = None,
+    search: Optional[str] = None,
     skip: Optional[int] = 0,
     limit: Optional[int] = 10,
 ):
     try:
         opportunities = await opportunity_service.get_opportunity_by_filter(
             type=type,
-            title=title,
+            search=search,
             skip=skip,
             limit=limit,
         )
@@ -382,3 +382,8 @@ async def select_collection(query: str, collections: List[Dict[str, str]]) -> st
     except Exception as e:
         print(f"Parsing error: {e}")
         return "Tidak dapat menentukan koleksi relevan"
+
+
+def predict_collection(model, query: str):
+    prediction = model.predict([query])[0]
+    return prediction

@@ -29,8 +29,8 @@ class MessageService:
     async def get_messages_by_conversation_id(
         self,
         conversation_id: str,
-        skip: Optional[int] = None,
-        limit: Optional[int] = None,
+        skip: Optional[int] = 0,
+        limit: Optional[int] = 10,
     ):
         try:
             async with session_manager.session() as db:

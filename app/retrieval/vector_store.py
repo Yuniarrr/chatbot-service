@@ -302,9 +302,9 @@ class VectorStore:
         metadatas = [doc.metadata for doc in all_docs]
 
         bm25_retriever = BM25Retriever.from_texts(texts=texts, metadatas=metadatas)
-        bm25_retriever.k = self._k
+        bm25_retriever.k = 12
 
-        vector_retriever = vector_store.as_retriever(search_kwargs={"k": self._k})
+        vector_retriever = vector_store.as_retriever(search_kwargs={"k": 12})
 
         ensemble_retriever = EnsembleRetriever(
             retrievers=[bm25_retriever, vector_retriever], weights=[0.5, 0.5]
@@ -323,7 +323,7 @@ class VectorStore:
         # )
         llm = llm = ChatOpenAI(temperature=0, model_name="gpt-4o")
 
-        _filter = LLMListwiseRerank.from_llm(llm, top_n=5)
+        _filter = LLMListwiseRerank.from_llm(llm, top_n=8)
 
         return ContextualCompressionRetriever(
             base_compressor=_filter, base_retriever=ensemble_retriever

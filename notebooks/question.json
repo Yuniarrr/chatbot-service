@@ -2,501 +2,733 @@
     {
         "id": 1,
         "question": "Berikan jadwal perkuliahan di hari Senin",
-        "answer": "*   *07.00-07.55*: Arsitektur Enterprise C (3 SKS) - Semester 2\n*   *07.00-07.55*: Struktur Data dan Pemograman Berorientasi Objek B (3 SKS) - Semester 2\n*   *07.00-07.55*: Pengembangan Sistem/Aplikasi (Capstone Project) 2022 A - Semester 6\n*   *08.00-08.55*: (2018-2021) - Semester 8\n*   *09.00-09.55*:\n*   *10.00-10.55*: Arsitektur Enterprise A (3 SKS) - Semester 2\n*   *10.00-10.55*: (2022) - Semester 6\n*   *11.00-11.55*:\n*   *12.00-12.55*:\n*   *12.00-12.55*: (2023) - Semester 4\n*   *13.30-14.20*: Sistem Operasi A (4 SKS) - Semester 2\n*   *13.30-14.20*: Struktur Data dan Pemograman Berorientasi Objek C (3 SKS) - Semester 2\n*   *13.30-14.20*: Arsitektur Enterprise B (3 SKS) - Semester 2\n*   *13.30-14.20*: Kriptografi B (3 SKS) - Semester 6\n*   *14.30-15.20*:\n*   *14.30-15.20*: (2024) - Semester 2\n*   *15.30-16.20*: "
+        "answer": "*   *07.00-07.55*: Arsitektur Enterprise C (3 SKS) - Semester 2\n*   *07.00-07.55*: Struktur Data dan Pemograman Berorientasi Objek B (3 SKS) - Semester 2\n*   *07.00-07.55*: Pengembangan Sistem/Aplikasi (Capstone Project) 2022 A - Semester 6\n*   *08.00-08.55*: (2018-2021) - Semester 8\n*   *09.00-09.55*:\n*   *10.00-10.55*: Arsitektur Enterprise A (3 SKS) - Semester 2\n*   *10.00-10.55*: (2022) - Semester 6\n*   *11.00-11.55*:\n*   *12.00-12.55*:\n*   *12.00-12.55*: (2023) - Semester 4\n*   *13.30-14.20*: Sistem Operasi A (4 SKS) - Semester 2\n*   *13.30-14.20*: Struktur Data dan Pemograman Berorientasi Objek C (3 SKS) - Semester 2\n*   *13.30-14.20*: Arsitektur Enterprise B (3 SKS) - Semester 2\n*   *13.30-14.20*: Kriptografi B (3 SKS) - Semester 6\n*   *14.30-15.20*:\n*   *14.30-15.20*: (2024) - Semester 2\n*   *15.30-16.20*: ",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 2,
         "question": "Siapa saja dosen yang ada di departemen teknologi informasi?",
-        "answer": "*   Dr.tech.Ir. Raden Venantius Hari Ginardi, M.Sc (Kepala Departemen)\n*   Ir. Muchammad Husni, M.Kom\n*   Dr. Ir. Henning Titi Ciptaningtyas, S.Kom, M.Kom.\n*   Ridho Rahman Hariadi, S.Kom., M.Sc.\n*   Hatma Suryotrisongko, S.Kom., M.Eng., Ph.D.\n*   Annisaa Sri Indrawanti, S. Kom., M. Kom\n*   Dr. Rizka Wakhidatus Sholikah, S. Kom\n*   Irzal Ahmad Sabilla, S. Kom.,M.Kom\n*   Fuad Dary Rosyadi, S.Kom., M.Kom.\n*   Hafara Firdausi, S.Kom., M.Kom."
+        "answer": "*   Dr.tech.Ir. Raden Venantius Hari Ginardi, M.Sc (Kepala Departemen)\n*   Ir. Muchammad Husni, M.Kom\n*   Dr. Ir. Henning Titi Ciptaningtyas, S.Kom, M.Kom.\n*   Ridho Rahman Hariadi, S.Kom., M.Sc.\n*   Hatma Suryotrisongko, S.Kom., M.Eng., Ph.D.\n*   Annisaa Sri Indrawanti, S. Kom., M. Kom\n*   Dr. Rizka Wakhidatus Sholikah, S. Kom\n*   Irzal Ahmad Sabilla, S. Kom.,M.Kom\n*   Fuad Dary Rosyadi, S.Kom., M.Kom.\n*   Hafara Firdausi, S.Kom., M.Kom.",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 3,
         "question": "Siapa saja staff tata usaha yang ada di departemen teknologi informasi?",
-        "answer": "*   Khairun Nasihin, S.ST.\n*   Lila Ambarwati, S.Pd.\n*   Jihan Fadhilah, S.M.\n*   Anggun Anisafitri, S.Ak.\n*   Dimas Bahtiyar, A.Md.T.\n*   Rizky Maulana"
+        "answer": "*   Khairun Nasihin, S.ST.\n*   Lila Ambarwati, S.Pd.\n*   Jihan Fadhilah, S.M.\n*   Anggun Anisafitri, S.Ak.\n*   Dimas Bahtiyar, A.Md.T.\n*   Rizky Maulana",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 4,
         "question": "Siapa kepala departemen teknologi informasi?",
-        "answer": "Dr.tech.Ir. Raden Venantius Hari Ginardi, M.Sc"
+        "answer": "Dr.tech.Ir. Raden Venantius Hari Ginardi, M.Sc",
+        "collection_name": "tentang-kami"
     },
     {
         "id": 5,
         "question": "Apa daftar mata kuliah untuk Angkatan 2024 di Semester Genap 2024/2025?",
-        "answer": "- Sistem Operasi\n- Arsitektur Enterprise\n- Struktur Data dan Pemrograman Berorientasi Objek\n- Sistem Basis Data\n-Interaksi Manusia dan Komputer\n- Kalkulus 2"
+        "answer": "- Sistem Operasi\n- Arsitektur Enterprise\n- Struktur Data dan Pemrograman Berorientasi Objek\n- Sistem Basis Data\n-Interaksi Manusia dan Komputer\n- Kalkulus 2",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 6,
         "question": "Apa kode mata kuliah untuk Tugas Akhir?",
-        "answer": "ET234801"
+        "answer": "ET234801",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 7,
         "question": "Berapa jumlah SKS minimal untuk syarat pengajuan kegiatan MBKM?",
-        "answer": "Minimal  sudah lulus >= 90 SKS"
+        "answer": "Minimal  sudah lulus >= 90 SKS",
+        "collection_name": "akademik"
     },
     {
         "id": 8,
         "question": "Dimana saya dapat mengumpulkan seluruh berkas untuk pengajuan konversi SKS MBKM?",
-        "answer": "Seluruh dokumen dapat dikirim ke link: intip.in/submitalihkreditDTI"
+        "answer": "Seluruh dokumen dapat dikirim ke link: intip.in/submitalihkreditDTI",
+        "collection_name": "akademik"
     },
     {
         "id": 9,
         "question": "Bagaimana ketentuan konversi SKS MBKM?",
-        "answer": "Konversi kegaiatan MBKM dapat dilakukan dengan ketentuan sebagai berikut:\n1. 3 MK Magang Bidang\n2. 1 MK KP\n3. 2-3(maksimal) MK Umum MBKM\n4. 1-2 MK Departemen (memilih antara Manajemen Proyek, IMK, Capstone Project, MK Pengayaan, MK KKN Tematik, MK Pilihan Dept. yang terkait)"
+        "answer": "Konversi kegaiatan MBKM dapat dilakukan dengan ketentuan sebagai berikut:\n1. 3 MK Magang Bidang\n2. 1 MK KP\n3. 2-3(maksimal) MK Umum MBKM\n4. 1-2 MK Departemen (memilih antara Manajemen Proyek, IMK, Capstone Project, MK Pengayaan, MK KKN Tematik, MK Pilihan Dept. yang terkait)",
+        "collection_name": "akademik"
     },
     {
         "id": 10,
         "question": "Bagaimana cara konversi prestasi ke SKS Mata Kuliah?",
-        "answer": "- Konversi prestasi ke SKS Matakuliah mengikuti juknis prestasi\n- Prestasi kompetisi terbagi menjadi Prestasi dari PKM dan Non-PKM\n- Jumlah kegiatan kompetisi maksimal 3 kegiatan prestasi yang bisa diajukan dalam 1 semester dengan maksimal konversi 20 sks/semester. Jika, dalam 1 semester yang sama mahasiswa juga mengajukan konversi kegiatan MBKM, makaakanmengurangi kuota konversi sks prestasi\n- Setiap mahasiswadapat mengkonversi prestasi + MBKM maksimal 40 sks untuk seluruh kompetisi dan MBKM yang diikuti"
+        "answer": "- Konversi prestasi ke SKS Matakuliah mengikuti juknis prestasi\n- Prestasi kompetisi terbagi menjadi Prestasi dari PKM dan Non-PKM\n- Jumlah kegiatan kompetisi maksimal 3 kegiatan prestasi yang bisa diajukan dalam 1 semester dengan maksimal konversi 20 sks/semester. Jika, dalam 1 semester yang sama mahasiswa juga mengajukan konversi kegiatan MBKM, makaakanmengurangi kuota konversi sks prestasi\n- Setiap mahasiswadapat mengkonversi prestasi + MBKM maksimal 40 sks untuk seluruh kompetisi dan MBKM yang diikuti",
+        "collection_name": "akademik"
     },
     {
         "id": 11,
         "question": "Berapa maksimal konversi SKS untuk Prestasi PKM ke sks Matakuliah?",
-        "answer": "Maksimal konversi ke 20 SKS dalam 1 semester (include MBKM-jika mengikuti MBKM di semester yang sama)"
+        "answer": "Maksimal konversi ke 20 SKS dalam 1 semester (include MBKM-jika mengikuti MBKM di semester yang sama)",
+        "collection_name": "akademik"
     },
     {
         "id": 12,
         "question": "Bagaimana persyaratan pengajuan prestasi di DTI?",
-        "answer": "- Kompetisi yang dapat dikonversi diselerenggarakan oleh institusi yang tercantum pada SK Rektor no 10 Tahun 2022 mengenai Pemberian Apresiasi Kepada Mahasiswa Berprestasi dan Dosen Pembimbing\n- Mendiskusikan MK Konversi dengan dosen wali Ketika FRS , mengambil MK Konversi dari Dropdown MBKM yang diambil dari dosen wali\n- Persyaratan lainnya disesuaikan dengan kebutuhan kegiatan yang diikuti\n- Mengisi form pengajuan konversi prestasi"
+        "answer": "- Kompetisi yang dapat dikonversi diselerenggarakan oleh institusi yang tercantum pada SK Rektor no 10 Tahun 2022 mengenai Pemberian Apresiasi Kepada Mahasiswa Berprestasi dan Dosen Pembimbing\n- Mendiskusikan MK Konversi dengan dosen wali Ketika FRS , mengambil MK Konversi dari Dropdown MBKM yang diambil dari dosen wali\n- Persyaratan lainnya disesuaikan dengan kebutuhan kegiatan yang diikuti\n- Mengisi form pengajuan konversi prestasi",
+        "collection_name": "akademik"
     },
     {
         "id": 13,
         "question": "Dokumen apa saja yang diperlukan untuk pengajuan konversi prestasi?",
-        "answer": "1. Dokumen jobdesk yang dikerjakan secara detil(Ditandatangani dosen pembimbing dan dosen wali)\n2. Logbook (ditandatangani dosen pembimbing dan dosen wali)\n3. Sertifikat kompetisi\n4. Form alih kredit\n5. Wajib mengisi MyITS StudentConnect dan pilih konversi sks akademik"
+        "answer": "1. Dokumen jobdesk yang dikerjakan secara detil(Ditandatangani dosen pembimbing dan dosen wali)\n2. Logbook (ditandatangani dosen pembimbing dan dosen wali)\n3. Sertifikat kompetisi\n4. Form alih kredit\n5. Wajib mengisi MyITS StudentConnect dan pilih konversi sks akademik",
+        "collection_name": "akademik"
     },
     {
         "id": 14,
         "question": "Apa hukuman yang didapatkan jika memalsukan dokumen untuk konversi MBKM/Prestasi?",
-        "answer": "Bagi mahasiswa yang memalsukan data dalam kegiatan MBKM/Prestasi utamanya dalam hal konversi SKS, maka kelulusan matakuliah akan dibatalkan"
+        "answer": "Bagi mahasiswa yang memalsukan data dalam kegiatan MBKM/Prestasi utamanya dalam hal konversi SKS, maka kelulusan matakuliah akan dibatalkan",
+        "collection_name": "akademik"
     },
     {
         "id": 15,
         "question": "Apa itu SKEM?",
-        "answer": "SKEM adalah Satuan Kredit Ekstrakurikuler Mahasiswa"
+        "answer": "SKEM adalah Satuan Kredit Ekstrakurikuler Mahasiswa",
+        "collection_name": "akademik"
     },
     {
         "id": 16,
         "question": "Apakah Olahraga merupakan kegiatan wajib untuk SKEM?",
-        "answer": "Ya, mulai angkatan 2021, olaharga menjadi kegiatan wajib untuk SKEM"
+        "answer": "Ya, mulai angkatan 2021, olaharga menjadi kegiatan wajib untuk SKEM",
+        "collection_name": "akademik"
     },
     {
         "id": 17,
         "question": "Apa saja yang termasuk ke dalam kegiatan Olahraga untuk SKEM?",
-        "answer": "a. Kegiatan olahraga mandiri yang ditunjukkan dengan logbook dan diverifikasi oleh dosen wali.\nb. Kegiatan olahraga yang dikoordinasi oleh UKM olahraga yang ada di ITS dengan menunjukkan sertifikat/surat keterangan dimana verifikasi dilakukan oleh dosen wali.\nc. Kegiatan olahraga yang diselanggarakan oleh Komite Olahraga Nasional Indonesia (KONI) dengan menunjukkan sertifikat/surat keterangan dimana verifikasi dilakukan oleh dosen wali."
+        "answer": "a. Kegiatan olahraga mandiri yang ditunjukkan dengan logbook dan diverifikasi oleh dosen wali.\nb. Kegiatan olahraga yang dikoordinasi oleh UKM olahraga yang ada di ITS dengan menunjukkan sertifikat/surat keterangan dimana verifikasi dilakukan oleh dosen wali.\nc. Kegiatan olahraga yang diselanggarakan oleh Komite Olahraga Nasional Indonesia (KONI) dengan menunjukkan sertifikat/surat keterangan dimana verifikasi dilakukan oleh dosen wali.",
+        "collection_name": "akademik"
     },
     {
         "id": 18,
         "question": "Departemen Teknologi Informasi ada di fakultas apa?",
-        "answer": "Fakultas Teknologi Elektro dan Informatika Cerdas ITS (ELECTICS)"
+        "answer": "Fakultas Teknologi Elektro dan Informatika Cerdas ITS (ELECTICS)",
+        "collection_name": "tentang-kami"
     },
     {
         "id": 19,
         "question": "Apa saja kompetensi utama di departemen teknologi informasi?",
-        "answer": "Keamanan Siber (Cyber Security), Internet of Things (IoT), dan Smart City"
+        "answer": "Keamanan Siber (Cyber Security), Internet of Things (IoT), dan Smart City",
+        "collection_name": "tentang-kami"
     },
     {
         "id": 20,
         "question": "Kapan berdirinya departemen teknologi informasi?",
-        "answer": "Tanggal 24 Januari 2018"
+        "answer": "Tanggal 24 Januari 2018",
+        "collection_name": "tentang-kami"
     },
     {
         "id": 21,
         "question": "Apa tujuan departemen teknologi informasi?",
-        "answer": "1. Menghasilkan lulusan yang mempunyai keahlian di bidang Cybersecurity, System Integration dan Cloud Computing Services, serta Internet of Things for Smart City dimana masing-masing memiliki program bersertifikasi, sehingga mendukung kemandirian untuk berkompetisi di tingkat nasional.\n2. Menghasilkan penelitian dan publikasi di jurnal nasional/internasional.\n3. Berperan aktif dalam kegiatan bidang Teknologi Informasi pada tingkat nasional dan internasional.\n4. Memberikan kontribusi bagi peningkatan mutu kehidupan masyarakat melalui kegiatan pengabdian kepada masyarakat."
+        "answer": "1. Menghasilkan lulusan yang mempunyai keahlian di bidang Cybersecurity, System Integration dan Cloud Computing Services, serta Internet of Things for Smart City dimana masing-masing memiliki program bersertifikasi, sehingga mendukung kemandirian untuk berkompetisi di tingkat nasional.\n2. Menghasilkan penelitian dan publikasi di jurnal nasional/internasional.\n3. Berperan aktif dalam kegiatan bidang Teknologi Informasi pada tingkat nasional dan internasional.\n4. Memberikan kontribusi bagi peningkatan mutu kehidupan masyarakat melalui kegiatan pengabdian kepada masyarakat.",
+        "collection_name": "tentang-kami"
     },
     {
         "id": 22,
         "question": "Apa visi keilmuan departemen teknologi informasi?",
-        "answer": "Menghasilkan sarjana yang unggul secara nasional serta mampu bersaing di tingkat internasional dan berkontribusi bagi masyarakat pada bidang ilmu teknologi informasi, khususnya dalam kompetensi Cybersecurity, System Integration dan Cloud Computing Services, serta Internet of Things for Smart City."
+        "answer": "Menghasilkan sarjana yang unggul secara nasional serta mampu bersaing di tingkat internasional dan berkontribusi bagi masyarakat pada bidang ilmu teknologi informasi, khususnya dalam kompetensi Cybersecurity, System Integration dan Cloud Computing Services, serta Internet of Things for Smart City.",
+        "collection_name": "tentang-kami"
     },
     {
         "id": 23,
         "question": "Apa visi departemen teknologi informasi?",
-        "answer": "Menjadi pengelola program studi bidang teknologi informasi yang memiliki reputasi internasional serta berkontribusi pada keilmuan dan kemanusiaan."
+        "answer": "Menjadi pengelola program studi bidang teknologi informasi yang memiliki reputasi internasional serta berkontribusi pada keilmuan dan kemanusiaan.",
+        "collection_name": "tentang-kami"
     },
     {
         "id": 24,
         "question": "Departemen teknologi informasi memiliki berapa laboratorium?",
-        "answer": "Terdapat 3 laboratorium di departemen teknologi informasi, yaitu:\n1. Laboratorium Kota Cerdas dan Keamanan Siber (KCKS)\n2. Laboratorium Security Operation Center (SOC) TW2-902\n3. Laboratorium Internet of Things (IoT) TW2-904"
+        "answer": "Terdapat 3 laboratorium di departemen teknologi informasi, yaitu:\n1. Laboratorium Kota Cerdas dan Keamanan Siber (KCKS)\n2. Laboratorium Security Operation Center (SOC) TW2-902\n3. Laboratorium Internet of Things (IoT) TW2-904",
+        "collection_name": "tentang-kami"
     },
     {
         "id": 25,
         "question": "Bagaimana prospek karir lulusan departemen teknologi informasi?",
-        "answer": "Berikut beberapa contoh pekerjaan sebagai lulusan departemen teknologi informasi:\n1. Software Developer\n2. System Analyst\n3. Network Administrator\n4. IT Consultant\n5. Dan masih banyak lagi"
+        "answer": "Berikut beberapa contoh pekerjaan sebagai lulusan departemen teknologi informasi:\n1. Software Developer\n2. System Analyst\n3. Network Administrator\n4. IT Consultant\n5. Dan masih banyak lagi",
+        "collection_name": "tentang-kami"
     },
     {
         "id": 26,
         "question": "Apa saja program seleksi di departemen teknologi informasi?",
-        "answer": "Terdapat 4 jalur seleksi, yaitu:\n1. Seleksi Nasional Masuk Perguruan Tinggi Negeri (SNMPTN)\n2. Seleksi Bersama Masuk Perguruan Tinggi Negeri (SBMPTN)\n3. Seleksi Mandiri : Program Kemitraan dan Mandiri (PKM)"
+        "answer": "Terdapat 4 jalur seleksi, yaitu:\n1. Seleksi Nasional Masuk Perguruan Tinggi Negeri (SNMPTN)\n2. Seleksi Bersama Masuk Perguruan Tinggi Negeri (SBMPTN)\n3. Seleksi Mandiri : Program Kemitraan dan Mandiri (PKM)",
+        "collection_name": "umum"
     },
     {
         "id": 27,
         "question": "Apa kode mata kuliah untuk Kecerdasan Artifisial dan Machine Learning?",
-        "answer": "ET234405"
+        "answer": "ET234405",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 28,
         "question": "Siapa dosen yang mengajar mata kuliah Sistem Cerdas A?",
-        "answer": "Irzal Ahmad Sabilla, S. Kom.,M.Kom"
+        "answer": "Irzal Ahmad Sabilla, S. Kom.,M.Kom",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 29,
         "question": "Adakah informasi mengenai email dari Bapak Hari Ginardi?",
-        "answer": "Ya, email beliau adalah hari@its.ac.id dan hari.ginardi@gmail.com"
+        "answer": "Ya, email beliau adalah hari@its.ac.id dan hari.ginardi@gmail.com",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 30,
         "question": "Adakah informasi mengenai riwayat pendidikan dari Bu Henning?",
-        "answer": "Beliau menempuh S1 di tahun 2006 di Institut Teknologi Sepuluh Nopember. Kemudian, menempuh pendidikan Magister pada tahun 2010 di Insititut Teknologi Sepuluh Nopember"
+        "answer": "Beliau menempuh S1 di tahun 2006 di Institut Teknologi Sepuluh Nopember. Kemudian, menempuh pendidikan Magister pada tahun 2010 di Insititut Teknologi Sepuluh Nopember",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 31,
         "question": "Siapa dosen dengan lulusan termuda di departemen teknologi informasi?",
-        "answer": "Dosen dengan lulusan termuda di departemen teknologi informasi adalah Hafara Firdausi, S.Kom., M.Kom. "
+        "answer": "Dosen dengan lulusan termuda di departemen teknologi informasi adalah Hafara Firdausi, S.Kom., M.Kom.",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 32,
         "question": "Di jadwal mata kuliah, di ruang kelas mana mata kuliah Pengembangan Sistem/Aplikasi (Capstone Project) 2022 A diajarkan?",
-        "answer": "Mata kuliah tersebut akan diajarkan di kelas TW2-704"
+        "answer": "Mata kuliah tersebut akan diajarkan di kelas TW2-704",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 33,
         "question": "Di jadwal mata kuliah, siapa yang mengajar mata kuliah Security Operations Center A?",
-        "answer": "Dosen yang mengajar mata kuliah tersebut adalah Hatma Suryotrisongko, S.Kom., M.Eng., Ph.D."
+        "answer": "Dosen yang mengajar mata kuliah tersebut adalah Hatma Suryotrisongko, S.Kom., M.Eng., Ph.D.",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 34,
         "question": "Siapa dosen yang merupakan lulusan dari Kumamoto University?",
-        "answer": "Dosen yang merupakan lulusan dari Kumamoto University adalah Hatma Suryotrisongko, S.Kom., M.Eng., Ph.D."
+        "answer": "Dosen yang merupakan lulusan dari Kumamoto University adalah Hatma Suryotrisongko, S.Kom., M.Eng., Ph.D.",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 35,
         "question": "Terdapat berapa kelas untuk matakuliah Struktur Data dan Pemograman Berorientasi Objek?",
-        "answer": "Terdapat 3 kelas, yaitu kelas A, B, dan C"
+        "answer": "Terdapat 3 kelas, yaitu kelas A, B, dan C",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 36,
         "question": "Matakuliah apa yang diajarkan di kelas TW2-703 pada pukul 7 pagi samapi 10 siang?",
-        "answer": "Pada jam dan kelas tersebut diajarkan mata kuliah Manajemen Insiden Keamanan Siber B (3 SKS) - Semester 4"
+        "answer": "Pada jam dan kelas tersebut diajarkan mata kuliah Manajemen Insiden Keamanan Siber B (3 SKS) - Semester 4",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 37,
-        "question": "Apakah terdapat mata kuliah yang diajarkan di kelas SKPB (Towe  1) pada hari Senin?",
-        "answer": "Tidak ada mata kuliah yang diajarkan di kelas SKPB (Towe 1) pada hari Senin"
+        "question": "Apakah terdapat mata kuliah yang diajarkan di kelas SKPB (Tower  1) pada hari Senin?",
+        "answer": "Tidak ada mata kuliah yang diajarkan di kelas SKPB (Tower 1) pada hari Senin",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 38,
-        "question": "Kapan Bapak Ir. Muchammad Husni, M.Kom purnatugas?",
-        "answer": "Beliau purnatugas pada tanggal 14 April 2025"
+        "question": "Adakah berita tentang kapan Bapak Ir. Muchammad Husni, M.Kom purnatugas?",
+        "answer": "Beliau purnatugas pada tanggal 14 April 2025",
+        "collection_name": "tentang-kami"
     },
     {
         "id": 39,
         "question": "Apakah terdapat informasi mengenai beasiswa yang diadakan oleh Djarum?",
-        "answer": "Ya, terdapat satu informasi mengenai beasiswa yang diadakan oleh Djarum, yaitu Beasiswa Djarum Plus 2025. Beasiswa ini diberikan kepada mahasiswa S1 atau D4 yang sedang menempuh semester 4 di kampus mitra Djarum Foundation."
+        "answer": "Ya, terdapat satu informasi mengenai beasiswa yang diadakan oleh Djarum, yaitu Beasiswa Djarum Plus 2025. Beasiswa ini diberikan kepada mahasiswa S1 atau D4 yang sedang menempuh semester 4 di kampus mitra Djarum Foundation.",
+        "collection_name": null
     },
     {
         "id": 40,
         "question": "Adakah informasi course yang diadakan oleh Udemy?",
-        "answer": "Ya, terdapat beberapa informasi mengenai course yang diadakan oleh Udemy, antara lain:\n1. From Zero to Pro Data Science & AI Advanced Full Course 2025\n2. Learn Ethical Hacking and Penetration Testing | EHPT+"
+        "answer": "Ya, terdapat beberapa informasi mengenai course yang diadakan oleh Udemy, antara lain:\n1. From Zero to Pro Data Science & AI Advanced Full Course 2025\n2. Learn Ethical Hacking and Penetration Testing | EHPT+",
+        "collection_name": null
     },
     {
         "id": 41,
         "question": "Dimana saya bisa mendapatkan informasi untuk membuat permohonan Surat Rekomendasi?",
-        "answer": "Dengan memanfaatkan layanan daring pengajuan surak akademik dapat memilih PSA01 untuk pengajuan surat rekomendasi. Pengajuan surat rekomendasi dapat dilakukan dengan mengisi form yang telah disediakan pada link berikut: intip.in/formPSA01"
+        "answer": "Dengan memanfaatkan layanan daring pengajuan surak akademik dapat memilih PSA01 untuk pengajuan surat rekomendasi. Pengajuan surat rekomendasi dapat dilakukan dengan mengisi form yang telah disediakan pada link berikut: intip.in/formPSA01",
+        "collection_name": "umum"
     },
     {
         "id": 42,
         "question": "Bagaimana cara mendapatkan surat permohonan pengatar penelitian?",
-        "answer": "Hal ini bisa diurus dengan memilih kategori PSA02 dan mengisi formulir yang telah disediakan pada link berikut: intip.in/formPSA02"
+        "answer": "Hal ini bisa diurus dengan memilih kategori PSA02 dan mengisi formulir yang telah disediakan pada link berikut: intip.in/formPSA02",
+        "collection_name": "umum"
     },
     {
         "id": 43,
         "question": "Apa itu event ARA 6.0?",
-        "answer": "ARA (A Renewal Agent) 6.0 adalah kegiatan yang diselenggarakan oleh HMIT (Himpunan Mahasiswa Teknologi Informasi) ITS periode 2024/2025 yang dimana event ini akan menjadi media untuk menyalurkan minat di bidang IT (teknologi informasi) bagi siswa SMA/SMK dan mahasiswa."
+        "answer": "ARA (A Renewal Agent) 6.0 adalah kegiatan yang diselenggarakan oleh HMIT (Himpunan Mahasiswa Teknologi Informasi) ITS periode 2024/2025 yang dimana event ini akan menjadi media untuk menyalurkan minat di bidang IT (teknologi informasi) bagi siswa SMA/SMK dan mahasiswa.",
+        "collection_name": "ara"
     },
     {
         "id": 44,
         "question": "Apa saja rangkaian acara dari event ARA 6.0?",
-        "answer": "Terdapat 3 rangkaian acara utama, yaitu:\n1. OlimpIT\n2. CTF (Capture The Flag)\n3. ExploIT"
+        "answer": "Terdapat 3 rangkaian acara utama, yaitu:\n1. OlimpIT\n2. CTF (Capture The Flag)\n3. ExploIT",
+        "collection_name": "ara"
     },
     {
         "id": 45,
         "question": "Siapa saja peserta yang dapat mengikuti event Olimpiade Cyber Security dan Internet of Things pada ARA 6.0?",
-        "answer": "Peserta merupakan siswa dari SMA/SMK/Sederajat yang terdaftar di Indonesia"
+        "answer": "Peserta merupakan siswa dari SMA/SMK/Sederajat yang terdaftar di Indonesia",
+        "collection_name": "ara"
     },
     {
         "id": 46,
         "question": "Berapa jumlah SKS mata kuliah Teknologi Komputasi Awan?",
-        "answer": "4 SKS"
+        "answer": "4 SKS",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 47,
         "question": "Apakah terdapat pengumuman mengenai pengisian survey pemanfaatan GenAI dalam pembelajaran?",
-        "answer": "Ya, terdapat surat edaran mengenai pengisian survey pemanfaatan GenAI dalam pembelajaran. Survey ini dapat diakses melalui link berikut:\n1. Mahasiswa: https://its.id/SurveyGenAIMhsITS\n2. Dosen: https://its.id/SurveyGenAIDosenITS"
+        "answer": "Ya, terdapat surat edaran mengenai pengisian survey pemanfaatan GenAI dalam pembelajaran. Survey ini dapat diakses melalui link berikut:\n1. Mahasiswa: https://its.id/SurveyGenAIMhsITS\n2. Dosen: https://its.id/SurveyGenAIDosenITS",
+        "collection_name": "pengumuman"
     },
     {
         "id": 48,
         "question": "Kapan kegiatan perkuliahan diliburkan terkait kegiatan Halal Bihalal Keluarga Besar Institut Teknologi Sepuluh Nopember?",
-        "answer": "Pada hari Selasa, tanggal 8 April 2025 mulai pukul 07.00 WIB s.d. 12.00 WIB, kegiatan perkuliahan diliburkan terkait kegiatan Halal Bihalal Keluarga Besar Institut Teknologi Sepuluh Nopember."
+        "answer": "Pada hari Selasa, tanggal 8 April 2025 mulai pukul 07.00 WIB s.d. 12.00 WIB, kegiatan perkuliahan diliburkan terkait kegiatan Halal Bihalal Keluarga Besar Institut Teknologi Sepuluh Nopember.",
+        "collection_name": "pengumuman"
     },
     {
         "id": 49,
         "question": "Bagaimana format penulisan proposal tugas/proyek akhir?",
-        "answer": "Pengetikan proposal tugas/proyek akhir mengikuti kententuan berikut:\n- Jenis dan ukuran kertas: Kertas HVS 80 gram ukuran A4 (210 mm x 297 mm)\n- Jarak spasi: 1 (satu/single)\n- Jarak tepi(margin):\n  - Tepi atas: 3.0 cm\n  - Tepi bawah: 2.5 cm\n  - Tepi kiri: 3.0 cm\n  - Tepi kanan: 2.0 cm\n- Jenis huruf:\n  - Times New Roman, Normal, ukuran 12 (khusus untuk judul dapat pakai ukuran 14)\n  - Kata yang berasal dari bahasa asing yang tidak diterjemahkan ditulis miring (italic)"
+        "answer": "Pengetikan proposal tugas/proyek akhir mengikuti kententuan berikut:\n- Jenis dan ukuran kertas: Kertas HVS 80 gram ukuran A4 (210 mm x 297 mm)\n- Jarak spasi: 1 (satu/single)\n- Jarak tepi(margin):\n  - Tepi atas: 3.0 cm\n  - Tepi bawah: 2.5 cm\n  - Tepi kiri: 3.0 cm\n  - Tepi kanan: 2.0 cm\n- Jenis huruf:\n  - Times New Roman, Normal, ukuran 12 (khusus untuk judul dapat pakai ukuran 14)\n  - Kata yang berasal dari bahasa asing yang tidak diterjemahkan ditulis miring (italic)",
+        "collection_name": "tugas-akhir"
     },
     {
         "id": 50,
         "question": "Untuk tugas/proyek akhir, penulisan daftar pustaka mengikuti format apa?",
-        "answer": "Secara umum penulisan daftar pustaka dalam standar APA, versi 7.0"
+        "answer": "Secara umum penulisan daftar pustaka dalam standar APA, versi 7.0",
+        "collection_name": "tugas-akhir"
     },
     {
         "id": 51,
         "question": "Berapa biaya pendaftaran normal untuk event Capture The Flag di ARA 6.0?",
-        "answer": "Pendaftaran normal tanggal 27 Januari sampai 31 Januari 2025 untuk event Capture The Flag di ARA 6.0 adalah Rp 110.000 / tim"
+        "answer": "Pendaftaran normal tanggal 27 Januari sampai 31 Januari 2025 untuk event Capture The Flag di ARA 6.0 adalah Rp 110.000 / tim",
+        "collection_name": "ara"
     },
     {
         "id": 52,
         "question": "Event ARA 6.0 diselenggarakan oleh siapa?",
-        "answer": "ARA 6.0 diselenggarakan oleh Himpunan Mahasiswa Teknologi Informasi (HMIT) ITS"
+        "answer": "ARA 6.0 diselenggarakan oleh Himpunan Mahasiswa Teknologi Informasi (HMIT) ITS",
+        "collection_name": "ara"
     },
     {
         "id": 53,
         "question": "Apa tema yang diusung di event Tech Talk ARA 6.0?",
-        "answer": "Tema yang diusung di event Tech Talk ARA 6.0 adalah \"Future Fusion: Embracing the Synergy of Emerging Technologies\""
+        "answer": "Tema yang diusung di event Tech Talk ARA 6.0 adalah \"Future Fusion: Embracing the Synergy of Emerging Technologies\"",
+        "collection_name": "ara"
     },
     {
         "id": 54,
         "question": "Kapan event Tech Talk ARA 6.0 diselenggarakan?",
-        "answer": "Event Tech Talk ARA 6.0 diselenggarakan pada Sabtu, 26 April 2025 pada pukul 12.30 - 16.40 WIB"
+        "answer": "Event Tech Talk ARA 6.0 diselenggarakan pada Sabtu, 26 April 2025 pada pukul 12.30 - 16.40 WIB",
+        "collection_name": "ara"
     },
     {
         "id": 55,
         "question": "Berapa kecepatan maksimal untuk mengemudikan kendaraan bermotor di lingkungan kampus ITS?",
-        "answer": "Kecepatan maksimal untuk mengemudikan kendaraan bermotor di lingkungan kampus ITS adalah 30 km/jam"
+        "answer": "Kecepatan maksimal untuk mengemudikan kendaraan bermotor di lingkungan kampus ITS adalah 30 km/jam",
+        "collection_name": "pengumuman"
     },
     {
         "id": 56,
         "question": "Apa yang harus dilakukan jika terdapat kejadian penipuan yang mengatasnamakan pimpinan ITS?",
-        "answer": "1. Melakukan Verifikasi Informasi: Jika menerima pesan, email, atau telepon yang mengatasnamakan pimpinan ITS dan meminta bantuan dalam bentuk apapun, terutama terkait transfer dana, segera lakukan verifikasi langsung kepada pihak yang bersangkutan melalui jalur komunikasi resmi.\n2. Menggunakan Jalur Resmi: Selalu gunakan email dan/atau nomor telepon resmi ITS untuk berkomunikasi dengan pimpinan atau pejabat institusi, khususnya terkait keperluan kedinasan.\n3. Mohon Tidak Terburu-buru: Hindari mengambil keputusan tergesa-gesa atas permintaan yang mencurigakan. Penipu biasanya memanfaatkan tekanan waktu untuk memancing korban agar segera bertindak.\n4. Segera Melaporkan: Jika menemukan indikasi penipuan atau telah menerima pesan mencurigakan, segeralaporkan kepada Computer Security Incident Response Team (CSIRT) ITS ( Narahubung: Kasubdit IKTI DPTSI ITS, email: kasubdit.ikti@its.ac.id ) atau pihak berwenang di lingkungan ITS."
+        "answer": "1. Melakukan Verifikasi Informasi: Jika menerima pesan, email, atau telepon yang mengatasnamakan pimpinan ITS dan meminta bantuan dalam bentuk apapun, terutama terkait transfer dana, segera lakukan verifikasi langsung kepada pihak yang bersangkutan melalui jalur komunikasi resmi.\n2. Menggunakan Jalur Resmi: Selalu gunakan email dan/atau nomor telepon resmi ITS untuk berkomunikasi dengan pimpinan atau pejabat institusi, khususnya terkait keperluan kedinasan.\n3. Mohon Tidak Terburu-buru: Hindari mengambil keputusan tergesa-gesa atas permintaan yang mencurigakan. Penipu biasanya memanfaatkan tekanan waktu untuk memancing korban agar segera bertindak.\n4. Segera Melaporkan: Jika menemukan indikasi penipuan atau telah menerima pesan mencurigakan, segeralaporkan kepada Computer Security Incident Response Team (CSIRT) ITS ( Narahubung: Kasubdit IKTI DPTSI ITS, email: kasubdit.ikti@its.ac.id ) atau pihak berwenang di lingkungan ITS.",
+        "collection_name": "pengumuman"
     },
     {
         "id": 57,
         "question": "Adakah pengumuman tentang kapan FRS untuk mata kuliah bersama (mata kuliah yang berada di bawah pengelolaan SKPB) dilaksanakan?",
-        "answer": " FRS untuk Mata Kuliah Bersama (Mata Kuliah yang berada di bawah pengelolaan SKPB) dilaksanakan mulai tanggal 17 s/d 19 Februari 2025."
+        "answer": " FRS untuk Mata Kuliah Bersama (Mata Kuliah yang berada di bawah pengelolaan SKPB) dilaksanakan mulai tanggal 17 s/d 19 Februari 2025.",
+        "collection_name": "pengumuman"
     },
     {
         "id": 58,
         "question": "Adakah pengumuman tentang dimana saya dapat mendaftar untuk mengikuti remedial?",
-        "answer": "Mahasiswa dapat mendaftarkan diri untuk mengikuti remidial melalui link sebagai berikut: https://its.id/RemedialPerkuliahanBersama"
+        "answer": "Mahasiswa dapat mendaftarkan diri untuk mengikuti remidial melalui link sebagai berikut: https://its.id/RemedialPerkuliahanBersama",
+        "collection_name": "pengumuman"
     },
     {
         "id": 59,
         "question": "Berapa NIP dari Dr. Rizka Wakhidatus Sholikah, S. Kom ",
-        "answer": "NIP beliau adalah 1993202012054"
+        "answer": "NIP beliau adalah 1993202012054",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 60,
         "question": "Siapa dosen yang merupakan lulusan dari National Taiwan University Of Science And Technology?",
-        "answer": "Beliau adalah Bapak Ridho Rahman Hariadi, S.Kom., M.Sc. "
+        "answer": "Beliau adalah Bapak Ridho Rahman Hariadi, S.Kom., M.Sc.",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 61,
         "question": "Siapa yang mengajar mata kuliah Teknologi Komputasi Awan A?",
-        "answer": "Pengajar mata kuliah tersebut adalah Dr. Ir. Henning Titi Ciptaningtyas, S.Kom, M.Kom. dan Fuad Dary Rosyadi, S.Kom., M.Kom."
+        "answer": "Pengajar mata kuliah tersebut adalah Dr. Ir. Henning Titi Ciptaningtyas, S.Kom, M.Kom. dan Fuad Dary Rosyadi, S.Kom., M.Kom.",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 62,
         "question": "Dimana mata kuliah Interaksi Manusia dan Komputer D diajarkan?",
-        "answer": "Mata kuliah Ineraksi Manusia dan Komputer D diajarkan di kelas TW2-702"
+        "answer": "Mata kuliah Ineraksi Manusia dan Komputer D diajarkan di kelas TW2-702",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 63,
         "question": "Siapa kelapa Sub Bagian Tata Usaha Departemen Teknologi Informasi?",
-        "answer": "Beliau adalah Khairun Nasihin, S.ST."
+        "answer": "Beliau adalah Khairun Nasihin, S.ST.",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 64,
         "question": "Siapa yang bertugas sebagai Administrasi Akademik Departemen Teknologi Informasi?",
-        "answer": "Beliau adalah Jihan Fadhilah, S.M."
+        "answer": "Beliau adalah Jihan Fadhilah, S.M.",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 65,
-        "question": "Dari tanggal berapa sampai tanggal berapa kegiatan perkuliahan diliburkan terkait perayaan Idul Fitri 1446 H?",
-        "answer": "Kegiatan perkuliahan diliburkan mulai tanggal 2 April 2025 sampai dengan 7 April 2025"
+        "question": "Adakah pengumuman tentang dari tanggal berapa sampai tanggal berapa kegiatan perkuliahan diliburkan terkait perayaan Idul Fitri 1446 H?",
+        "answer": "Kegiatan perkuliahan diliburkan mulai tanggal 2 April 2025 sampai dengan 7 April 2025",
+        "collection_name": "pengumuman"
     },
     {
         "id": 66,
         "question": "Adakah peraturan mengenai menjaga ketertiban di lingkungan kampus ITS?",
-        "answer": "Ya, menurut surat edaran Nomor 9241/IT2.III/T/TU.00.08/II/2025 terdapat himbauan untuk menjaga ketertiban di lingkungan kampus ITS kepada seluruh Dosen, Tenaga kependidikan, dan Mahasiswa ITS."
+        "answer": "Ya, menurut surat edaran Nomor 9241/IT2.III/T/TU.00.08/II/2025 terdapat himbauan untuk menjaga ketertiban di lingkungan kampus ITS kepada seluruh Dosen, Tenaga kependidikan, dan Mahasiswa ITS.",
+        "collection_name": "pengumuman"
     },
     {
         "id": 67,
-        "question": "Kapan FRS untuk mata kuliah bersama (mata kuliah yang berada di bawah pengelolaan SKPB) dilaksanakan?",
-        "answer": "FRS untuk Mata Kuliah Bersama (Mata Kuliah yang berada di bawah pengelolaan SKPB) dilaksanakan mulai tanggal 10 s/d 14 Februari 2025."
+        "question": "Adakah pengumuman tentang kapan FRS untuk mata kuliah bersama (mata kuliah yang berada di bawah pengelolaan SKPB) dilaksanakan?",
+        "answer": "FRS untuk Mata Kuliah Bersama (Mata Kuliah yang berada di bawah pengelolaan SKPB) dilaksanakan mulai tanggal 10 s/d 14 Februari 2025.",
+        "collection_name": "pengumuman"
     },
     {
         "id": 68,
-        "question": "Berapa jumlah wisudawan untuk W-131?",
-        "answer": "Terdapat 10 wisudawan untuk W-131"
+        "question": "Adakah berita tentang berapa jumlah wisudawan untuk W-131?",
+        "answer": "Terdapat 10 wisudawan untuk W-131",
+        "collection_name": "tentang-kami"
     },
     {
         "id": 69,
         "question": "Ada berapa mata kuliah yang dibuka untuk angkatan 2023 di semester genap 2024/2025?",
-        "answer": "Terdapat 7 mata kuliah yang dibuka untuk angkatan 2023 di semester genap 2024/2025, yaitu:\n1. Interaksi Manusia dan Komputer\n2. Manajemen Insiden Keamanan Siber\n3. Security Operation Center\n4. Teknologi Komputasi Awan\n5. Big Data dan Data Lakehouse\n6. Kecerdasan Artifisial dan Machine Learning\n7. Integrasi Sistem"
+        "answer": "Terdapat 7 mata kuliah yang dibuka untuk angkatan 2023 di semester genap 2024/2025, yaitu:\n1. Interaksi Manusia dan Komputer\n2. Manajemen Insiden Keamanan Siber\n3. Security Operation Center\n4. Teknologi Komputasi Awan\n5. Big Data dan Data Lakehouse\n6. Kecerdasan Artifisial dan Machine Learning\n7. Integrasi Sistem",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 70,
         "question": "Apa nama mata kuliah untuk angkatan 2021 yang berjumlah 6 SKS?",
-        "answer": "Mata kuliah tersebut adalah Tugas Akhir"
+        "answer": "Mata kuliah tersebut adalah Tugas Akhir",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 71,
         "question": "Apa saja mata kuliah yang dilaksanakan di gedung SKPB?",
-        "answer": "Terdapat 2 mata kuliah yang dilaksanakan di gedung SKPB, yaitu:\n1. Kalkulus 2 (3 SKS) Semester 2\n2. Kebudayaan dan Kebangsaan (2 SKS) Semester 4"
+        "answer": "Terdapat 2 mata kuliah yang dilaksanakan di gedung SKPB, yaitu:\n1. Kalkulus 2 (3 SKS) Semester 2\n2. Kebudayaan dan Kebangsaan (2 SKS) Semester 4",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 72,
         "question": "Pada hari apa saja mata kuliah Kriptografi (3 SKS) diajarkan?",
-        "answer": "Terdapat 2 hari, yaitu:\n1. Hari Senin\n2. Hari Jumat"
+        "answer": "Terdapat 2 hari, yaitu:\n1. Hari Senin\n2. Hari Jumat",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 73,
         "question": "Apakah mata kuliah Teknologi Smartcity diajarkan oleh 2 orang dosen?",
-        "answer": "Ya, mata kuliah tersebut diajarkan oleh 2 orang dosen, yaitu:\n1.  Ir. Muchammad Husni, M.Kom\n2. Irzal Ahmad Sabilla, S. Kom.,M.Kom."
+        "answer": "Ya, mata kuliah tersebut diajarkan oleh 2 orang dosen, yaitu:\n1.  Ir. Muchammad Husni, M.Kom\n2. Irzal Ahmad Sabilla, S. Kom.,M.Kom.",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 74,
         "question": "Apa mata kuliah yang diajarkan pada hari Kamis di kelas TW2-704?",
-        "answer": "Mata kuliah yang diajarkan pada hari Kamis di kelas TW2-704 adalah:\n1. Integrasi Sistem B (3 SKS) - Semester 4\n2. Teknologi Multimedia B (2022+2023 (3 SKS) - Semester 4"
+        "answer": "Mata kuliah yang diajarkan pada hari Kamis di kelas TW2-704 adalah:\n1. Integrasi Sistem B (3 SKS) - Semester 4\n2. Teknologi Multimedia B (2022+2023 (3 SKS) - Semester 4",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 75,
         "question": "Apa saja mata kuliah yang dibuka untuk semester 6 semester genap 2024/2025?",
-        "answer": "Terdapat beberapa mata kuliah yang dibuka untuk semester 6, yaitu:\n1. Pengembangan Sistem/Aplikasi (Capstone Project)\n2. Kriptografi\n3. Penulisan Ilmiah\n4. Teknologi Smartcity\n5. Security Operations Center\n6. Manajemen Proyek\n7. Interaksi Manusia dan Komputer\n8. Sistem Cerdas\n9. Teknologi Multimedia"
+        "answer": "Terdapat beberapa mata kuliah yang dibuka untuk semester 6, yaitu:\n1. Pengembangan Sistem/Aplikasi (Capstone Project)\n2. Kriptografi\n3. Penulisan Ilmiah\n4. Teknologi Smartcity\n5. Security Operations Center\n6. Manajemen Proyek\n7. Interaksi Manusia dan Komputer\n8. Sistem Cerdas\n9. Teknologi Multimedia",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 76,
         "question": "Siapa dosen yang mengajar mata kuliah Teknologi Multimedia?",
-        "answer": "Terdapat 2 dosen yang mengajar mata kuliah tersebut, yaitu:\n1. Annisaa Sri Indrawanti, S. Kom., M. Kom.\n2. Hafara Firdausi, S.Kom., M.Kom."
+        "answer": "Terdapat 2 dosen yang mengajar mata kuliah tersebut, yaitu:\n1. Annisaa Sri Indrawanti, S. Kom., M. Kom.\n2. Hafara Firdausi, S.Kom., M.Kom.",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 77,
         "question": "Pada tahun berapa Bapak Ir. Khakim Ghozali, M.MT lulus Magister di ITS?",
-        "answer": "Beliau lulus pada tahun 2010"
+        "answer": "Beliau lulus pada tahun 2010",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 78,
         "question": "Siapa dosen dengan kode RR?",
-        "answer": "Beliau adalah Bapak Ridho Rahman Hariadi, S.Kom., M.Sc."
+        "answer": "Beliau adalah Bapak Ridho Rahman Hariadi, S.Kom., M.Sc.",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 79,
         "question": "Siapa dosen dengan kode RW?",
-        "answer": "Beliau adalah Dr. Rizka Wakhidatus Sholikah, S. Kom."
+        "answer": "Beliau adalah Dr. Rizka Wakhidatus Sholikah, S. Kom.",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 80,
         "question": "Kapan wisuda ke-132 dilaksanakan?",
-        "answer": "Wisuda ke-132 dilaksanakan pada tanggal 22 September hingga 25 September 2025"
+        "answer": "Wisuda ke-132 dilaksanakan pada tanggal 22 September hingga 25 September 2025",
+        "collection_name": "akademik"
     },
     {
         "id": 81,
         "question": "Siapa sekretaris departemen teknologi informasi?",
-        "answer": "beliau adalah Dr. Ir. Henning Titi Ciptaningtyas, S.Kom., M.Kom."
+        "answer": "beliau adalah Dr. Ir. Henning Titi Ciptaningtyas, S.Kom., M.Kom.",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 82,
         "question": "Berapa jumlah daya tampung jalur SNBT di departemen teknologi informasi?",
-        "answer": "Untuk jalur SNBT, daya tampung di departemen teknologi informasi adalah 39 orang"
+        "answer": "Untuk jalur SNBT, daya tampung di departemen teknologi informasi adalah 39 orang",
+        "collection_name": "umum"
     },
     {
         "id": 83,
         "question": "Berapa biaya pendidikan atau uang kuilah tunggal di departemen teknologi informasi?",
-        "answer": "Biaya pendidikan atau uang kuliah tunggal di departemen teknologi informasi bervariasi, yaitu\n1. UKT Kelompok 1: Rp 500.000\n2. UKT Kelompok 2: Rp 1.000.000\n3. UKT Kelompok 3: Rp 2.500.000\n4. UKT Kelompok 4: Rp 4.000.000\n5. UKT Kelompok 5: Rp 5.000.000\n6. UKT Kelompok 6: Rp 6.000.000\n7. UKT Kelompok 7: Rp 7.500.000\n8. UKT Kelompok 8: Rp 10.000.000\n9. UKT Kelompok 9: Rp 12.500.000"
+        "answer": "Biaya pendidikan atau uang kuliah tunggal di departemen teknologi informasi bervariasi, yaitu\n1. UKT Kelompok 1: Rp 500.000\n2. UKT Kelompok 2: Rp 1.000.000\n3. UKT Kelompok 3: Rp 2.500.000\n4. UKT Kelompok 4: Rp 4.000.000\n5. UKT Kelompok 5: Rp 5.000.000\n6. UKT Kelompok 6: Rp 6.000.000\n7. UKT Kelompok 7: Rp 7.500.000\n8. UKT Kelompok 8: Rp 10.000.000\n9. UKT Kelompok 9: Rp 12.500.000",
+        "collection_name": "umum"
     },
     {
         "id": 84,
         "question": "Berapa jumlah daya tampung jalur SNBP di departemen teknologi informasi?",
-        "answer": "Untuk jalur SNBP, daya tampung di departemen teknologi informasi adalah 26 orang"
+        "answer": "Untuk jalur SNBP, daya tampung di departemen teknologi informasi adalah 26 orang",
+        "collection_name": "umum"
     },
     {
         "id": 85,
         "question": "Departemen teknologi informasi berada di fakultas apa?",
-        "answer": "Departemen teknologi informasi berada di Fakultas Teknologi Elektro dan Informatika Cerdas ITS (ELECTICS)"
+        "answer": "Departemen teknologi informasi berada di Fakultas Teknologi Elektro dan Informatika Cerdas ITS (ELECTICS)",
+        "collection_name": "tentang-kami"
     },
     {
         "id": 86,
         "question": "Bagaimana cara menghubungi dosen Bu Annisa?",
-        "answer": "Untuk menghubungi dosen Bu Annisa, Anda dapat mengirimkan email ke annisaa@its.ac.id"
+        "answer": "Untuk menghubungi dosen Bu Annisa, Anda dapat mengirimkan email ke annisaa@its.ac.id",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 87,
         "question": "Kapan Wisuda ke-131 dilaksanakan?",
-        "answer": "Wisuda ke-131 dilaksanakan dari tanggal 12 April hingga 13 April 2025"
+        "answer": "Wisuda ke-131 dilaksanakan dari tanggal 12 April hingga 13 April 2025",
+        "collection_name": "akademik"
     },
     {
         "id": 88,
         "question": "Kapan batas pembatalan atau drop mata kuliah untuk semester genap tahun 2024/2025?",
-        "answer": "Batas akhir pembatalan mata kuliah pada tanggal 9 Mei 2025"
+        "answer": "Batas akhir pembatalan mata kuliah pada tanggal 9 Mei 2025",
+        "collection_name": "akademik"
     },
     {
         "id": 89,
         "question": "Pada tanggal berapa FRS untuk semester genap tahun 2024/2025 dilaksanakan?",
-        "answer": "FRS dilakukan di rentang tanggal 10 hingga 14 Februari 2025"
+        "answer": "FRS dilakukan di rentang tanggal 10 hingga 14 Februari 2025",
+        "collection_name": "akademik"
     },
     {
         "id": 90,
         "question": "Kapan proses yudisium untuk wisuda ke-132?",
-        "answer": "Proses yudisium dimulai pada tanggal 6 Agustus sampai 7 Agustus 2025"
+        "answer": "Proses yudisium dimulai pada tanggal 6 Agustus sampai 7 Agustus 2025",
+        "collection_name": "akademik"
     },
     {
         "id": 91,
         "question": "Siapa dosen pengajar mata kuliah Penulisan Ilmiah?",
-        "answer": "Dosen yang mengajar mata kuliah Penulisan Ilmiah adalah Dr. Ir. Henning Titi Ciptaningtyas, S.Kom, M.Kom."
+        "answer": "Dosen yang mengajar mata kuliah Penulisan Ilmiah adalah Dr. Ir. Henning Titi Ciptaningtyas, S.Kom, M.Kom.",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 92,
         "question": "Siapa saja dosen yang lulus tahun 2020 dari Institut Teknologi Sepuluh Nopember?",
-        "answer": "Terdapat 2 dosen yang lulus ditahun 2020, yaitu:\n1. Dr. Rizka Wakhidatus Sholikah, S. Kom.\n2. Irzal Ahmad Sabilla, S. Kom.,M.Kom."
+        "answer": "Terdapat 2 dosen yang lulus ditahun 2020, yaitu:\n1. Dr. Rizka Wakhidatus Sholikah, S. Kom.\n2. Irzal Ahmad Sabilla, S. Kom.,M.Kom.",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 93,
         "question": "Berapa jumlah SKS mata kuliah Big Data dan Data Lakehouse?",
-        "answer": "Mata kuliah tersebut berjumlah 3 SKS"
+        "answer": "Mata kuliah tersebut berjumlah 3 SKS",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 94,
         "question": "Berapa jumlah SKS yang harus diambil oleh angkatan 2024 untuk semester genap tahun 2024/2025?",
-        "answer": "Terdapat sejumlah 20 SKS yang harus diambil"
+        "answer": "Terdapat sejumlah 20 SKS yang harus diambil",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 95,
         "question": "Kapan mata kuliah Kalkulus 2 dilaksanakan?",
-        "answer": "Mata kuliah kalkulus 2 dilaksanakan tiap hari Selasa dan Kamis"
+        "answer": "Mata kuliah kalkulus 2 dilaksanakan tiap hari Selasa dan Kamis",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 96,
         "question": "Mata kuliah kebudayaan dan kebangsaan diajarkan dimana?",
-        "answer": "Mata kuliah kebudayaan dan kebangsaan dilaksanakan di Gedung SKPB (Tower 1)"
+        "answer": "Mata kuliah kebudayaan dan kebangsaan dilaksanakan di Gedung SKPB (Tower 1)",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 97,
         "question": "Mata kuliah Kriptografi dibuka untuk angkatan berapa?",
-        "answer": "Mata kuliah Kriptografi dibuka untuk angkatan 2022"
+        "answer": "Mata kuliah Kriptografi dibuka untuk angkatan 2022",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 98,
         "question": "Bu Hafara Firdausi penah menempuh pendidikan dimana saja?",
-        "answer": "Riwayat pendidikan dari Hafara Firdausi, yaitu:\n- S-1, Institut Teknologi Sepuluh Nopember, 2019\n- S-2, Institut Teknologi Sepuluh Nopember, 2021"
+        "answer": "Riwayat pendidikan dari Hafara Firdausi, yaitu:\n- S-1, Institut Teknologi Sepuluh Nopember, 2019\n- S-2, Institut Teknologi Sepuluh Nopember, 2021",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 99,
         "question": "Berapa NIP dari Fuad Dary Rosyadi, S.Kom., M.Kom.?",
-        "answer": "NIP beliau adalah 2022199611029"
+        "answer": "NIP beliau adalah 2022199611029",
+        "collection_name": "perkuliahan"
     },
     {
         "id": 100,
         "question": "Mata kuliah Kecerdasan Artifisial dan Machine Learning dilaksanakan pada hari apa?",
-        "answer": "Mata kuliah Kecerdasan Artifisial dan Machine Learning dilaksanakan pada hari Rabu"
+        "answer": "Mata kuliah Kecerdasan Artifisial dan Machine Learning dilaksanakan pada hari Rabu",
+        "collection_name": "perkuliahan"
+    },
+    {
+        "id": 101,
+        "question": "Apa akreditasi di departemen teknologi informasi?",
+        "answer": "Departemen teknologi informasi memiliki akreditasi baik sekali",
+        "collection_name": "akademik"
+    },
+    {
+        "id": 102,
+        "question": "Bagaimana persyaratan pengambilan mata kuliah kerja praktik?",
+        "answer": "Persyaratan pengambilan MK Kerja Praktik - Reguler, yaitu:\n1. Mahasiswa/i aktif departemen teknologi informasi\n2. Mahasiswa/i semester 6 (minimal)\n3. Lama pelaksanaan KP 1-3 bulan\n4. KP dapat dilaksanakan secara perorangan atau berkelompok/tim dengan maksimal 3 orang",
+        "collection_name": "akademik"
+    },
+    {
+        "id": 103,
+        "question": "Apa visi himpunan mahasiswa di departemen teknologi informasi",
+        "answer": "Himpunan Mahasiswa Teknologi Informasi ITS akan bergerak bersama demi mewujudkan visi besar yakni AKTIF (Aspiratif, Kolaboratif, dan Prestatif).",
+        "collection_name": "umum"
+    },
+    {
+        "id": 104,
+        "question": "Apa itu jalur penerimaan SMITS Future Leader and Academic Talent (FLAT)?",
+        "answer": "Jalur ini dibuka untuk memberikan apresiasi bagi siswa SMA/MA/SMK sederajat yang mempunyai akademik dan prestasi guna dibina menjadi bibit unggul calon pemimpin dan talenta masa depan.",
+        "collection_name": "umum"
+    },
+    {
+        "id": 105,
+        "question": "Apa berapa jalur penerimaan SMITS Future Leader and Academic Talent (FLAT)?",
+        "answer": "Terdapat 2 jalur, yaitu:\n1. Seleksi Mandiri Beasiswa. Untuk memberi kesempatan bagi siswa-siswi yang memiliki akademik dan prestasi unggul namun berasal dari keluarga kurang mampu dengan beasiswa pembebasan IPI 100% dari Beasiswa ITS Peduli.\n2. Seleksi Mandiri Prestasi. Untuk memberi apresiasi bagi siswa-siswi yang memiliki prestasi unggul berupa kesempatan diterima ITS tanpa tes tulis.",
+        "collection_name": "umum"
+    },
+    {
+        "id": 106,
+        "question": "Apa itu jalur penerimaan SMITS Academic and Competence Excellence (SMITS ACE)?",
+        "answer": "Jalur ini dibuka untuk memberikan kesempatan lebih luas bagi siswa SMA/MA/SMK sederajat yang memiliki kemampuan akademik unggul melalui nilai UTBK atau Ujian SMITS atau keduanya.",
+        "collection_name": "umum"
+    },
+    {
+        "id": 107,
+        "question": "Pada Gedung Tower 2 ITS Lantai 7 terdapat berapa fasilitas ruang kelas yang dimiliki departemen teknologi informasi?",
+        "answer": "terdapat 4 ruang kelas, yaitu:\n1. Ruang kelas TW2-702 berkapasitas 40 mahasiswa\n2. Ruang kelas TW2-703 berkapasitas 40 mahasiswa\n3. Ruang kelas TW2-704 berkapasitas 40 mahasiswa\n4. Ruang kelas TW2-705 berkapasitas 40 mahasiswa",
+        "collection_name": "tentang-kami"
+    },
+    {
+        "id": 108,
+        "question": "Ada berapa fasilitas toilet di departemen teknologi informasi?",
+        "answer": "Departemen Teknologi Informasi memiliki toilet di Gedung Tower 2 ITS, sebagai berikut :\n1. Toilet Pria Lantai 2\n2. Toilet Wanita Lantai 2\n3. Toilet Pria Lantai 7\n4. Toilet Wanita Lantai 7\nDepartemen Teknologi Informasi juga memiliki toilet untuk penyandang difabel, sebagai berikut :\n1. Toilet Disabilitas Lantai 2\n2. Toilet Disabilitas Lantai 7",
+        "collection_name": "tentang-kami"
+    },
+    {
+        "id": 109,
+        "question": "Adakah berita tentang siapa yang diundang pada acara Guest Lecture Interaksi Manusia dan Komputer (IMK)?",
+        "answer": "Beliau adalah Ms. Rocel Audrey Batara sebagai pembicara utama",
+        "collection_name": "tentang-kami"
+    },
+    {
+        "id": 109,
+        "question": "Adakah berita tentang siapa yang diundang pada acara Guest Lecture Interaksi Manusia dan Komputer (IMK)?",
+        "answer": "Beliau adalah Ms. Rocel Audrey Batara sebagai pembicara utama",
+        "collection_name": "tentang-kami"
+    },
+    {
+        "id": 110,
+        "question": "Adakah berita tentang siapa yang diundang pada acara Guest Lecture Interaksi Manusia dan Komputer (IMK)?",
+        "answer": "Beliau adalah Ms. Rocel Audrey Batara sebagai pembicara utama",
+        "collection_name": "tentang-kami"
+    },
+    {
+        "id": 111,
+        "question": "Apa saja yang perlu dipersiapkan untuk syarat administrasi untuk yudisium untuk softcopy?",
+        "answer": "Untuk syarat administrasi non-sim akademik ITS, yaitu:\n1. Mempersiapkan:\n- KTP dan NIK untuk PIN (Penomoran Ijazah Nasional)\n- Buku TA softcopy\n- Slide presentasi\n- Jurnal POMITS\n- Poster\n- Feed IG\n- Video\n2. Mengupload keseluruhan berkas tersebut pada Google Form untuk Administrasi Yudisium Departemen",
+        "collection_name": "tugas-akhir"
+    },
+    {
+        "id": 112,
+        "question": "Apa saja syarat pendaftaran sidang TA?",
+        "answer": "Untuk sidang TA terdapat beberapa syarat, yaitu:\n- Nilai TOEFL ITS minimal 477\n- Nilai SKEM Mahasiswa menggunakan kredit 100 dan IP SKEM minimal 2,1\n-  Logbook bimbingan (minimal 8 kali bimbingan) yang telah di ttd oleh dosen pembimbing (ttd basah)\n- Lembar Persetujuan Maju Sidang TA (ttd basah)\n- Buku TA (soft copy, format .pdf)\n- Artikel Ilmiah POMITS (Soft copy, format .pdf)\n-  Melakukan pendaftaran melalui MyITS Thesis dan Google Form",
+        "collection_name": "tugas-akhir"
+    },
+    {
+        "id": 113,
+        "question": "Dimana saya bisa mengakses link terkait tugas akhir?",
+        "answer": "Link dokumen terkait tugas akhir dapat diakses di https://linktr.ee/InfoDTI_ITS",
+        "collection_name": "tugas-akhir"
+    },
+    {
+        "id": 114,
+        "question": "Dimana saya mendapatkan template untuk jurnal teknik?",
+        "answer": "Template untuk POMITS atau jurnal teknik dapat di unduh di https://ejurnal.its.ac.id/",
+        "collection_name": "tugas-akhir"
+    },
+    {
+        "id": 115,
+        "question": "Berapa minimal frame rate untuk video tugas akhir?",
+        "answer": "Untuk tugas akhir, minimal frame rate yaitu 30 fps",
+        "collection_name": "tugas-akhir"
+    },
+    {
+        "id": 116,
+        "question": "Apakah ada jumlah halaman maksimal untuk tugas akhir?",
+        "answer": "Tidak ada jumlah halaman maksidmal untuk tugas akhir",
+        "collection_name": "tugas-akhir"
+    },
+    {
+        "id": 117,
+        "question": "Kapan periode pendaftaran untuk CTF ara?",
+        "answer": "Peserta atau tim melakukan pendaftaran sesuai dengan periode pendaftran yang telah ditentukan, yaitu 16 Desember 2024 - 31 Januari 2025",
+        "collection_name": "ara"
+    },
+    {
+        "id": 118,
+        "question": "Berapa total hadiah untuk Olimpiade ARA 6.0?",
+        "answer": "Untuk Olimpiade ARA 6.0 terdapat total hadiah senilai Rp5.000.000",
+        "collection_name": "ara"
+    },
+    {
+        "id": 119,
+        "question": "Bagaimana aturan dress code untuk sidang tugas akhir?",
+        "answer": "Dress code formal professional:\n- Pria: kemeja lengan panjang warna terang dan celana panjang kain warna gelap; Dasi dan jas opsional.\n- Perempuan: kemeja lengan panjang warna terang dan rok/celana panjang kain warna gelap; Blazer optional",
+        "collection_name": "tugas-akhir"
+    },
+    {
+        "id": 119,
+        "question": "Berapa nilai minimal TOEFL ITS untuk pendaftaran sidang tugas akhir?",
+        "answer": "Untuk pendaftaran sidang tugas akhir nilai TOEFL ITS minimal 477",
+        "collection_name": "tugas-akhir"
+    },
+    {
+        "id": 120,
+        "question": "Kapan yudisium fakultas untuk wisuda ke-132 dilaksanakan?",
+        "answer": "Yudisium fakultas semester genap 2024/2025 (Wisuda ke-132) dilaksanakan dari tanggal 6 - 7 Agustus 2025",
+        "collection_name": "akademik"
     }
 ]

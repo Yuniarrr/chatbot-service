@@ -1,0 +1,73 @@
+$ python -m notebooks.test.train_4
+Cleaning data...
+Removed 3 invalid/duplicate entries
+You are using the default legacy behaviour of the <class 'transformers.models.t5.tokenization_t5.T5Tokenizer'>. This is expected, and simply means that the `legacy` (previous) behavior will be used so nothing changes for you. If you want to use the new behaviour, set `legacy=False`. This should only be set if you understand what it means, and thoroughly read the reason why this was added as explained in https://github.com/huggingface/transformers/pull/24565
+Augmenting class 'ara' with 9 samples (ratio=5.1)
+Augmenting class 'pengumuman' with 8 samples (ratio=5.8)
+
+============================================================
+DATA IMPROVEMENT SUGGESTIONS
+============================================================
+🔍 Remove duplicate questions in 'ara' class
+🔍 Remove duplicate questions in 'pengumuman' class
+
+💡 Target: Aim for 20-50+ samples per class with balanced distribution
+
+Training with 168 samples...
+============================================================
+DATA QUALITY ANALYSIS
+============================================================
+Total samples: 168
+Unique collections: 7
+
+Class Distribution:
+  perkuliahan: 46 samples (27.4%)
+  ara: 36 samples (21.4%)
+  pengumuman: 32 samples (19.0%)
+  akademik: 19 samples (11.3%)
+  tentang-kami: 15 samples (8.9%)
+  umum: 10 samples (6.0%)
+  tugas-akhir: 10 samples (6.0%)
+
+Imbalance Ratio: 4.60
+⚠️  HIGH CLASS IMBALANCE DETECTED!
+   Consider using SMOTE or class weighting
+
+Text Statistics:
+  Average text length: 55.4 characters
+  Average word count: 7.9 words
+  Min/Max words: 1/19
+
+============================================================
+SMART HYPERPARAMETER TUNING (F1-macro + Randomized)
+============================================================
+Vectorizer settings:
+  Max features: 336
+  N-gram range: (1, 2)
+  Min/Max DF: 1/0.95
+Baseline F1-macro: 0.7736 ± 0.0452
+Using RandomizedSearchCV with 3 folds
+Starting hyperparameter search...
+Fitting 3 folds for each of 15 candidates, totalling 45 fits
+Search completed in 4.96s
+Best parameters: {'vectorizer__ngram_range': (1, 1), 'vectorizer__max_features': 1000, 'classifier__class_weight': 'balanced', 'classifier__C': 10.0}
+Best F1-macro CV score: 0.8323
+Improvement over baseline: +0.0587
+✅ Using tuned model
+Using tuned model with score: 0.8323
+
+Final model accuracy: 0.8323
+
+============================================================
+TESTING PREDICTIONS
+============================================================
+Q: Siapa dosen pengajar mata kuliah pemrograman?
+A: perkuliahan (confidence: 0.924)
+
+Q: Kapan wisuda dilaksanakan?
+A: akademik (confidence: 0.757)
+
+Q: Apa persyaratan untuk mengikuti MBKM?
+A: akademik (confidence: 0.718)
+
+Model saved to ./notebooks/test/improved_question_classifier.pkl
