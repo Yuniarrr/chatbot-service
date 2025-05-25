@@ -32,12 +32,22 @@ class Collection(Base):
 
 
 ####################
+# FORMS
+####################
+
+
+class UpdateCollectionForm(BaseModel):
+    status: bool
+
+
+####################
 # SCHEMA
 ####################
 
 
 class CollectionBaseModel(BaseModel):
     name: str
+    description: str
     is_active: bool = True
     count: int = 0
 

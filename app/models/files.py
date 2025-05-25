@@ -58,7 +58,10 @@ class File(Base):
 
 
 class UpdateFileForm(BaseModel):
-    status: Optional[FileStatus] = None
+    file_name: Optional[str] = None
+    file_path: Optional[str] = None
+    # collection_name: Optional[str] = None
+    # status: Optional[FileStatus] = None
     meta: Optional[dict] = None
 
 
@@ -99,6 +102,7 @@ class FileReadModel(FileBaseModel):
 
 class FileUpdateModel(BaseModel):
     status: Optional[FileStatus] = None
+    file_name: Optional[str] = None
     meta: Optional[dict] = None
 
 

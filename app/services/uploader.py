@@ -65,5 +65,23 @@ class UploaderService:
         contents = text.encode("utf-8")
         return self.upload_to_local(contents, filename)
 
+    def rename_file(self, old_name: str, new_name: str) -> str:
+        """Rename file di local storage dan kembalikan path baru."""
+        old_path = os.path.join(UPLOAD_DIR, old_name)
+        new_path = os.path.join(UPLOAD_DIR, new_name)
+
+        if not os.path.exists(old_path):
+            raise FileNotFoundError(
+                f"File {old_path} tidak ditemukan di local storage."
+            )
+
+        if os.path.exists(new_path):
+            raise FileExistsError(
+                f"File baru {new_path} sudah ada. Tidak bisa overwrite."
+            )
+
+        os.rename(old_path, new_path)
+        return new_path
+
 
 uploader_service = UploaderService()

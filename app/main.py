@@ -22,7 +22,15 @@ from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from starlette.staticfiles import StaticFiles
 
 from app.env import PY_ENV, DATABASE_URL, UPLOAD_DIR
-from app.routers import auth, user, conversation, chat, opportunity, collection
+from app.routers import (
+    auth,
+    user,
+    conversation,
+    chat,
+    opportunity,
+    collection,
+    feedback,
+)
 from app.routers.file import router
 from app.core.database import session_manager, pgvector_session_manager
 from app.core.exceptions import DatabaseException, DuplicateValueException
@@ -109,6 +117,7 @@ app.include_router(conversation.router, prefix="/conversation", tags=["conversat
 app.include_router(chat.router, prefix="/chat", tags=["chat"])
 app.include_router(opportunity.router, prefix="/opportunity", tags=["opportunity"])
 app.include_router(collection.router, prefix="/collection", tags=["collection"])
+app.include_router(feedback.router, prefix="/feedback", tags=["feedback"])
 
 
 # @app.get("/uploads/{filename}")

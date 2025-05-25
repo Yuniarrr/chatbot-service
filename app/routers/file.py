@@ -41,10 +41,9 @@ from app.models.files import (
     FileReadModel,
     UpdateFileForm,
 )
-from app.retrieval.embed import embedding_service
 from app.retrieval.vector_store import vector_store_service
-from app.task import queue, process_uploaded_file
-from app.retrieval.loaders import CustomITSLoader
+from app.services.collection import collection_service
+from app.models.collections import Collection
 
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["ROUTER"])
@@ -61,8 +60,6 @@ async def add_new_file(
     file: Optional[UploadFile] = File(None),
     collection_name: Optional[str] = Form("administration"),
     url: Optional[str] = Form(None),
-    document_type: Optional[str] = Form(None),
-    topik: Optional[str] = Form(None),
     content: Optional[str] = Form(None),
 ):
     try:
@@ -97,8 +94,6 @@ async def add_new_file(
                         "content_type": file.content_type,
                         "size": len(contents),
                         "collection_name": collection_name,
-                        "document_type": document_type,
-                        "topik": topik,
                     },
                 }
             )
@@ -121,14 +116,11 @@ async def add_new_file(
                     "content_type": "text/plain",
                     "size": len(content.encode("utf-8")),
                     "collection_name": collection_name,
-                    "document_type": document_type,
-                    "topik": topik,
                 },
             )
 
             await file_service.insert_new_file(_new_file)
         elif url:
-            parsed = urlparse(url)
             _new_file = FileCreateModel(
                 **{
                     "id": id,
@@ -137,20 +129,15 @@ async def add_new_file(
                     "file_path": url,
                     "status": FileStatus.AWAITING,
                     "meta": {
-                        "name": f"{parsed.scheme}://{parsed.netloc}",
+                        "name": url,
                         "content_type": "application/octet-stream",
                         "size": 0,
                         "collection_name": collection_name,
-                        "document_type": document_type,
-                        "topik": topik,
                     },
                 }
             )
 
             await file_service.insert_new_file(_new_file)
-
-        print("_new_file")
-        print(_new_file)
 
         background_tasks.add_task(
             process_file, _new_file, file, url, collection_name, _new_file.meta
@@ -168,12 +155,13 @@ async def get_all_file(
     current_user: Annotated[TokenData, Depends(get_not_user)],
     skip: int = Query(0, ge=0),
     limit: int = Query(10, ge=1),
+    search: Optional[str] = Query(None),
 ):
     try:
-        files = await file_service.get_files(skip=skip, limit=limit)
+        files = await file_service.get_files(skip=skip, limit=limit, search=search)
 
         return ResponseModel(
-            status_code=200, message=SUCCESS_MESSAGE.RETRIEVED, data=files["data"]
+            status_code=200, message=SUCCESS_MESSAGE.RETRIEVED, data=files
         )
     except Exception as e:
         raise InternalServerException(str(e))
@@ -210,15 +198,39 @@ async def update_file_by_id(
         if file.status == FileStatus.AWAITING:
             raise BadRequestException("File sedang dalam proses upload")
 
-        await file_service.update_file_by_id(str(file_id), form_data)
+        update_file = FileUpdateModel(**{"status": FileStatus.AWAITING})
+        await file_service.update_file_by_id(file.id, update_file)
 
-        print("form_data.meta:", form_data.meta)
+        if file.file_name != form_data.file_name:
+            try:
+                new_file_path = uploader_service.rename_file(
+                    file.file_name, form_data.file_name
+                )
+                form_data.file_path = new_file_path
+            except FileNotFoundError:
+                raise NotFoundException("File fisik tidak ditemukan di storage.")
+            except FileExistsError:
+                raise BadRequestException("File dengan nama baru sudah ada.")
+
+        updated_file = await file_service.update_file_by_id(str(file_id), form_data)
 
         if form_data.meta is not None:
+            form_data.meta["source"] = updated_file.file_path
             await vector_store_service.update_metadata_by_file_id(
                 str(file_id),
                 form_data.meta,
             )
+
+        if form_data.meta["collection_name"] != file.meta["collection_name"]:
+            collection_id = await vector_store_service.get_collection_id_by_name(
+                form_data.meta["collection_name"]
+            )
+            await vector_store_service.update_collection_by_file_id(
+                str(file_id), collection_id
+            )
+
+        update_file = FileUpdateModel(**{"status": FileStatus.SUCCESS})
+        await file_service.update_file_by_id(file.id, update_file)
 
         return ResponseModel(
             status_code=200, message=SUCCESS_MESSAGE.UPDATED, data=form_data

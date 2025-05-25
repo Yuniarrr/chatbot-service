@@ -2,6 +2,8 @@ import logging
 from typing import Optional
 
 from fastapi import UploadFile
+from sqlalchemy import Text, cast, func, or_
+from sqlalchemy.future import select
 
 from app.models.users import RegisterForm
 from app.core.database import session_manager
@@ -18,6 +20,7 @@ from app.models.files import (
 from app.core.exceptions import InternalServerException
 from app.retrieval.embed import embedding_service
 from app.retrieval.vector_store import vector_store_service
+from app.services.collection import collection_service
 
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["SERVICE"])
@@ -45,13 +48,45 @@ class FileService:
             log.error(f"Error get file by id: {e}")
             raise DatabaseException(str(e))
 
-    async def get_files(self, skip: Optional[int] = None, limit: Optional[int] = None):
+    async def get_files(
+        self,
+        skip: Optional[int] = 0,
+        limit: Optional[int] = 10,
+        search: Optional[str] = None,
+    ):
         try:
             async with session_manager.session() as db:
-                files_list = await files.get_multi(db=db, skip=skip, limit=limit)
-                if not files_list:
-                    return []
-                return files_list
+                stmt = select(File)
+
+                if search:
+                    stmt = stmt.where(
+                        or_(
+                            File.file_name.ilike(f"%{search}%"),
+                            cast(File.meta["name"], Text).ilike(f"%{search}%"),
+                        )
+                    )
+
+                count_stmt = select(func.count()).select_from(stmt.subquery())
+                total_result = await db.execute(count_stmt)
+                total = total_result.scalar() or 0
+
+                stmt = stmt.offset(skip).limit(limit).order_by(File.created_at.desc())
+
+                result = await db.execute(stmt)
+                files_list = result.scalars().all()
+
+                return {
+                    "data": [FileReadModel.model_validate(file) for file in files_list],
+                    "meta": {
+                        "skip": skip,
+                        "limit": limit,
+                        "total": total,
+                        "is_next": skip + limit < total,
+                        "is_prev": skip > 0,
+                        "start": skip + 1 if total > 0 else 0,
+                        "end": min(skip + limit, total),
+                    },
+                }
         except Exception as e:
             log.error(f"Error get files: {e}")
             raise DatabaseException(str(e))
@@ -60,6 +95,8 @@ class FileService:
         self, file_id: str, form_data: FileUpdateModel
     ) -> FileReadModel:
         try:
+            print("update_file_by_id")
+            print(form_data)
             async with session_manager.session() as db:
                 updated_file = await files.update(
                     db=db,
@@ -124,8 +161,11 @@ async def process_file(
             meta=meta,
         )
 
+        print("disini ya")
+
         await vector_store_service.add_vectostore(splitted_document, collection_name)
 
+        print("ini update ya")
         update_file = FileUpdateModel(**{"status": FileStatus.SUCCESS})
         await file_service.update_file_by_id(_new_file.id, update_file)
     except Exception as e:

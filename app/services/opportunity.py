@@ -2,7 +2,7 @@ import logging
 
 from typing import Optional
 from datetime import datetime
-from sqlalchemy import or_
+from sqlalchemy import func, or_
 from sqlalchemy.future import select
 
 from app.core.database import session_manager
@@ -66,21 +66,56 @@ class OpportunityService:
 
     async def get_opportunities(
         self,
-        skip: Optional[int] = None,
-        limit: Optional[int] = None,
+        skip: Optional[int] = 0,
+        limit: Optional[int] = 10,
         type: Optional[OpportunityType] = None,
+        search: Optional[str] = None,
     ):
         try:
             async with session_manager.session() as db:
-                if type is not None:
-                    opportunity_list = await opportunities.get_multi(
-                        db=db, skip=skip, limit=limit, type=type
+                stmt = select(Opportunity)
+
+                if type:
+                    stmt = stmt.where(Opportunity.type == type)
+
+                if search:
+                    stmt = stmt.where(
+                        or_(
+                            Opportunity.title.ilike(f"%{search}%"),
+                            Opportunity.description.ilike(f"%{search}%"),
+                            Opportunity.organizer.ilike(f"%{search}%"),
+                        )
                     )
-                else:
-                    opportunity_list = await opportunities.get_multi(
-                        db=db, skip=skip, limit=limit
-                    )
-                return opportunity_list
+
+                # Hitung total setelah filter
+                count_stmt = select(func.count()).select_from(stmt.subquery())
+                total_result = await db.execute(count_stmt)
+                total = total_result.scalar() or 0
+
+                stmt = (
+                    stmt.offset(skip)
+                    .limit(limit)
+                    .order_by(Opportunity.created_at.desc())
+                )
+
+                result = await db.execute(stmt)
+                opportunities_list = result.scalars().all()
+
+                return {
+                    "data": [
+                        OpportunitiesReadModel.model_validate(opp)
+                        for opp in opportunities_list
+                    ],
+                    "meta": {
+                        "skip": skip,
+                        "limit": limit,
+                        "total": total,
+                        "is_next": skip + limit < total,
+                        "is_prev": skip > 0,
+                        "start": skip + 1 if total > 0 else 0,
+                        "end": min(skip + limit, total),
+                    },
+                }
         except Exception as e:
             log.error(f"Error get opportunities: {e}")
             raise DatabaseException(str(e))

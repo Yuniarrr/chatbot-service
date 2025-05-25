@@ -12,6 +12,7 @@ from app.models.opportunities import (
     OpportunitiesCreateModel,
     OpportunitiesForm,
     OpportunityType,
+    UpdateOpportunitiesForm,
 )
 from app.utils.auth import TokenData, get_verified_user, get_not_user
 from app.services.opportunity import opportunity_service
@@ -58,11 +59,12 @@ async def get_all_opportunity(
     current_user: Annotated[TokenData, Depends(get_verified_user)],
     skip: int = Query(0, ge=0),
     limit: int = Query(10, ge=1),
-    type: Optional[OpportunityType] = None,
+    type: Optional[OpportunityType] = Query(None),
+    search: Optional[str] = Query(None),
 ):
     try:
         opportunities = await opportunity_service.get_opportunities(
-            skip=skip, limit=limit, type=type
+            skip=skip, limit=limit, type=type, search=search
         )
 
         return ResponseModel(
@@ -97,7 +99,7 @@ async def get_opportunity_by_id(
 async def update_opportunity_by_id(
     opportunity_id: UUID,
     current_user: Annotated[TokenData, Depends(get_verified_user)],
-    form_data: OpportunitiesForm,
+    form_data: UpdateOpportunitiesForm,
 ):
     try:
         opportunity = await opportunity_service.get_opportunity_by_id(
@@ -111,7 +113,7 @@ async def update_opportunity_by_id(
         )
 
         return ResponseModel(
-            status_code=201, message=SUCCESS_MESSAGE.CREATED, data=updated_opportunity
+            status_code=200, message=SUCCESS_MESSAGE.UPDATED, data=updated_opportunity
         )
     except Exception as e:
         raise InternalServerException(str(e))

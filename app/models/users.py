@@ -77,7 +77,16 @@ class AddUserForm(BaseModel):
     full_name: str
     email: str
     password: str
+    phone_number: Optional[str] = None
     role: Role
+
+
+class UpdateUserForm(BaseModel):
+    full_name: Optional[str] = None
+    email: Optional[str] = None
+    password: Optional[str] = None
+    phone_number: Optional[str] = None
+    role: Optional[Role] = None
 
 
 ####################
@@ -136,9 +145,9 @@ class UserUpdateModel(BaseModel):
     phone_number: Optional[str] = None
     password: Optional[str] = None
     role: Optional[Role] = None
-    profile_picture: Optional[str] = None
-    nrp: Optional[str] = None
-    nip: Optional[str] = None
+    # profile_picture: Optional[str] = None
+    # nrp: Optional[str] = None
+    # nip: Optional[str] = None
 
 
 class UserUpdateInternalModel(UserUpdateModel):

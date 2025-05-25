@@ -68,6 +68,17 @@ class OpportunitiesForm(BaseModel):
     image_url: Optional[str] = None
 
 
+class UpdateOpportunitiesForm(BaseModel):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    organizer: Optional[str] = None
+    type: Optional[str] = None
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
+    link: Optional[str] = None
+    image_url: Optional[str] = None
+
+
 ####################
 # SCHEMA
 ####################

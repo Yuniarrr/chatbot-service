@@ -3,7 +3,6 @@ import json
 import logging
 import os
 import sqlalchemy as sa
-import sentence_transformers
 from typing import List, Optional
 
 from langchain_postgres import PGVector
@@ -19,18 +18,14 @@ from langchain_community.retrievers import BM25Retriever
 from langchain_core.retrievers import BaseRetriever
 from langchain.retrievers.document_compressors import LLMListwiseRerank
 
-from app.retrieval.model.colbert import ColBERT
 from app.retrieval.rerank import (
     AsyncCrossEncoderReranker,
-    AsyncReranker,
-    ManualRerankRetriever,
-    RerankCompressor,
-    Reranker,
 )
 from app.core.database import pgvector_session_manager
 from app.core.exceptions import DatabaseException
 from app.env import PGVECTOR_DB_URL, VECTOR_TABLE_NAME, SENTENCE_TRANSFORMERS_HOME
 from app.core.logger import SRC_LOG_LEVELS
+from app.services.collection import collection_service
 
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["RAG"])
@@ -56,7 +51,9 @@ class VectorStore:
         self._table_name = VECTOR_TABLE_NAME
         self._embedding_model = None
         self._vector_store = None
-        self._k = 8
+        self._k = 7
+        self._total_docs = []
+        self.bm25_cache = {}
 
     def initialize_embedding_model(
         self, sentence_transformers_home: Optional[str] = None
@@ -260,14 +257,9 @@ class VectorStore:
             ),
             AttributeInfo(
                 name="document_type",
-                description="Tipe dokumen, misal jadwal, kalendar akademik, skem, mata kuliah, kerja praktik, cuti bersama, artikel ilmiah, mbkm, pkm, tugas akhir, pengumuman, dan akreditasi",
+                description="Tipe dokumen, misal jadwal, kalendar akademik, skem, mata kuliah, kerja praktik, cuti bersama, publikasi, penerimaan, mbkm, pkm, tugas akhir, pengumuman, berita, tentang kami, dan akreditasi",
                 type="string",
             ),
-            # AttributeInfo(
-            #     name="tahun_ajaran",
-            #     description="Tahun ajaran dokumen (jika ada)",
-            #     type="string",
-            # ),
             AttributeInfo(
                 name="topik",
                 description="Topik terkait dokumen seperti, akreditasi, penelitian, dan lain lain (jika ada)",
@@ -290,40 +282,39 @@ class VectorStore:
 
         return retriever
 
-    async def get_hybrid_retriever(
-        self,
-        collection_name: str,
-        # llm: ChatOpenAI,
-    ) -> BaseRetriever:
-        vector_store = self.initialize_pg_vector(collection_name)
+    async def refetch_bm25(self, collection_name: str):
         all_docs = await self.get_all_documents(collection_name=collection_name)
 
         texts = [doc.page_content for doc in all_docs]
         metadatas = [doc.metadata for doc in all_docs]
 
-        bm25_retriever = BM25Retriever.from_texts(texts=texts, metadatas=metadatas)
-        bm25_retriever.k = 12
+        bm25 = BM25Retriever.from_texts(texts=texts, metadatas=metadatas)
+        bm25.k = self._k
+        self.bm25_cache[collection_name] = bm25
 
-        vector_retriever = vector_store.as_retriever(search_kwargs={"k": 12})
+    async def get_hybrid_retriever(
+        self,
+        collection_name: str,
+    ) -> BaseRetriever:
+        k = self._k
+        top_n = 7
+
+        if collection_name not in self.bm25_cache:
+            await self.refetch_bm25(collection_name)
+
+        bm25_retriever = self.bm25_cache[collection_name]
+
+        vector_store = self.initialize_pg_vector(collection_name)
+
+        vector_retriever = vector_store.as_retriever(search_kwargs={"k": k})
 
         ensemble_retriever = EnsembleRetriever(
             retrievers=[bm25_retriever, vector_retriever], weights=[0.5, 0.5]
         )
 
-        # reranker = sentence_transformers.CrossEncoder(
-        #     "BAAI/bge-reranker-base",
-        #     trust_remote_code=True,
-        # )
-
-        # compressor = RerankCompressor(
-        #     embedding_function=self._embedding_model.embed_query,
-        #     top_n=self._k,
-        #     reranking_function=reranker,
-        #     r_score=0.3,
-        # )
         llm = llm = ChatOpenAI(temperature=0, model_name="gpt-4o")
 
-        _filter = LLMListwiseRerank.from_llm(llm, top_n=8)
+        _filter = LLMListwiseRerank.from_llm(llm, top_n=top_n)
 
         return ContextualCompressionRetriever(
             base_compressor=_filter, base_retriever=ensemble_retriever
@@ -359,34 +350,20 @@ class VectorStore:
         query: str,
         collection_name: str,
     ) -> list[Document]:
+        if collection_name not in self.bm25_cache:
+            await self.refetch_bm25(collection_name)
+
+        bm25_retriever = self.bm25_cache[collection_name]
+
         vector_store = self.initialize_pg_vector(collection_name)
-        all_docs = await self.get_all_documents(collection_name=collection_name)
-
-        print(f"[INFO] Total dokumen dalam koleksi: {len(all_docs)}")
-
-        if not all_docs:
-            print("[WARN] Koleksi kosong.")
-            return []
-
-        texts = [doc.page_content for doc in all_docs]
-        metadatas = [doc.metadata for doc in all_docs]
-
-        bm25_retriever = BM25Retriever.from_texts(texts=texts, metadatas=metadatas)
-        bm25_retriever.k = self._k
 
         vector_retriever = vector_store.as_retriever(search_kwargs={"k": self._k})
 
-        # Combine
         ensemble_retriever = EnsembleRetriever(
             retrievers=[bm25_retriever, vector_retriever], weights=[0.5, 0.5]
         )
 
-        # Run initial hybrid retrieval
         initial_docs = await ensemble_retriever.ainvoke(query)
-        print(f"[INFO] Jumlah dokumen hasil hybrid retrieval: {len(initial_docs)}")
-        if not initial_docs:
-            print("[WARN] Tidak ada dokumen ditemukan dari hybrid retriever.")
-            return []
 
         # Rerank
         # reranker = AsyncCrossEncoderReranker(device="cpu")
@@ -403,20 +380,50 @@ class VectorStore:
             top_n=self._k,
         )
 
+        content_to_doc = {doc.page_content: doc for doc in initial_docs}
+
         reranked_docs = [
-            doc for doc in initial_docs if doc.page_content in reranked_texts
+            content_to_doc[text] for text in reranked_texts if text in content_to_doc
         ]
 
         return reranked_docs
 
-    async def get_contextual_compression(self, retriever):
-        llm = llm = ChatOpenAI(temperature=0, model_name="gpt-4o")
+    async def update_collection_by_file_id(self, file_id: str, new_collection_id: str):
+        try:
+            sql = sa.text(
+                """
+                UPDATE langchain_pg_embedding
+                SET collection_id = :new_collection_id
+                WHERE cmetadata->>'file_id' = :file_id
+                """
+            )
+            async with pgvector_session_manager.session() as db:
+                async with db.begin():
+                    await db.execute(
+                        sql,
+                        {"file_id": file_id, "new_collection_id": new_collection_id},
+                    )
+        except Exception as e:
+            log.error(f"Error updating collection_id for file_id={file_id}: {e}")
+            raise DatabaseException(str(e))
 
-        _filter = LLMListwiseRerank.from_llm(llm, top_n=self._k)
+    async def get_collection_id_by_name(self, name: str) -> Optional[str]:
+        try:
+            sql = sa.text(
+                """
+                SELECT uuid FROM langchain_pg_collection
+                WHERE name = :name
+                LIMIT 1
+                """
+            )
 
-        return ContextualCompressionRetriever(
-            base_compressor=_filter, base_retriever=retriever
-        )
+            async with pgvector_session_manager.session() as db:
+                result = await db.execute(sql, {"name": name})
+                row = result.fetchone()
+                return str(row[0]) if row else None
+        except Exception as e:
+            log.error(f"Error getting collection_id for name={name}: {e}")
+            raise DatabaseException(str(e))
 
 
 vector_store_service = VectorStore()

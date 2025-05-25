@@ -1,0 +1,8 @@
+,0
+context_precision,0.6999999999299998
+faithfulness,0.6838041628134505
+answer_relevancy,0.6756353979609976
+context_recall,0.5626862745098039
+answer_correctness,0.4655126985105242
+semantic_similarity,0.8703878712856511
+processing_time_sec,6.5801481800002515

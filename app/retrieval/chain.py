@@ -118,8 +118,6 @@ class Chain:
                 "best_improved_question_classifier.pkl",
             )
         )
-        print("model_path")
-        print(model_path)
         model_data = joblib.load(model_path)
         pipeline = model_data["pipeline"]
         cls.model = pipeline
@@ -194,15 +192,16 @@ class Chain:
     
             Anda adalah asisten yang dikembangkan oleh mahasiswi di Departemen Teknologi Informasi, Midyanisa Yuniar, sebagai bagian dari Tugas Akhir.
             
+            Karena ini adalah chatbot terintegrasi dengan WhatsApp dan terdapat limitation jumlah karakter sebanyak 1600 karakter. Maka setiap response yang kamu berikan harus dibawah 1600
+            
             Saat pengguna mengajukan pertanyaan:
             - Jawablah berdasarkan data yang tersedia dalam sistem.
             - Jika informasi tidak tersedia, sampaikan bahwa informasi tersebut tidak ada saat ini.
 
             Saat pengguna ingin MENAMBAHKAN DATA:
-            - Jika pengguna meminta Anda untuk menyimpan atau menambahkan data, gunakan tool `confirm_user_intent` terlebih dahulu untuk meminta persetujuan eksplisit pengguna sebelum menjalankan `servis_add_opportunity`.
+            - Jika pengguna meminta Anda untuk menyimpan atau menambahkan data, selalu tanyakan persetujuan pengguna.
             - Tanyakan detail yang relevan seperti nama, deskripsi, tanggal, dan informasi lain yang dibutuhkan.
             - Jika pengguna mengunggah gambar atau file, gunakan URL gambar yang tersedia dari sistem.
-            - Gunakan tool `servis_add_opportunity` **hanya jika pengguna telah memberikan izin eksplisit**.
             - Jangan menyimpan data secara otomatis tanpa persetujuan pengguna.
 
             Saat pengguna memberikan masukan, saran, atau kritik:
@@ -241,7 +240,9 @@ class Chain:
             output_parser=StrOutputParser(),
         )
 
-    def create_agent(self, model: str) -> CompiledGraph:
+    def create_agent(
+        self, model: str, custom_prompt: Optional[str] = None
+    ) -> CompiledGraph:
         if self._checkpointer is None:
             raise RuntimeError("Checkpointer is not initialized")
 
@@ -292,19 +293,20 @@ class Chain:
             #     description="Gunakan ini untuk meminta persetujuan pengguna sebelum menyimpan data.",
             #     args_schema=AskConsent,
             # ),
-            StructuredTool(
-                name="pilih_koleksi_terbaik",
-                coroutine=select_collection,
-                description="Pilih koleksi paling relevan dari daftar berdasarkan query pengguna",
-                args_schema=CollectionSelectorInput,
-            ),
         ]
+
+        if custom_prompt is not None:
+            prompt = custom_prompt
+        else:
+            prompt = self.agent_system_prompt(model)
+
+        print(prompt)
 
         return create_react_agent(
             model,
             tools,
             # checkpointer=self._checkpointer,
-            prompt=self.agent_system_prompt(model),
+            prompt=prompt,
         )
 
     async def init_checkpointer_connection(self):
@@ -356,23 +358,41 @@ class Chain:
             print(f"Chosen collection: {chosen_collection_name}")
 
             docs = []
+            # Hybrid Retriever with LLM-based Contextual Reranking
             hybrid_retriever = await vector_store_service.get_hybrid_retriever(
                 collection_name=chosen_collection_name,
             )
             docs = await hybrid_retriever.ainvoke(query)
 
+            # self query
+            # retriever = vector_store_service.get_self_query_retriever(
+            #     collection_name=chosen_collection_name, query=query
+            # )
+            # docs = await retriever.ainvoke(query)
+
+            # semantic similarity
+            # docs = await vector_store_service.async_similarity_search(
+            #     query, collection_name=chosen_collection_name
+            # )
+
+            # Hybrid Retrieval with CrossEncoder Reranking
+            # docs = await vector_store_service.retrieve_with_rerank(
+            #     query=query, collection_name=chosen_collection_name
+            # )
+
             print(f"Jumlah dokumen yang dikembalikan: {len(docs)}")
 
             # 3. Jika masih 0, fallback ke full semantic similarity search tanpa filter
             if len(docs) == 0:
+                # return "Tidak ditemukan dokumen relevan.", []
                 print("Fallback: menggunakan full-text search (tanpa filter metadata)")
                 docs = await vector_store_service.async_similarity_search(
                     query, collection_name=chosen_collection_name
                 )
                 print(f"Jumlah dokumen yang dikembalikan setelah fallback: {len(docs)}")
 
-            for doc in docs:
-                print(f"Document file name: {doc.metadata.get('file_name', 'unknown')}")
+            # for doc in docs:
+            #     print(f"Document file name: {doc.metadata.get('file_name', 'unknown')}")
 
             serialized = "\n\n".join(
                 f"Source: {doc.metadata}\nContent: {doc.page_content}" for doc in docs

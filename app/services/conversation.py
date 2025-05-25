@@ -40,10 +40,9 @@ class ConversationService:
 
     async def get_unique_conversation_items(
         self, skip: int = 0, limit: int = 100
-    ) -> list[dict[str, str | None]]:
+    ) -> dict[str, object]:
         try:
             async with session_manager.session() as db:
-                # Join Conversation with User on user_id
                 query = select(
                     Conversation.sender,
                     Conversation.user_id,
@@ -68,7 +67,21 @@ class ConversationService:
                             }
                         )
 
-                return unique_items[skip : skip + limit]
+                total = len(unique_items)
+                paginated_items = unique_items[skip : skip + limit]
+
+                return {
+                    "data": paginated_items,
+                    "meta": {
+                        "skip": skip,
+                        "limit": limit,
+                        "total": total,
+                        "is_next": skip + limit < total,
+                        "is_prev": skip > 0,
+                        "start": skip + 1 if total > 0 else 0,
+                        "end": min(skip + limit, total),
+                    },
+                }
 
         except Exception as e:
             raise DatabaseException(str(e))
@@ -78,12 +91,46 @@ class ConversationService:
     ):
         try:
             async with session_manager.session() as db:
-                return await conversations.get_multi(
-                    db=db,
-                    user_id=user_id,
-                    offset=skip,
-                    limit=limit,
+                stmt = (
+                    select(Conversation)
+                    .offset(skip)
+                    .limit(limit)
+                    .filter(Conversation.user_id == user_id)
+                    .order_by(Conversation.created_at.desc())
                 )
+                result = await db.execute(stmt)
+                conversations_list = result.scalars().all()
+
+                total = await conversations.count(db=db, user_id=user_id)
+
+                if not conversations_list:
+                    return {
+                        "data": [],
+                        "meta": {
+                            "skip": skip,
+                            "limit": limit,
+                            "total": total,
+                            "is_next": skip + limit < total,
+                            "is_prev": skip > 0,
+                            "start": skip + 1 if total > 0 else 0,
+                            "end": min(skip + limit, total),
+                        },
+                    }
+                return {
+                    "data": [
+                        ConversationReadModel.model_validate(c)
+                        for c in conversations_list
+                    ],
+                    "meta": {
+                        "skip": skip,
+                        "limit": limit,
+                        "total": total,
+                        "is_next": skip + limit < total,
+                        "is_prev": skip > 0,
+                        "start": skip + 1 if total > 0 else 0,
+                        "end": min(skip + limit, total),
+                    },
+                }
         except Exception as e:
             raise DatabaseException(str(e))
 
@@ -115,12 +162,45 @@ class ConversationService:
     ):
         try:
             async with session_manager.session() as db:
-                return await conversations.get_multi(
-                    db=db,
-                    sender=sender,
-                    offset=skip,
-                    limit=limit,
+                stmt = (
+                    select(Conversation)
+                    .offset(skip)
+                    .limit(limit)
+                    .filter(Conversation.sender == sender)
+                    .order_by(Conversation.created_at.desc())
                 )
+                result = await db.execute(stmt)
+                conversations_list = result.scalars().all()
+                total = await conversations.count(db=db, sender=sender)
+
+                if not conversations_list:
+                    return {
+                        "data": [],
+                        "meta": {
+                            "skip": skip,
+                            "limit": limit,
+                            "total": total,
+                            "is_next": skip + limit < total,
+                            "is_prev": skip > 0,
+                            "start": skip + 1 if total > 0 else 0,
+                            "end": min(skip + limit, total),
+                        },
+                    }
+                return {
+                    "data": [
+                        ConversationReadModel.model_validate(c)
+                        for c in conversations_list
+                    ],
+                    "meta": {
+                        "skip": skip,
+                        "limit": limit,
+                        "total": total,
+                        "is_next": skip + limit < total,
+                        "is_prev": skip > 0,
+                        "start": skip + 1 if total > 0 else 0,
+                        "end": min(skip + limit, total),
+                    },
+                }
         except Exception as e:
             raise DatabaseException(str(e))
 
@@ -153,6 +233,22 @@ class ConversationService:
         try:
             async with session_manager.session() as db:
                 await conversations.db_delete(db=db, id=id, allow_multiple=False)
+        except Exception as e:
+            raise DatabaseException(str(e))
+
+    async def delete_conversation_by_sender(self, sender: str):
+        try:
+            async with session_manager.session() as db:
+                await conversations.db_delete(db=db, sender=sender, allow_multiple=True)
+        except Exception as e:
+            raise DatabaseException(str(e))
+
+    async def delete_conversation_by_user_id(self, user_id: str):
+        try:
+            async with session_manager.session() as db:
+                await conversations.db_delete(
+                    db=db, user_id=user_id, allow_multiple=True
+                )
         except Exception as e:
             raise DatabaseException(str(e))
 

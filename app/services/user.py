@@ -1,6 +1,9 @@
 import logging
 from typing import Optional
 
+from sqlalchemy import func, or_
+from sqlalchemy.future import select
+
 from app.models.users import RegisterForm
 from app.core.database import session_manager
 from app.models.users import (
@@ -10,6 +13,7 @@ from app.models.users import (
     Role,
     UserReadModel,
     UserUpdateModel,
+    User,
 )
 from app.core.logger import SRC_LOG_LEVELS
 from app.core.exceptions import DatabaseException
@@ -20,7 +24,7 @@ log.setLevel(SRC_LOG_LEVELS["SERVICE"])
 
 class UserService:
     async def create_new_user(
-        self, full_name: str, email: str, password: str, role: Role
+        self, full_name: str, email: str, password: str, role: Role, phone_number: str
     ) -> Optional[UserReadModel]:
         try:
             async with session_manager.session() as db:
@@ -29,6 +33,7 @@ class UserService:
                     email=email,
                     password=password,
                     role=role.value,
+                    phone_number=phone_number,
                 )
                 new_user = await users.create(db=db, object=user, commit=True)
                 await db.refresh(new_user)
@@ -70,12 +75,68 @@ class UserService:
             log.error(f"Error get user by email: {e}")
             raise DatabaseException(str(e))
 
-    async def get_users(self, skip: Optional[int] = None, limit: Optional[int] = None):
+    async def get_user_by_user_id(
+        self, user_id: str
+    ) -> Optional[UserReadWithPasswordModel]:
         try:
             async with session_manager.session() as db:
-                return await users.get_multi(
-                    db=db, offset=skip, limit=limit, schema_to_select=UserReadModel
+                user = await users.get(
+                    db=db,
+                    user_id=user_id,
+                    schema_to_select=UserReadWithPasswordModel,
+                    return_as_model=True,
                 )
+
+                if not user:
+                    return None
+
+                return UserReadWithPasswordModel.model_validate(user)
+        except Exception as e:
+            log.error(f"Error get user by email: {e}")
+            raise DatabaseException(str(e))
+
+    async def get_users(
+        self,
+        skip: Optional[int] = 0,
+        limit: Optional[int] = 10,
+        search: Optional[str] = None,
+    ):
+        try:
+            async with session_manager.session() as db:
+                stmt = select(User)
+
+                if search:
+                    stmt = stmt.where(
+                        or_(
+                            User.full_name.ilike(f"%{search}%"),
+                            User.email.ilike(f"%{search}%"),
+                        )
+                    )
+
+                # Hitung total dulu (setelah filter)
+                count_stmt = select(func.count()).select_from(stmt.subquery())
+                total_result = await db.execute(count_stmt)
+                total = total_result.scalar() or 0
+
+                # Tambahkan offset & limit untuk paginasi
+                stmt = stmt.offset(skip).limit(limit)
+
+                result = await db.execute(stmt)
+                users_list = result.scalars().all()
+
+                return {
+                    "data": [UserReadModel.model_validate(u) for u in users_list],
+                    "meta": {
+                        "skip": skip,
+                        "limit": limit,
+                        "total": total,
+                        "is_next": skip + limit < total,
+                        "is_prev": skip > 0,
+                        "start": skip + 1 if total > 0 else 0,
+                        "end": min(skip + limit, total),
+                    },
+                }
+
         except Exception as e:
             log.error(f"Error get users: {e}")
             raise DatabaseException(str(e))
@@ -95,15 +156,21 @@ class UserService:
             raise DatabaseException(str(e))
 
     async def update_user_by_id(
-        self, id: str, data: UserUpdateModel
+        self, id: str, form_data: UserUpdateModel
     ) -> Optional[UserReadModel]:
         try:
             async with session_manager.session() as db:
-                await users.update(
+                updated_user = await users.update(
                     db=db,
-                    object=data.model_dump(),
+                    object=form_data,
                     id=id,
+                    commit=True,
+                    return_as_model=True,
+                    schema_to_select=User,
                 )
+                updated_user = await db.merge(updated_user)
+                await db.refresh(updated_user)
+                return UserReadModel.model_validate(updated_user)
         except Exception as e:
             log.error(f"Error updating user: {e}")
             raise DatabaseException(str(e))
