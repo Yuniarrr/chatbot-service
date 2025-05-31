@@ -229,6 +229,10 @@ async def update_file_by_id(
                 str(file_id), collection_id
             )
 
+            await vector_store_service.refetch_bm25(
+                collection_name=form_data.meta["collection_name"]
+            )
+
         update_file = FileUpdateModel(**{"status": FileStatus.SUCCESS})
         await file_service.update_file_by_id(file.id, update_file)
 
@@ -268,6 +272,8 @@ async def delete_file_by_id(
                 str(file_id),
                 FileUpdateModel(status=FileStatus.DETACHED),
             )
+
+        await vector_store_service.refetch_bm25(collection_name)
 
         return ResponseModel(status_code=200, message=SUCCESS_MESSAGE.DELETED)
     except Exception as e:

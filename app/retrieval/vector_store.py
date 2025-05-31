@@ -25,7 +25,6 @@ from app.core.database import pgvector_session_manager
 from app.core.exceptions import DatabaseException
 from app.env import PGVECTOR_DB_URL, VECTOR_TABLE_NAME, SENTENCE_TRANSFORMERS_HOME
 from app.core.logger import SRC_LOG_LEVELS
-from app.services.collection import collection_service
 
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["RAG"])
@@ -70,7 +69,7 @@ class VectorStore:
     def initialize_pg_vector(
         self, collection_name: Optional[str] = VECTOR_TABLE_NAME
     ) -> PGVector:
-        log.info("Initializing PGVector")
+        print("Initializing PGVector")
 
         if self._embedding_model == None:
             print("Embedding model not initialize")
@@ -285,6 +284,17 @@ class VectorStore:
         bm25 = BM25Retriever.from_texts(texts=texts, metadatas=metadatas)
         bm25.k = self._k
         self.bm25_cache[collection_name] = bm25
+
+    async def init_bm25(self):
+        from app.retrieval.chain import chain_service
+
+        print("init bm25 vector")
+        if not chain_service.collections_status:
+            await chain_service.init_collection_status()
+
+        for collection in chain_service.collections_status:
+            if collection["is_active"]:
+                await self.refetch_bm25(collection_name=collection["name"])
 
     async def get_hybrid_retriever(
         self,

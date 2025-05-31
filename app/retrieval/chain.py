@@ -71,6 +71,7 @@ class Chain:
 
     @classmethod
     async def init_collection_status(cls):
+        print("Init collection status")
         collections_list = await collection_service.get_active_collections()
         collections = collections_list.get("data", [])
         for c in collections:
@@ -98,6 +99,7 @@ class Chain:
 
     @classmethod
     def load_model_collection(cls):
+        print("Load model collection")
         model_path = os.path.abspath(
             os.path.join(
                 os.path.dirname(__file__),

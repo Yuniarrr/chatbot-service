@@ -161,13 +161,12 @@ async def process_file(
             meta=meta,
         )
 
-        print("disini ya")
-
         await vector_store_service.add_vectostore(splitted_document, collection_name)
 
-        print("ini update ya")
         update_file = FileUpdateModel(**{"status": FileStatus.SUCCESS})
         await file_service.update_file_by_id(_new_file.id, update_file)
+
+        await vector_store_service.refetch_bm25(collection_name)
     except Exception as e:
         update_file = FileUpdateModel(**{"status": FileStatus.FAILED})
         await file_service.update_file_by_id(_new_file.id, update_file)
