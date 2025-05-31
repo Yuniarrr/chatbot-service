@@ -63,7 +63,7 @@ class AgentState(TypedDict):
 
 
 class Chain:
-    collection_embeddings_cache = {}
+    collection_embeddings_cache = []
     model = None
 
     def __init__(self):
@@ -74,37 +74,19 @@ class Chain:
         collections_list = await collection_service.get_active_collections()
         collections = collections_list.get("data", [])
         for c in collections:
-            desc = f"{c['name']}: {c['description'] or ''}"
-            emb = vector_store_service._embedding_model.embed_query(desc)
-            cls.collection_embeddings_cache[c["name"]] = {
-                "embedding": emb,
-                "description": desc,
-            }
+            cls.collection_embeddings_cache.append(
+                {
+                    "name": c["name"],
+                    "is_active": c["is_active"],
+                }
+            )
 
     @classmethod
-    def pick_best_collection(cls, query: str, threshold=0.15) -> str | None:
-        if not cls.collection_embeddings_cache:
-            return None
-
-        query_embedding = vector_store_service._embedding_model.embed_query(query)
-        best_score = -1
-        best_name = None
-
-        for name, data in cls.collection_embeddings_cache.items():
-            score = cosine_similarity([query_embedding], [data["embedding"]])[0][0]
-            print(f"Similarity query vs collection '{name}': {score:.4f}")  # Debug
-            if score > best_score:
-                best_score = score
-                best_name = name
-
-        if best_score >= threshold:
-            print(f"Memilih koleksi '{best_name}' dengan skor {best_score:.4f}")
-            return best_name
-        else:
-            print(
-                f"Tidak ada koleksi yang melewati threshold {threshold}, best_score={best_score:.4f}"
-            )
-            return None
+    def is_collection_active(cls, chosen_collection_name: str):
+        for collection in cls.collection_embeddings_cache:
+            if collection["name"] == chosen_collection_name:
+                return collection["is_active"]
+        return False
 
     @classmethod
     def load_model_collection(cls):
@@ -349,6 +331,10 @@ class Chain:
             chosen_collection_name = agent_response
 
             print(f"Chosen collection: {chosen_collection_name}")
+
+            if not Chain.is_collection_active(chosen_collection_name):
+                print(f"Collection {chosen_collection_name} is not active.")
+                return "Tidak dapat menemukan dokumen yang relevan", []
 
             docs = []
             # Hybrid Retriever with LLM-based Contextual Reranking
