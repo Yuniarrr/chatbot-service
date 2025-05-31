@@ -26,6 +26,7 @@ from app.retrieval.chain import chain_service
 from app.services.conversation import conversation_service
 from app.services.uploader import uploader_service
 from app.env import ASSET_URL, TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN
+from app.utils.split import split_by_newline_before_limit
 from app.utils.twillio_util import download_twilio_media
 
 log = logging.getLogger(__name__)
@@ -281,7 +282,16 @@ async def process_in_background(form_data):
         await message_service.create_new_message(_new_chat_from_assistant)
 
         # Send AI response via Twilio
-        await asyncio.to_thread(send_whatsapp_message, sender, ai_content, to)
+        # MAX_LENGTH = 1599
+        # truncated_content = ai_content[:MAX_LENGTH]
+        # await asyncio.to_thread(send_whatsapp_message, sender, truncated_content, to)
+
+        contents = split_by_newline_before_limit(ai_content)
+
+        for part in contents:
+            print("part")
+            print(part)
+            await asyncio.to_thread(send_whatsapp_message, sender, part, to)
 
         print(f"Total processing time: {time.time() - start_time:.2f} seconds")
     except Exception as e:

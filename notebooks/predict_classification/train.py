@@ -863,7 +863,6 @@ def train_improved_classifier():
     with open("./notebooks/question.json", "r", encoding="utf-8") as f:
         data = json.load(f)
 
-    # Filter out invalid entries
     sample_data = [
         {
             "id": item["id"],
@@ -880,39 +879,19 @@ def train_improved_classifier():
     augmentor = TextAugmentor(model_name="t5-small")
     df = augment_minority_class(df, augmentor, imbalance_threshold=5, min_samples=10)
 
-    # Get data improvement suggestions
     suggest_data_improvements(df)
 
-    # Train with smart hyperparameter tuning
     print(f"\nTraining with {len(df)} samples...")
     accuracy = classifier.train_model(
         df,
         use_class_balancing=True,
         use_ensemble=True,
         min_samples_threshold=3,
-        enable_tuning=True,  # Enable smart hyperparameter tuning
+        enable_tuning=True,
     )
 
     print(f"\nFinal model accuracy: {accuracy:.4f}")
 
-    # Test predictions
-    test_questions = [
-        "Siapa dosen pengajar mata kuliah pemrograman?",
-        "Kapan wisuda dilaksanakan?",
-        "Apa persyaratan untuk mengikuti MBKM?",
-    ]
-
-    print(f"\n" + "=" * 60)
-    print("TESTING PREDICTIONS")
-    print("=" * 60)
-
-    for question in test_questions:
-        prediction, confidence = classifier.predict(question)
-        print(f"Q: {question}")
-        print(f"A: {prediction} (confidence: {confidence:.3f})")
-        print()
-
-    # Save the best model
     classifier.save_model("./notebooks/test/improved_question_classifier.pkl")
 
     return classifier, accuracy

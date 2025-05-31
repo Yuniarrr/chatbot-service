@@ -62,7 +62,7 @@ async def main():
         question_data = json.load(f)
 
     with open(
-        rf"{PARENT_DIR}/notebooks/evaluate/prompting/skenario_4/skenario_4.txt",
+        rf"{PARENT_DIR}/notebooks/evaluate/prompting/skenario_3/skenario_3.txt",
         "r",
         encoding="utf-8",
     ) as f:
@@ -156,22 +156,22 @@ async def main():
     # df["processing_time_sec"] = processing_times
 
     df.to_csv(
-        f"{PARENT_DIR}/notebooks/evaluate/prompting/skenario_4/evaluation_result_skenario_4.csv",
+        f"{PARENT_DIR}/notebooks/evaluate/prompting/skenario_3/evaluation_result_skenario_3.csv",
         index=False,
     )
     df.to_excel(
-        f"{PARENT_DIR}/notebooks/evaluate/prompting/skenario_4/evaluation_result_skenario_4.xlsx",
+        f"{PARENT_DIR}/notebooks/evaluate/prompting/skenario_3/evaluation_result_skenario_3.xlsx",
         index=False,
     )
 
     pd.DataFrame(evaluation_data).to_csv(
-        f"{PARENT_DIR}/notebooks/evaluate/prompting/skenario_4/raw_evaluation_data_skenario_4.csv",
+        f"{PARENT_DIR}/notebooks/evaluate/prompting/skenario_3/raw_evaluation_data_skenario_3.csv",
         index=False,
     )
 
     average_scores = df.mean(numeric_only=True)
     average_scores.to_csv(
-        f"{PARENT_DIR}/notebooks/evaluate/prompting/skenario_4/average_scores_skenario_4.csv"
+        f"{PARENT_DIR}/notebooks/evaluate/prompting/skenario_3/average_scores_skenario_3.csv"
     )
     print("\nRata-rata setiap metrik:")
     print(average_scores)
@@ -181,12 +181,12 @@ async def main():
     df.drop(columns=["question"], inplace=True)
     df.mean(numeric_only=True)
     df.to_csv(
-        f"{PARENT_DIR}/notebooks/evaluate/prompting/skenario_4/evaluation_result_skenario_4_with_time.csv",
+        f"{PARENT_DIR}/notebooks/evaluate/prompting/skenario_3/evaluation_result_skenario_3_with_time.csv",
         index=False,
     )
     average_scores = df.mean(numeric_only=True)
     average_scores.to_csv(
-        f"{PARENT_DIR}/notebooks/evaluate/prompting/skenario_4/average_scores_skenario_4_with_time.csv"
+        f"{PARENT_DIR}/notebooks/evaluate/prompting/skenario_3/average_scores_skenario_3_with_time.csv"
     )
 
 

@@ -35,19 +35,13 @@ class User(Base):
 
     full_name: Mapped[Union[str, None]] = mapped_column(String(40))
     email: Mapped[str] = mapped_column(String(40), unique=True)
-    phone_number: Mapped[Union[str, None]] = mapped_column(
-        String(20), unique=True, nullable=True
-    )
+    phone_number: Mapped[Union[str, None]] = mapped_column(String(20), nullable=True)
     password: Mapped[Union[str, None]] = mapped_column(String(255), nullable=True)
     role: Mapped[Role] = mapped_column(
         SQLEnum(Role),
         default=Role.USER,
         nullable=False,
     )
-
-    profile_picture: Mapped[Union[str, None]] = mapped_column(Text, nullable=True)
-    nrp: Mapped[Union[str, None]] = mapped_column(String, nullable=True)
-    nip: Mapped[Union[str, None]] = mapped_column(String, nullable=True)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(ZoneInfo("UTC"))
@@ -100,9 +94,6 @@ class UserBaseModel(BaseModel):
     phone_number: Optional[str] = None
     # password: Optional[str] = None
     role: Optional[Role] = None
-    profile_picture: Optional[str] = None
-    nrp: Optional[str] = None
-    nip: Optional[str] = None
     created_at: Optional[datetime] = None
     updated_at: Optional[datetime] = None
 
@@ -145,9 +136,6 @@ class UserUpdateModel(BaseModel):
     phone_number: Optional[str] = None
     password: Optional[str] = None
     role: Optional[Role] = None
-    # profile_picture: Optional[str] = None
-    # nrp: Optional[str] = None
-    # nip: Optional[str] = None
 
 
 class UserUpdateInternalModel(UserUpdateModel):

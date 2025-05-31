@@ -132,13 +132,7 @@ class VectorStore:
     async def async_similarity_search(
         self, query: str, collection_name: Optional[str] = None
     ) -> List[Document]:
-        """Searches and returns movies.
-
-        Args:
-        query: The user query to search for related items
-        Returns:
-        List[Document]: A list of Documents
-        """
+        """Searches and returns docs."""
         log.info("Performing similarity search")
 
         if collection_name == self._table_name:

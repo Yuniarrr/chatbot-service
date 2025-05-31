@@ -188,25 +188,20 @@ class Chain:
             Jangan membuat ringkasan PDF, menyimpulkan dari dokumen tidak relevan, atau menyebut institusi lain.
             """
         else:
-            return """Anda adalah CATI, asisten virtual yang membantu pengguna dengan menjawab pertanyaan seputar administarasi dan informasi mengenai Departemen Teknologi Informasi di Institut Teknologi Sepuluh Nopember.
-    
-            Anda adalah asisten yang dikembangkan oleh mahasiswi di Departemen Teknologi Informasi, Midyanisa Yuniar, sebagai bagian dari Tugas Akhir.
-            
-            Karena ini adalah chatbot terintegrasi dengan WhatsApp dan terdapat limitation jumlah karakter sebanyak 1600 karakter. Maka setiap response yang kamu berikan harus dibawah 1600
-            
-            Saat pengguna mengajukan pertanyaan:
-            - Jawablah berdasarkan data yang tersedia dalam sistem.
-            - Jika informasi tidak tersedia, sampaikan bahwa informasi tersebut tidak ada saat ini.
+            return """Anda adalah CATI, asisten virtual untuk Departemen Teknologi Informasi ITS. Anda adalah asisten yang dikembangkan oleh mahasiswi di Departemen Teknologi Informasi, Midyanisa Yuniar, sebagai bagian dari Tugas Akhir. Anda akan menjawab pertanyaan berdasarkan dokumen yang tersedia, dan dapat menggunakan tool berikut jika diperlukan:
 
-            Saat pengguna ingin MENAMBAHKAN DATA:
-            - Jika pengguna meminta Anda untuk menyimpan atau menambahkan data, selalu tanyakan persetujuan pengguna.
-            - Tanyakan detail yang relevan seperti nama, deskripsi, tanggal, dan informasi lain yang dibutuhkan.
-            - Jika pengguna mengunggah gambar atau file, gunakan URL gambar yang tersedia dari sistem.
-            - Jangan menyimpan data secara otomatis tanpa persetujuan pengguna.
+            - `retrieve`: mengambil informasi dari RAG.
+            - `servis_pengiriman_email`: mengirimkan email.
+            - `servis_tambah_jadwal_ke_kalender`: menambahkan jadwal ke kalender.
+            - `servis_simpan_feedback`: menyimpan saran atau kritik pengguna.
+            - `servis_get_opportunity`: mengambil data acara atau kegiatan.
+            - `servis_add_opportunity`: menyimpan data acara atau kegiatan.
 
-            Saat pengguna memberikan masukan, saran, atau kritik:
-            - Tanyakan apakah mereka ingin menyimpan feedback tersebut.
-            - Gunakan tool `servis_simpan_feedback` untuk menyimpannya jika mereka setuju.
+            Contoh:
+            Pengguna: Saya ingin menambahkan acara seminar.
+            Asisten: Apakah Anda ingin menyimpan informasi ini ke sistem? Saya butuh izin Anda.
+            Pengguna: Iya, silakan simpan.
+            Asisten: Baik, tolong berikan detail acara seperti nama, tanggal, dan deskripsi.
 
             Setelah menyelesaikan setiap interaksi:
             - Selalu tanyakan apakah pengguna memiliki saran atau feedback untuk chatbot ini.
@@ -215,7 +210,6 @@ class Chain:
 
     def init_llm(self, model: Optional[str] = "llama"):
         if model == "llama":
-            # return OllamaLLM(model=RAG_MODEL, base_url=RAG_OLLAMA_BASE_URL)
             return init_chat_model(
                 model="llama3.2",
                 model_provider="ollama",
@@ -229,7 +223,6 @@ class Chain:
             return init_chat_model(
                 "gemini-2.0-flash-001", model_provider="google_genai"
             )
-            # model = init_chat_model("gemini-2.0-flash-001", model_provider="google_vertexai")
         elif model == "openai":
             return init_chat_model("gpt-4o", model_provider="openai")
 
@@ -305,7 +298,7 @@ class Chain:
         return create_react_agent(
             model,
             tools,
-            # checkpointer=self._checkpointer,
+            checkpointer=self._checkpointer,
             prompt=prompt,
         )
 
@@ -366,7 +359,7 @@ class Chain:
 
             # self query
             # retriever = vector_store_service.get_self_query_retriever(
-            #     collection_name=chosen_collection_name, query=query
+            #     collection_name=chosen_collection_name
             # )
             # docs = await retriever.ainvoke(query)
 
