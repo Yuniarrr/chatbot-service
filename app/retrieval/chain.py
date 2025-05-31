@@ -63,18 +63,18 @@ class AgentState(TypedDict):
 
 
 class Chain:
-    collection_embeddings_cache = []
+    collections_status = []
     model = None
 
     def __init__(self):
         self._checkpointer = None
 
     @classmethod
-    async def init_collection_embeddings(cls):
+    async def init_collection_status(cls):
         collections_list = await collection_service.get_active_collections()
         collections = collections_list.get("data", [])
         for c in collections:
-            cls.collection_embeddings_cache.append(
+            cls.collections_status.append(
                 {
                     "name": c["name"],
                     "is_active": c["is_active"],
@@ -83,9 +83,17 @@ class Chain:
 
     @classmethod
     def is_collection_active(cls, chosen_collection_name: str):
-        for collection in cls.collection_embeddings_cache:
+        for collection in cls.collections_status:
             if collection["name"] == chosen_collection_name:
                 return collection["is_active"]
+        return False
+
+    @classmethod
+    def update_collection_status(cls, collection_name: str, is_active: bool):
+        for c in cls.collections_status:
+            if c["name"] == collection_name:
+                c["is_active"] = is_active
+                return True
         return False
 
     @classmethod

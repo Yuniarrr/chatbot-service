@@ -58,9 +58,9 @@ async def lifespan(app: FastAPI):
     vector_store_service.initialize_pg_vector()
     chain_service.load_model_collection()
     await pgvector_session_manager.initialize()
-    await chain_service.init_collection_embeddings()
+    await chain_service.init_collection_status()
     print("chain_service.collection_embeddings_cache")
-    print(chain_service.collection_embeddings_cache)
+    print(chain_service.collections_status)
     DB_URI = f"postgresql://{DATABASE_URL}?sslmode=disable"
     connection_kwargs = {
         "autocommit": True,

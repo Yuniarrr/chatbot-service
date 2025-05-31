@@ -1,21 +1,23 @@
 import logging
-import os
 import uuid
 
-from typing import Annotated, Optional
-from fastapi import APIRouter, Form, Query, Request, UploadFile, File, Depends
+from typing import Optional
+from fastapi import APIRouter, Depends
 
 from app.core.constants import ERROR_MESSAGES, SUCCESS_MESSAGE
-from app.core.exceptions import InternalServerException, NotFoundException
+from app.core.exceptions import (
+    InternalServerException,
+    NotFoundException,
+    BadRequestException,
+)
 from app.core.response import ResponseModel
 from app.core.logger import SRC_LOG_LEVELS
 from app.models.collections import UpdateCollectionForm
-from app.models.conversations import ConversationForm
 from app.utils.auth import (
-    TokenData,
     get_verified_user,
 )
 from app.services.collection import collection_service
+from app.retrieval.chain import chain_service
 
 log = logging.getLogger(__name__)
 log.setLevel(SRC_LOG_LEVELS["ROUTER"])
@@ -46,6 +48,13 @@ async def get_collection(
 
         if is_col_exist is None:
             raise NotFoundException(ERROR_MESSAGES.NOT_FOUND("Collection"))
+
+        update_status = chain_service.update_collection_status(
+            collection_name=is_col_exist.name, is_active=form_data.status
+        )
+
+        if not update_status:
+            raise BadRequestException("Gagal memperbarui status")
 
         update_col = await collection_service.update_status_by_collection_id(
             collection_id=collection_id, status=form_data.status
