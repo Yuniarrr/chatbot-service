@@ -2,7 +2,7 @@ import logging
 from typing import Optional
 
 from sqlalchemy.future import select
-from sqlalchemy.sql import or_, join
+from sqlalchemy.sql import or_, join, desc
 
 from app.core.database import session_manager
 from app.models.conversations import (
@@ -220,7 +220,15 @@ class ConversationService:
     async def get_one_conversation_by_sender(self, sender: str):
         try:
             async with session_manager.session() as db:
-                conversation = await conversations.get(db=db, sender=sender)
+                query = (
+                    select(Conversation)
+                    .where(Conversation.sender == sender)
+                    .order_by(desc(Conversation.created_at))
+                    .limit(1)
+                )
+
+                result = await db.execute(query)
+                conversation = result.scalar_one_or_none()
 
                 if not conversation:
                     return None

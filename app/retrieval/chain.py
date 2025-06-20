@@ -188,6 +188,16 @@ class Chain:
             - `servis_simpan_feedback`: menyimpan saran atau kritik pengguna.
             - `servis_get_opportunity`: mengambil data acara atau kegiatan.
             - `servis_add_opportunity`: menyimpan data acara atau kegiatan.
+            
+            Jika pengguna tampak bingung atau tidak tahu harus mulai dari mana, bantu arahkan dengan memberikan beberapa pilihan atau contoh topik yang bisa ditanyakan, seperti:
+            - Jadwal perkuliahan
+            - Informasi dosen
+            - Kegiatan ARA
+            - Menambahkan acara ke kalender
+            
+            Jika dalam proses pencarian data melalui RAG tidak ditemukan informasi yang relevan, informasikan kepada pengguna bahwa mereka dapat menghubungi Tata Usaha Departemen Teknologi Informasi ITS untuk bantuan lebih lanjut.
+            
+            Selalu lakukan validasi sebelum menyimpan data ke sistem. Misalnya, jika pengguna ingin menambahkan acara atau kegiatan, pastikan data yang diberikan benar. Jika data yang diberikan tidak sesuai, maka jangan simpan data tersebut.
 
             Contoh:
             Pengguna: Saya ingin menambahkan acara seminar.

@@ -53,6 +53,8 @@ class VectorStore:
         self._k = 7
         self._total_docs = []
         self.bm25_cache = {}
+        self.vector_store_cache = {}
+        self.llm = ChatOpenAI(temperature=0, model_name="gpt-4o")
 
     def initialize_embedding_model(
         self, sentence_transformers_home: Optional[str] = None
@@ -285,6 +287,10 @@ class VectorStore:
         bm25.k = self._k
         self.bm25_cache[collection_name] = bm25
 
+    async def refetch_vector_store(self, collection_name: str):
+        vector_store = self.initialize_pg_vector(collection_name)
+        self.vector_store_cache[collection_name] = vector_store
+
     async def init_bm25(self):
         from app.retrieval.chain import chain_service
 
@@ -296,6 +302,17 @@ class VectorStore:
             if collection["is_active"]:
                 await self.refetch_bm25(collection_name=collection["name"])
 
+    async def init_vector_store(self):
+        from app.retrieval.chain import chain_service
+
+        print("init vector store")
+        if not chain_service.collections_status:
+            await chain_service.init_collection_status()
+
+        for collection in chain_service.collections_status:
+            if collection["is_active"]:
+                await self.refetch_vector_store(collection_name=collection["name"])
+
     async def get_hybrid_retriever(
         self,
         collection_name: str,
@@ -306,9 +323,12 @@ class VectorStore:
         if collection_name not in self.bm25_cache:
             await self.refetch_bm25(collection_name)
 
+        if collection_name not in self.vector_store_cache:
+            await self.refetch_vector_store(collection_name)
+
         bm25_retriever = self.bm25_cache[collection_name]
 
-        vector_store = self.initialize_pg_vector(collection_name)
+        vector_store = self.vector_store_cache[collection_name]
 
         vector_retriever = vector_store.as_retriever(search_kwargs={"k": k})
 
@@ -316,9 +336,9 @@ class VectorStore:
             retrievers=[bm25_retriever, vector_retriever], weights=[0.5, 0.5]
         )
 
-        llm = llm = ChatOpenAI(temperature=0, model_name="gpt-4o")
+        # llm = ChatOpenAI(temperature=0, model_name="gpt-4o")
 
-        _filter = LLMListwiseRerank.from_llm(llm, top_n=top_n)
+        _filter = LLMListwiseRerank.from_llm(self.llm, top_n=top_n)
 
         return ContextualCompressionRetriever(
             base_compressor=_filter, base_retriever=ensemble_retriever

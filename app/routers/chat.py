@@ -163,12 +163,10 @@ async def reply(request: Request, background_tasks: BackgroundTasks):
     form_data = await request.form()
     print(form_data)
 
-    # Quick ACK for Twilio webhook
     fast_resp = MessagingResponse()
     fast_resp.message("Pesan Anda sedang diproses...")
     response = Response(content=str(fast_resp), media_type="application/xml")
 
-    # Trigger background processing
     background_tasks.add_task(process_in_background, form_data)
 
     return response
@@ -184,7 +182,6 @@ async def process_in_background(form_data):
     try:
         start_time = time.time()
 
-        # Parallel media download and conversation fetch
         media_task = download_twilio_media(media_url) if media_url else asyncio.sleep(0)
         conversation_task = conversation_service.get_one_conversation_by_sender(sender)
         media, conversation = await asyncio.gather(media_task, conversation_task)
@@ -209,18 +206,14 @@ async def process_in_background(form_data):
                     "image_url": {"url": media["final_url"]},
                 }
             )
-        elif isinstance(media, dict) and media.get("content_type", "").startswith(
-            "application/"
-        ):
-            content_blocks.append(
-                {
-                    "type": "file",
-                    "source_type": "base64",
-                    "data": media["file_data"],
-                    "mime_type": media["content_type"],
-                    "filename": media["filename"],
-                }
+        elif isinstance(media, dict):
+            await asyncio.to_thread(
+                send_whatsapp_message,
+                sender,
+                "Maaf untuk saat ini, file yang diunggah tidak didukung. Hanya gambar yang diperbolehkan.",
+                to,
             )
+            return
 
         _new_chat_from_user = MessageCreateModel(
             **{
@@ -281,11 +274,6 @@ async def process_in_background(form_data):
         )
         await message_service.create_new_message(_new_chat_from_assistant)
 
-        # Send AI response via Twilio
-        # MAX_LENGTH = 1599
-        # truncated_content = ai_content[:MAX_LENGTH]
-        # await asyncio.to_thread(send_whatsapp_message, sender, truncated_content, to)
-
         contents = split_by_newline_before_limit(ai_content)
 
         for part in contents:
@@ -293,6 +281,12 @@ async def process_in_background(form_data):
             print(part)
             await asyncio.to_thread(send_whatsapp_message, sender, part, to)
 
+        await asyncio.to_thread(
+            send_whatsapp_message,
+            sender,
+            f"Total processing time: {time.time() - start_time:.2f} seconds",
+            to,
+        )
         print(f"Total processing time: {time.time() - start_time:.2f} seconds")
     except Exception as e:
         log.exception("Error processing message")

@@ -167,6 +167,7 @@ async def process_file(
         await file_service.update_file_by_id(_new_file.id, update_file)
 
         await vector_store_service.refetch_bm25(collection_name)
+        await vector_store_service.refetch_vector_store(collection_name)
     except Exception as e:
         update_file = FileUpdateModel(**{"status": FileStatus.FAILED})
         await file_service.update_file_by_id(_new_file.id, update_file)
