@@ -24,7 +24,7 @@ log.setLevel(SRC_LOG_LEVELS["SERVICE"])
 
 class UserService:
     async def create_new_user(
-        self, full_name: str, email: str, password: str, role: Role, phone_number: str
+        self, full_name: str, email: str, password: str, role: Role, phone_number: Optional[str] = None
     ) -> Optional[UserReadModel]:
         try:
             async with session_manager.session() as db:
