@@ -218,8 +218,10 @@ class Chain:
                 configurable_fields={"base_url": RAG_OLLAMA_BASE_URL},
             )
         elif model == "deepseek":
-            return OllamaLLM(
-                model="deepseek-r1:1.5b", base_url="http://34.101.167.227:11434"
+            return init_chat_model(
+                model="deepseek-r1:8b",
+                model_provider="ollama",
+                configurable_fields={"base_url": RAG_OLLAMA_BASE_URL},
             )
         elif model == "gemini":
             return init_chat_model(
@@ -227,6 +229,12 @@ class Chain:
             )
         elif model == "openai":
             return init_chat_model("gpt-4o", model_provider="openai")
+        elif model == "qwen":
+            return init_chat_model(
+                "qwen3:8b",
+                model_provider="ollama",
+                configurable_fields={"base_url": RAG_OLLAMA_BASE_URL},
+            )
 
     def get_chain(self):
         return create_stuff_documents_chain(

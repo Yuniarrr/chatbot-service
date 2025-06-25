@@ -132,10 +132,7 @@ extra_meta = {
     "name": "jadwal-mata-kuliah.xlsx",
     "content_type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     "size": 80806,
-    "collection_name": "perkuliahan",
-    "document_type": "mata kuliah",
-    "topik": "jadwal mata kuliah di departemen teknologi informasi",
-    "tahun_ajaran": "2024/2025",
+    "collection_name": "perkuliahan"
 }
 
 docs = [

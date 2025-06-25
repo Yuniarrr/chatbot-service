@@ -13,6 +13,8 @@ from sse_starlette import EventSourceResponse
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
 from twilio.twiml.messaging_response import MessagingResponse, Message
 from fastapi.responses import Response
+from datetime import datetime
+from zoneinfo import ZoneInfo
 
 from app.core.constants import ERROR_MESSAGES
 from app.core.exceptions import InternalServerException, NotFoundException
@@ -34,6 +36,8 @@ log.setLevel(SRC_LOG_LEVELS["ROUTER"])
 
 
 router = APIRouter()
+
+now = datetime.now(ZoneInfo("Asia/Jakarta")).strftime("%Y-%m-%d %H:%M:%S")
 
 
 @router.post("/", response_model=ResponseModel)
@@ -119,7 +123,8 @@ async def chat_to_assistant(
 
             messages = [
                 SystemMessage(
-                    content=f"User ID atau sender pesan adalah: {current_user.id}"
+                    content=f"User ID atau sender pesan adalah: {current_user.id}. "
+                            f"Permintaan dibuat pada: {now}."
                 ),
                 HumanMessage(content=content_blocks),
             ]
@@ -239,6 +244,7 @@ async def process_in_background(form_data):
                 + (
                     f"User telah mengunggah gambar yang mungkin berisi informasi untuk disimpan. "
                     f"Gunakan URL ini sebagai image_url jika perlu menyimpan data: {ASSET_URL}/{media['filename']}."
+                    f"Permintaan dibuat pada: {now}."
                     if media and isinstance(media, dict)
                     else ""
                 )
