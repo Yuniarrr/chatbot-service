@@ -33,6 +33,10 @@ def on_message(client, userdata, msg):
             nomor = raw_nomor.strip().split()[0]
             isi = isi.strip()
 
+            if not isi:
+                print("⚠️ Pesan kosong, dilewati")
+                return
+
             # Ganti awalan 62 dengan 0
             if nomor.startswith("62"):
                 nomor = "0" + nomor[2:]

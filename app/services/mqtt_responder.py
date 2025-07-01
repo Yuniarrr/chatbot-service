@@ -92,6 +92,9 @@ async def mqtt_loop():
             nomor = msg["nomor"].strip()
             isi = msg["isi"].strip()
 
+            if not isi:
+                continue
+
             try:
                 ai_contents, duration = await process_with_ai(isi, nomor)
                 answer = f"{nomor} << {ai_contents[-1] if ai_contents else '(kosong)'}"
