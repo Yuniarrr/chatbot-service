@@ -46,6 +46,7 @@ from app.services.list_tool import (
     AddNewOpportunityInputSchema,
     add_new_opportunity,
     QueryInput,
+    preview_email,
     ask_consent_tool,
     AskConsent,
     CollectionSelectorInput,
@@ -289,6 +290,12 @@ class Chain:
                 "pada SystemMessage (contoh: https://example.com/image.jpg).",
                 args_schema=AddNewOpportunityInputSchema,
                 coroutine=add_new_opportunity,
+            ),
+            StructuredTool(
+                name="preview_email_template",
+                func=preview_email,
+                description="Menampilkan template email untuk dikonfirmasi oleh user sebelum dikirim.",
+                args_schema=EmailInputSchema,
             ),
             # StructuredTool(
             #     name="ask_consent_tool",

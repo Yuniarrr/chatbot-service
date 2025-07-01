@@ -122,6 +122,16 @@ def send_email(email: str, subject: str, body: str) -> str:
         return "Gagal mengirimkan email"
 
 
+def preview_email(email: str, subject: str, body: str) -> str:
+    return (
+        f"Preview Email: \n"
+        f"Kepada: {email}\n"
+        f"Subjek: {subject}\n"
+        f"Isi: {body}\n"
+        f"Apakah Anda ingin mengirim email ini?"
+    )
+
+
 class CalendarInputSchema(BaseModel):
     summary: str
     start_datetime: datetime
