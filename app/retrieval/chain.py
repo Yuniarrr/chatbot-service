@@ -1,7 +1,7 @@
 import logging
 import os
 import json
-from typing import Annotated, Optional, TypedDict
+from typing import Annotated, List, Optional, TypedDict
 import operator
 import asyncio
 import joblib
@@ -17,7 +17,7 @@ from langchain.chat_models import init_chat_model
 from langgraph.prebuilt import create_react_agent
 from langchain.agents import initialize_agent, Tool, AgentExecutor
 from langchain.chains import retrieval
-from langchain_core.messages import BaseMessage, FunctionMessage
+from langchain_core.messages import BaseMessage, FunctionMessage, SystemMessage
 from sqlalchemy import Sequence
 from langchain_core.runnables import RunnableLambda, Runnable
 from langchain_core.tools import tool
@@ -69,6 +69,7 @@ class Chain:
 
     def __init__(self):
         self._checkpointer = None
+        self.max_messages = 3
 
     @classmethod
     async def init_collection_status(cls):
@@ -117,6 +118,26 @@ class Chain:
 
     def set_checkpointer(self, checkpointer: AsyncPostgresSaver):
         self._checkpointer = checkpointer
+        
+    def limit_messages(self, messages: List[BaseMessage], max_count: int = None) -> List[BaseMessage]:
+        """
+        Batasi pesan yang dikirim ke agent, hanya ambil pesan terakhir
+        """
+        if max_count is None:
+            max_count = self.max_messages
+            
+        if len(messages) <= max_count:
+            return messages
+            
+        # Pisahkan system messages dan messages lainnya
+        system_messages = [msg for msg in messages if isinstance(msg, SystemMessage)]
+        other_messages = [msg for msg in messages if not isinstance(msg, SystemMessage)]
+        
+        # Ambil pesan terakhir sesuai limit
+        recent_messages = other_messages[-max_count:]
+        
+        # Gabungkan system messages dengan recent messages
+        return system_messages + recent_messages        
 
     def init_prompt(self):
         system_msg = (
@@ -315,8 +336,6 @@ class Chain:
             prompt = custom_prompt
         else:
             prompt = self.agent_system_prompt(model)
-
-        print(prompt)
 
         return create_react_agent(
             model,

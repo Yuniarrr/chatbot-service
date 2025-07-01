@@ -3,7 +3,8 @@ import time
 import hashlib
 import json
 from datetime import datetime
-from langchain_core.messages import HumanMessage, AIMessage, SystemMessage
+from typing import List
+from langchain_core.messages import HumanMessage, AIMessage, SystemMessage, BaseMessage
 import paho.mqtt.client as mqtt
 
 from app.env import (
@@ -55,23 +56,70 @@ client.on_connect = on_connect
 client.loop_start()
 # client.on_message = on_message
 
+def limit_conversation_messages(messages: List[BaseMessage], max_count: int = 3) -> List[BaseMessage]:
+    """
+    Fungsi helper untuk membatasi pesan percakapan
+    """
+    if len(messages) <= max_count:
+        return messages
+    
+    # Pisahkan system messages dan messages lainnya
+    system_messages = [msg for msg in messages if isinstance(msg, SystemMessage)]
+    other_messages = [msg for msg in messages if not isinstance(msg, SystemMessage)]
+    
+    # Ambil pesan terakhir sesuai limit (tidak termasuk system messages)
+    recent_messages = other_messages[-max_count:]
+    
+    return system_messages + recent_messages
 
-async def process_with_ai(message: str, sender: str):
+async def process_with_ai(message: str, sender: str, max_recent_messages: int = 3):
     start_time = time.time()
     conversation_id = hashlib.md5(sender.encode()).hexdigest()
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-    content_blocks = [{"type": "text", "text": message}]
-    messages = [
-        SystemMessage(content=f"Sender: {sender}. Timestamp: {now}."),
-        HumanMessage(content=content_blocks),
-    ]
-
+    
+    config = {"configurable": {"thread_id": conversation_id}}
     agent_executor = chain_service.create_agent("openai")
-    response = await agent_executor.ainvoke(
-        {"messages": messages},
-        {"configurable": {"thread_id": conversation_id}},
-    )
+
+    try:
+        # Ambil state saat ini untuk mendapatkan riwayat pesan
+        current_state = await agent_executor.aget_state(config)
+        existing_messages = current_state.values.get("messages", [])
+        
+        # Buat pesan baru
+        content_blocks = [{"type": "text", "text": message}]
+        new_message = HumanMessage(content=content_blocks)
+        
+        # Gabungkan dengan pesan yang ada
+        all_messages = existing_messages + [new_message]
+        
+        # LIMIT PESAN: Hanya ambil pesan terakhir
+        limited_messages = limit_conversation_messages(all_messages, max_recent_messages)
+        
+        # Tambahkan system message dengan info terbaru
+        system_msg = SystemMessage(content=f"Sender: {sender}. Timestamp: {now}.")
+        final_messages = [system_msg] + [msg for msg in limited_messages if not isinstance(msg, SystemMessage)]
+        
+        print(f"Sending {len(final_messages)} messages to agent (limited from {len(all_messages)})")
+        
+        # Invoke dengan pesan yang sudah dibatasi
+        response = await agent_executor.ainvoke(
+            {"messages": final_messages},
+            config,
+        )
+        
+    except Exception as e:
+        print(f"Error getting conversation history: {e}")
+        # Fallback: kirim hanya pesan baru
+        content_blocks = [{"type": "text", "text": message}]
+        messages = [
+            SystemMessage(content=f"Sender: {sender}. Timestamp: {now}."),
+            HumanMessage(content=content_blocks),
+        ]
+        
+        response = await agent_executor.ainvoke(
+            {"messages": messages},
+            config,
+        )
 
     ai_messages = [
         msg.content
