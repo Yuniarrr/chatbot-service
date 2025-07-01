@@ -30,8 +30,30 @@ def on_connect(client, userdata, flags, rc):
         print("❌ MQTT failed with code:", rc)
 
 
+def on_message(client, userdata, msg):
+    try:
+        message = msg.payload.decode()
+        print(f"\n📩 [INCOMING] {message}")
+
+        if ">>" in message:
+            raw_nomor, isi = message.split(">>")
+            nomor = raw_nomor.strip().split()[0]
+            isi = isi.strip()
+
+            if nomor.startswith("62"):
+                nomor = "0" + nomor[2:]
+
+            add_to_queue({"nomor": nomor, "isi": isi})
+            print(f"📥 [QUEUED] {nomor} : {isi}")
+        else:
+            print("⚠️ Format tidak sesuai")
+    except Exception as e:
+        print("❗ MQTT msg error:", e)
+
+
 client.on_connect = on_connect
 client.loop_start()
+# client.on_message = on_message
 
 
 async def process_with_ai(message: str, sender: str):
