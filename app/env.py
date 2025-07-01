@@ -169,3 +169,14 @@ ASSET_URL = BASE_URL + "/" + PY_ENV + "/uploads"
 
 TWILIO_ACCOUNT_SID = os.environ.get("TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = os.environ.get("TWILIO_AUTH_TOKEN")
+
+####################################
+# MQTT
+####################################
+MQTT_USERNAME = os.environ.get("MQTT_USERNAME")
+MQTT_PASSWORD = os.environ.get("MQTT_PASSWORD")
+MQTT_RECV_TOPIC = os.environ.get("MQTT_RECV_TOPIC")
+MQTT_SEND_TOPIC = os.environ.get("MQTT_SEND_TOPIC")
+QUEUE_FILE = "queue.json"
+MQTT_PORT = os.environ.get("MQTT_PORT", 1883)
+MQTT_BROKER = os.environ.get("MQTT_BROKER", "mqtt.cybtr.com")

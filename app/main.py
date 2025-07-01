@@ -36,6 +36,7 @@ from app.core.database import session_manager, pgvector_session_manager
 from app.core.exceptions import DatabaseException, DuplicateValueException
 from app.retrieval.vector_store import vector_store_service
 from app.retrieval.chain import chain_service
+from app.services.mqtt_worker import mqtt_loop
 
 print(
     rf"""
@@ -73,7 +74,7 @@ async def lifespan(app: FastAPI):
         checkpointer = AsyncPostgresSaver(pool)
         await checkpointer.setup()
         chain_service.set_checkpointer(checkpointer)
-
+        mqtt_task = asyncio.create_task(mqtt_loop())
         try:
             yield {"pool": pool}
         finally:
@@ -121,32 +122,6 @@ app.include_router(chat.router, prefix="/chat", tags=["chat"])
 app.include_router(opportunity.router, prefix="/opportunity", tags=["opportunity"])
 app.include_router(collection.router, prefix="/collection", tags=["collection"])
 app.include_router(feedback.router, prefix="/feedback", tags=["feedback"])
-
-
-# @app.get("/uploads/{filename}")
-# async def get_file(filename: str, request: Request):
-#     file_path = os.path.join(UPLOAD_DIR, filename)
-#     print("file_path")
-#     print(file_path)
-#     # if not os.path.exists(file_path):
-#     #     raise HTTPException(status_code=404, detail="File not found")
-#     # # return FileResponse(path=file_path, media_type="application/pdf")
-#     # response = FileResponse(file_path, media_type="application/pdf")
-#     # # Manually add CORS headers
-#     # origin = request.headers.get("origin")
-#     # if origin:
-#     #     response.headers["Access-Control-Allow-Origin"] = origin
-#     #     response.headers["Access-Control-Allow-Credentials"] = "true"
-#     # return response
-
-#     if not isfile(file_path):
-#         return Response(status_code=404)
-
-#     with open(file_path) as f:
-#         content = f.read()
-
-#     content_type, _ = guess_type(file_path)
-#     return Response(content, media_type=content_type)
 
 
 @app.exception_handler(RequestValidationError)
