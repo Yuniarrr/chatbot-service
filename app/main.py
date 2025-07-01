@@ -36,7 +36,7 @@ from app.core.database import session_manager, pgvector_session_manager
 from app.core.exceptions import DatabaseException, DuplicateValueException
 from app.retrieval.vector_store import vector_store_service
 from app.retrieval.chain import chain_service
-from app.services.mqtt_worker import mqtt_loop
+from app.services.mqtt_responder import mqtt_loop
 
 print(
     rf"""

@@ -52,7 +52,8 @@ def on_message(client, userdata, msg):
 
 
 client.on_connect = on_connect
-client.on_message = on_message
+client.loop_start()
+# client.on_message = on_message
 
 
 async def process_with_ai(message: str, sender: str):
