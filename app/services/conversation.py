@@ -3,6 +3,7 @@ from typing import Optional
 
 from sqlalchemy.future import select
 from sqlalchemy.sql import or_, join, desc
+from datetime import datetime, time, timezone, timedelta
 
 from app.core.database import session_manager
 from app.models.conversations import (
@@ -257,6 +258,33 @@ class ConversationService:
                 await conversations.db_delete(
                     db=db, user_id=user_id, allow_multiple=True
                 )
+        except Exception as e:
+            raise DatabaseException(str(e))
+
+    async def get_today_conversation_by_sender(self, sender: str):
+        try:
+            async with session_manager.session() as db:
+                today_start = datetime.now().replace(
+                    hour=0, minute=0, second=0, microsecond=0
+                )
+
+                query = (
+                    select(Conversation)
+                    .where(
+                        Conversation.sender == sender,
+                        Conversation.created_at >= today_start,
+                    )
+                    .order_by(desc(Conversation.created_at))
+                    .limit(1)
+                )
+
+                result = await db.execute(query)
+                conversation = result.scalar_one_or_none()
+
+                if not conversation:
+                    return None
+
+                return ConversationReadModel.model_validate(conversation)
         except Exception as e:
             raise DatabaseException(str(e))
 

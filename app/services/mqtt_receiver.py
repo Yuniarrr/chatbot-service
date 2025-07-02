@@ -33,7 +33,9 @@ async def handle_message(message):
             if nomor.startswith("62"):
                 nomor = "0" + nomor[2:]
 
-            conversation = await conversation_service.get_one_conversation_by_sender(nomor)
+            conversation = await conversation_service.get_today_conversation_by_sender(
+                nomor
+            )
 
             if conversation is None:
                 conversation = await conversation_service.create_new_conversation(
@@ -70,4 +72,4 @@ async def mqtt_receiver_loop():
         print(f"📡 Subscribed to topic: {MQTT_RECV_TOPIC}")
 
         async for message in client.messages:
-            asyncio.create_task(handle_message(message)) 
+            asyncio.create_task(handle_message(message))
