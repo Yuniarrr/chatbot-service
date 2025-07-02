@@ -75,11 +75,13 @@ async def lifespan(app: FastAPI):
         checkpointer = AsyncPostgresSaver(pool)
         await checkpointer.setup()
         chain_service.set_checkpointer(checkpointer)
-        mqtt_task = asyncio.create_task(mqtt_responder_loop())
-        mqtt_receiver_task = asyncio.create_task(mqtt_receiver_loop())
+        app.state._mqtt_receiver = asyncio.create_task(mqtt_receiver_loop())
+        app.state._mqtt_responder = asyncio.create_task(mqtt_responder_loop())
         try:
             yield {"pool": pool}
         finally:
+            app.state._mqtt_receiver.cancel()
+            app.state._mqtt_responder.cancel()
             await session_manager.close()
             await pgvector_session_manager.close()
 

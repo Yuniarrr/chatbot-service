@@ -18,7 +18,7 @@ from app.env import (
     MQTT_BROKER,
     MQTT_PORT,
 )
-from app.queue import add_to_queue, get_from_queue, pop_batch, pop_next, message_queue
+from app.queue import get_from_queue, pop_batch, pop_next, message_queue
 from app.retrieval.chain import chain_service
 from app.services.message import message_service
 
@@ -159,16 +159,12 @@ async def mqtt_responder_loop():
                 asyncio.create_task(worker(client, i)) for i in range(MAX_WORKERS)
             ]
 
-            # Worker pool jalan terus...
-            await message_queue.join()  # tunggu antrian kosong
+            print(f"[Worker-{id}] Queue size: {message_queue.qsize()}")
 
-            # (opsional) cancel semua worker jika sudah selesai
-            for w in workers:
-                w.cancel()
-
+            await asyncio.gather(*workers)
     except MqttError as error:
         print(f"❌ MQTT error: {error}")
 
 
-if __name__ == "__main__":
-    asyncio.run(mqtt_responder_loop())
+# if __name__ == "__main__":
+#     asyncio.run(mqtt_responder_loop())
