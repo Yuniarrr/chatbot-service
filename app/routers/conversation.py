@@ -64,7 +64,7 @@ async def get_conversation(
     limit: int = Query(10, ge=1),
 ):
     try:
-        if param.startswith("whatsapp"):
+        if param.startswith("whatsapp") or param.startswith("08"):
             conversations = await conversation_service.get_conversation_by_sender(
                 sender=param, skip=skip, limit=limit
             )

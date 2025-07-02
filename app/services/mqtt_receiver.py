@@ -39,18 +39,13 @@ async def handle_message(message):
                 conversation = await conversation_service.create_new_conversation(
                     title="Chat from WhatsApp", sender=nomor
                 )
-            
-            print("conversation.id")
-            print(str(conversation.id))
 
             add_to_queue(
                 {"nomor": nomor, "isi": isi, "conversation_id": str(conversation.id)}
             )
-            
-            print('pass add to queue')
 
             _new_chat_from_user = MessageCreateModel(
-                message=payload,
+                message=isi,
                 conversation_id=str(conversation.id),
                 from_message=FromMessage.USER,
             )
