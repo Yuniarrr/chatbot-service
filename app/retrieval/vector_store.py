@@ -64,7 +64,7 @@ class VectorStore:
         print("Initialize embedding model...")
         print(sentence_transformers_home)
         self._embedding_model = HuggingFaceEmbeddings(
-            model_name=sentence_transformers_home
+            model_name=sentence_transformers_home, model_kwargs={"device": "cuda"}
         )
         print("Successfully initialize embedding model")
 
@@ -397,7 +397,7 @@ class VectorStore:
 
         # return reranked_docs
 
-        reranker = AsyncCrossEncoderReranker(device="cpu")
+        reranker = AsyncCrossEncoderReranker(device="cuda")
         reranked_texts = await reranker.rerank(
             query=query,
             documents=[doc.page_content for doc in initial_docs],
