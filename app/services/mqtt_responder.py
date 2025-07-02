@@ -91,7 +91,7 @@ async def mqtt_responder_loop():
 
             while True:
                 msg = pop_next()
-                print(f"{time.time()} ~ 👀 Checking queue entry: {msg}")
+                print(f"{datetime.now().strftime('%Y-%m-%d %H:%M:%S')} ~ 👀 Checking queue entry: {msg}")
                 if msg:
                     nomor = msg["nomor"].strip()
                     conversation_id = msg["conversation_id"].strip()

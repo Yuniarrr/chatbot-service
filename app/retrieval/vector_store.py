@@ -64,7 +64,7 @@ class VectorStore:
         print("Initialize embedding model...")
         print(sentence_transformers_home)
         self._embedding_model = HuggingFaceEmbeddings(
-            model_name=sentence_transformers_home, model_kwargs={"device": "cuda"}
+            model_name=sentence_transformers_home
         )
         print("Successfully initialize embedding model")
 
