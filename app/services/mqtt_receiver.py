@@ -10,6 +10,9 @@ from app.env import (
     MQTT_PORT,
 )
 from app.queue import add_to_queue, pop_next, load_queue
+from app.services.conversation import conversation_service
+from app.models.messages import FromMessage, MessageCreateModel
+from app.services.message import message_service
 
 
 # Saat berhasil terhubung ke broker
@@ -23,7 +26,7 @@ def on_connect(client, userdata, flags, rc):
 
 
 # Saat menerima pesan
-def on_message(client, userdata, msg):
+async def on_message(client, userdata, msg):
     try:
         message = msg.payload.decode()
         print(f"\n📩 [INCOMING] {message}")
@@ -41,7 +44,28 @@ def on_message(client, userdata, msg):
             if nomor.startswith("62"):
                 nomor = "0" + nomor[2:]
 
-            add_to_queue({"nomor": nomor, "isi": isi})
+            conversation = await conversation_service.get_one_conversation_by_sender(
+                nomor
+            )
+
+            if conversation is None:
+                conversation = await conversation_service.create_new_conversation(
+                    title="Chat from WhatsApp", sender=nomor
+                )
+
+            add_to_queue(
+                {"nomor": nomor, "isi": isi, "conversation_id": conversation.id}
+            )
+
+            _new_chat_from_user = MessageCreateModel(
+                **{
+                    "message": message,
+                    "conversation_id": str(conversation.id),
+                    "from_message": FromMessage.USER,
+                }
+            )
+            await message_service.create_new_message(_new_chat_from_user)
+
             print(f"📥 [QUEUED] {nomor} : {isi}")
         else:
             print("⚠️ Format pesan tidak sesuai")

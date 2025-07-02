@@ -154,7 +154,7 @@ def add_to_calendar(
     BASE_DIR = os.path.dirname(
         os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     )
-    TOKEN_PATH = os.path.join(BASE_DIR, "token.json")  # <-- token, NOT credentials
+    TOKEN_PATH = os.path.join(BASE_DIR, "token.json")
     CREDENTIALS_PATH = os.path.join(BASE_DIR, "credentials.json")
 
     print("TOKEN_PATH")

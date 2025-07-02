@@ -4,6 +4,7 @@ import hashlib
 import json
 from datetime import datetime
 from typing import List
+from app.models.messages import FromMessage, MessageCreateModel
 from langchain_core.messages import HumanMessage, AIMessage, SystemMessage, BaseMessage
 import paho.mqtt.client as mqtt
 
@@ -17,6 +18,7 @@ from app.env import (
 )
 from app.queue import add_to_queue, pop_next
 from app.retrieval.chain import chain_service
+from app.services.message import message_service
 
 client = mqtt.Client()
 client.username_pw_set(MQTT_USERNAME, MQTT_PASSWORD)
@@ -56,57 +58,69 @@ client.on_connect = on_connect
 client.loop_start()
 # client.on_message = on_message
 
-def limit_conversation_messages(messages: List[BaseMessage], max_count: int = 3) -> List[BaseMessage]:
+
+def limit_conversation_messages(
+    messages: List[BaseMessage], max_count: int = 3
+) -> List[BaseMessage]:
     """
     Fungsi helper untuk membatasi pesan percakapan
     """
     if len(messages) <= max_count:
         return messages
-    
+
     # Pisahkan system messages dan messages lainnya
     system_messages = [msg for msg in messages if isinstance(msg, SystemMessage)]
     other_messages = [msg for msg in messages if not isinstance(msg, SystemMessage)]
-    
+
     # Ambil pesan terakhir sesuai limit (tidak termasuk system messages)
     recent_messages = other_messages[-max_count:]
-    
+
     return system_messages + recent_messages
 
-async def process_with_ai(message: str, sender: str, max_recent_messages: int = 3):
+
+async def process_with_ai(
+    message: str, sender: str, conversation_id: str, max_recent_messages: int = 3
+):
     start_time = time.time()
-    conversation_id = hashlib.md5(sender.encode()).hexdigest()
+    # conversation_id = hashlib.md5(sender.encode()).hexdigest()
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    
+
     config = {"configurable": {"thread_id": conversation_id}}
-    agent_executor = chain_service.create_agent("openai")
+    agent_executor = chain_service.create_agent("qwen")
 
     try:
         # Ambil state saat ini untuk mendapatkan riwayat pesan
         current_state = await agent_executor.aget_state(config)
         existing_messages = current_state.values.get("messages", [])
-        
+
         # Buat pesan baru
         content_blocks = [{"type": "text", "text": message}]
         new_message = HumanMessage(content=content_blocks)
-        
+
         # Gabungkan dengan pesan yang ada
         all_messages = existing_messages + [new_message]
-        
+
         # LIMIT PESAN: Hanya ambil pesan terakhir
-        limited_messages = limit_conversation_messages(all_messages, max_recent_messages)
-        
+        limited_messages = limit_conversation_messages(
+            all_messages, max_recent_messages
+        )
+
         # Tambahkan system message dengan info terbaru
         system_msg = SystemMessage(content=f"Sender: {sender}. Timestamp: {now}.")
-        final_messages = [system_msg] + [msg for msg in limited_messages if not isinstance(msg, SystemMessage)]
-        
-        print(f"Sending {len(final_messages)} messages to agent (limited from {len(all_messages)})")
-        
+        final_messages = [system_msg] + [
+            msg for msg in limited_messages if not isinstance(msg, SystemMessage)
+        ]
+
+        print(
+            f"Sending {len(final_messages)} messages to agent (limited from {len(all_messages)})"
+        )
+
         # Invoke dengan pesan yang sudah dibatasi
         response = await agent_executor.ainvoke(
             {"messages": final_messages},
             config,
         )
-        
+
     except Exception as e:
         print(f"Error getting conversation history: {e}")
         # Fallback: kirim hanya pesan baru
@@ -115,7 +129,7 @@ async def process_with_ai(message: str, sender: str, max_recent_messages: int = 
             SystemMessage(content=f"Sender: {sender}. Timestamp: {now}."),
             HumanMessage(content=content_blocks),
         ]
-        
+
         response = await agent_executor.ainvoke(
             {"messages": messages},
             config,
@@ -138,13 +152,16 @@ async def mqtt_loop():
         msg = pop_next()
         if msg:
             nomor = msg["nomor"].strip()
+            conversation_id = msg["conversation_id"].strip()
             isi = msg["isi"].strip()
 
             if not isi:
                 continue
 
             try:
-                ai_contents, duration = await process_with_ai(isi, nomor)
+                ai_contents, duration = await process_with_ai(
+                    isi, nomor, conversation_id
+                )
                 answer = f"{nomor} << {ai_contents[-1] if ai_contents else '(kosong)'}"
                 answer_duration = (
                     f"{nomor} << Total processing time: {duration:.2f} seconds"
@@ -157,6 +174,15 @@ async def mqtt_loop():
                     print(f"🔁 [REPLIED] {answer}")
                 else:
                     print(f"❌ Gagal kirim (rc={result.rc})")
+
+                _new_chat_from_assistant = MessageCreateModel(
+                    **{
+                        "message": ai_contents[-1] if ai_contents else "(kosong)",
+                        "conversation_id": str(conversation_id),
+                        "from_message": FromMessage.BOT,
+                    }
+                )
+                await message_service.create_new_message(_new_chat_from_assistant)
             except Exception as e:
                 print("❗ Error:", e)
                 fallback = f"{nomor} << Terjadi kesalahan sistem."
