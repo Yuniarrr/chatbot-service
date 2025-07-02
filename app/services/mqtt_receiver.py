@@ -42,7 +42,7 @@ async def handle_message(message):
                     title="Chat from WhatsApp", sender=nomor
                 )
 
-            add_to_queue(
+            await add_to_queue(
                 {"nomor": nomor, "isi": isi, "conversation_id": str(conversation.id)}
             )
 

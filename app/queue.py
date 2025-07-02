@@ -31,10 +31,10 @@ def save_queue(queue):
         json.dump(queue, f, indent=2)
 
 
-def add_to_queue(entry):
-    queue = load_queue()
-    queue.append(entry)
-    save_queue(queue)
+# def add_to_queue(entry):
+#     queue = load_queue()
+#     queue.append(entry)
+#     save_queue(queue)
 
 
 def pop_next():
