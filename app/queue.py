@@ -1,7 +1,22 @@
 import os
 import json
+from collections import deque
 
 from app.env import QUEUE_FILE
+
+queue_collections = deque()
+
+import asyncio
+
+message_queue = asyncio.Queue()
+
+
+async def add_to_queue(msg):
+    await message_queue.put(msg)
+
+
+async def get_from_queue():
+    return await message_queue.get()
 
 
 def load_queue():
@@ -29,3 +44,10 @@ def pop_next():
         save_queue(queue)
         return next_msg
     return None
+
+
+def pop_batch(n):
+    items = []
+    while queue_collections and len(items) < n:
+        items.append(queue_collections.popleft())
+    return items
